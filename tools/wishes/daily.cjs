@@ -78,7 +78,7 @@ function buildOne(cfg, wt, w) {
       '--settings', JSON.stringify(settings), '--append-system-prompt-file', path.join(__dirname, 'builder.md'), '--model', cfg.builderModel,
       '--output-format', 'json', '--no-session-persistence', '--json-schema', JSON.stringify(BUILD_SCHEMA)], { cwd: wt, input, minutes: cfg.builderMinutes });
     res = j.structured_output || JSON.parse(j.result);
-    res.cost = j.total_cost_usd; res.turns = j.num_turns; res.denied = (j.permission_denials || []).map((d) => d.tool_input && (d.tool_input.command || d.tool_input.file_path)).filter(Boolean).slice(0, 10);
+    res.cost = j.total_cost_usd; res.turns = j.num_turns; res.denied = (j.permission_denials || []).map((d) => d.tool_input && String(d.tool_input.command || d.tool_input.file_path || '').replace(/\s+/g, ' ').slice(0, 120)).filter(Boolean).slice(0, 10);
   } catch (e) { res.notes = `builder crashed or timed out: ${e.message}`.slice(0, 600); }
   res.minutes = Math.round((Date.now() - t0) / 6e3) / 10;
   // our own check, whatever the agent said
@@ -133,7 +133,7 @@ function report(st) {
     if (r.notes) L.push(`- Builder notes: ${r.notes}`);
     L.push(`- Check: ${r.check}. ${r.minutes} min${r.cost ? `, $${r.cost.toFixed(2)}` : ''}${r.stat ? `. ${r.stat}` : ''}`);
     if (r.files) L.push(`- Files: ${r.files.join(', ')}`);
-    if (r.denied && r.denied.length) L.push(`- Blocked actions: ${r.denied.join('; ')}`);
+    if (r.denied && r.denied.length) L.push(`- Blocked actions (${r.denied.length}): ${r.denied.map((d) => `\`${d.replace(/`/g, "'")}\``).join(', ')}`);
     L.push('');
   }
   const section = (title, list, f) => { if (!list.length) return; L.push(`## ${title}`, ''); for (const w of list) L.push(`- #${w.id} (${w.votes} votes) ${w.name}: "${w.text.replace(/\n+/g, ' ').slice(0, 140)}" - ${f(w)}`); L.push(''); };

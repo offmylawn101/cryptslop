@@ -98,7 +98,8 @@ const ALLOWED_PATHS = [/^src\//, /^tests\/[\w-]+\.test\.mjs$/, /^web\/models\//,
 function scanDiff(cwd, base) {
   const files = git(['diff', '--name-only', `${base}..HEAD`], cwd).split('\n').filter(Boolean);
   const badPaths = files.filter((f) => !ALLOWED_PATHS.some((re) => re.test(f)));
-  const added = git(['diff', '-U0', `${base}..HEAD`, '--', 'src', 'tests'], cwd, { maxBuffer: 64 << 20 }).split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'));
+  // only code that ships to players is scanned (tests run in check.cjs's sandbox)
+  const added = git(['diff', '-U0', `${base}..HEAD`, '--', 'src', 'web/index.html'], cwd, { maxBuffer: 64 << 20 }).split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'));
   const flags = [];
   for (const [re, what] of CODE_RED_FLAGS) {
     const hits = added.filter((l) => re.test(l));
