@@ -125,4 +125,26 @@ function claude(args, { cwd, input, minutes = 10, env } = {}) {
   return j;
 }
 
-module.exports = { ROOT, WORKTREES, STATE_DIR, CONFIG_FILE, CHECK, DEFAULTS, config, saveConfig, today, api, git, loadState, saveState, statePath, latestPending, SPEC_RED_FLAGS, scanDiff, claude, ALLOWED_PATHS };
+// the in-game CHANGELOG (src/changelog.js): its data sits between two markers as plain JSON
+const CHANGELOG_FILE = path.join(ROOT, 'src', 'changelog.js');
+const CL_START = '/* CHANGELOG-JSON-START */', CL_END = '/* CHANGELOG-JSON-END */';
+function readChangelog() {
+  const src = fs.readFileSync(CHANGELOG_FILE, 'utf8');
+  const a = src.indexOf(CL_START), b = src.indexOf(CL_END);
+  if (a < 0 || b < 0) throw new Error('changelog markers not found');
+  const block = src.slice(a + CL_START.length, b);
+  const json = block.slice(block.indexOf('['), block.lastIndexOf(']') + 1);
+  return { src, list: JSON.parse(json), a, b: b + CL_END.length };
+}
+function addChangelog({ title, by = [], items = [], at }) {
+  const { src, list, a, b } = readChangelog();
+  const last = list[list.length - 1];
+  const [maj, min] = String(last ? last.v : '0.0').split('.').map((n) => Number(n) || 0);
+  const e = { v: `${maj}.${min + 1}`, at: at || new Date().toISOString().replace(/\.\d+Z$/, 'Z'), title: String(title).toUpperCase(), by: [...new Set(by.map(String).filter(Boolean))], items: items.map((s) => String(s).toUpperCase()) };
+  list.push(e);
+  const body = `${CL_START}\nexport const CHANGELOG = [\n${list.map((x) => `  ${JSON.stringify(x)}`).join(',\n')}\n];\n${CL_END}`;
+  fs.writeFileSync(CHANGELOG_FILE, src.slice(0, a) + body + src.slice(b));
+  return e;
+}
+
+module.exports = { readChangelog, addChangelog, ROOT, WORKTREES, STATE_DIR, CONFIG_FILE, CHECK, DEFAULTS, config, saveConfig, today, api, git, loadState, saveState, statePath, latestPending, SPEC_RED_FLAGS, scanDiff, claude, ALLOWED_PATHS };

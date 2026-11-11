@@ -9,6 +9,7 @@ import { installClasses2 } from './classes2.js';
 import { installPorridge } from './porridge.js';
 import { installWishes } from './wishes.js';
 import { installShapeFx } from './shapefx.js';
+import { installChangelog } from './changelogUI.js';
 import { installBugsClient } from './bugs.js';
 import { installBestiaryClient } from './bestiary.js';
 import { installRooftopsClient } from './rooftops.js';
@@ -255,6 +256,7 @@ export class Game {
     });
     c.addEventListener('wheel', (e) => {
       if (this.locked && !this.casino.open && !this.console.open) { this.wheelJump = 0.06; e.preventDefault(); }
+      else if (!this.locked && this.ui.onWheel && this.ui.onWheel(e)) e.preventDefault(); // scrolling the changelog
     }, { passive: false });
     c.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('keydown', (e) => {
@@ -2911,6 +2913,7 @@ installPorridge(Game); // the PIXEL PORRIDGE EXCLUSIVE SHOP and its flair (porri
 installRooftopsClient(Game, UI); // rooftop events, fake hives, shacks, missiles, wire puzzles (rooftops.js)
 installBestiaryClient(Game, UI); // the deep floors' foes: models, looks, warnings, frozen floors (bestiary.js)
 installBugsClient(Game); // the looks of the reworked bugs (bugs.js; the host side installs itself in sim.js)
+installChangelog(UI); // the CHANGELOG in the title screen's left column (changelog.js, changelogUI.js)
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)

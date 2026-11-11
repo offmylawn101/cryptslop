@@ -56,6 +56,12 @@ async function main() {
     if (m.status !== 0) { spawnSync('git', ['merge', '--abort'], { cwd: C.ROOT }); fail(`merge conflict with live edits; resolve by hand (git merge ${st.branch}):\n${m.stdout}${m.stderr}`); }
     console.log(`merged ${built.length} wish(es) into main`);
     st.phase = 'merged'; C.saveState(st);
+    // the in-game CHANGELOG: one entry for the day, crediting every player whose wish was built
+    try {
+      const names = built.map((r) => st.picked.find((p) => p.id === r.id).name);
+      const e = C.addChangelog({ title: `WISHES OF ${st.date}`, by: names, items: built.map((r) => r.summary || st.picked.find((p) => p.id === r.id).title) });
+      console.log(`changelog V${e.v} added`);
+    } catch (e) { console.log(`changelog not updated: ${e.message}`); }
     const ap = spawnSync(process.execPath, [path.join(C.ROOT, 'tools', 'autopush.cjs')], { cwd: C.ROOT, encoding: 'utf8', timeout: 900e3 });
     const msg = (String(ap.stdout).match(/"systemMessage":"([^"]*)"/) || [])[1] || ap.stdout || ap.stderr;
     console.log(`autopush: ${msg}`);
