@@ -38,7 +38,7 @@ export function startLocal({ port = 8787, db = ':memory:', admin = 'local-admin-
     res.writeHead(out.status, headers);
     res.end(Buffer.from(await out.arrayBuffer()));
   });
-  return new Promise((resolve) => server.listen(port, () => {
+  return new Promise((resolve) => server.listen(port, '127.0.0.1', () => { // this PC only: DEV mode trusts made-up tokens
     if (!quiet) console.log(`Petition Bee (local, DEV) on http://localhost:${port}  admin token: ${admin}`);
     resolve({ server, env, close: () => new Promise((r) => { server.close(() => { env.DB.close(); r(); }); }) });
   }));

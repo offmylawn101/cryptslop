@@ -1,9 +1,9 @@
 // Build the game and run its tests inside a wish worktree, safely. The builder agent may run exactly
 // this command (it lives in the main checkout, outside the worktree, so the agent cannot change it):
-//   node C:/Users/npart/crypthop/tools/wishes/check.cjs
+//   node <path to the main checkout>/tools/wishes/check.cjs   (daily.cjs gives the builder the full path)
 // - the bundle is built with the MAIN checkout's esbuild (the worktree's copy could have been edited)
-// - every tests/*.test.mjs runs under Node's permission model: it can read and write only the
-//   worktree, cannot start processes, and gets a scrubbed environment (no home folder, no logins)
+// - every tests/*.test.mjs runs under Node's permission model: it can only read the worktree (no
+//   writing anywhere), cannot start processes, and gets a scrubbed environment (no home folder, no logins)
 // Exit 0 when the build and every test pass.
 const fs = require('fs');
 const path = require('path');
@@ -35,7 +35,7 @@ const env = { PATH: process.env.PATH || '', SystemRoot: process.env.SystemRoot |
 const only = process.argv[2];
 const tests = fs.readdirSync(path.join(wt, 'tests')).filter((f) => /^[\w-]+\.test\.mjs$/.test(f) && (!only || f.includes(only))).sort();
 for (const t of tests) {
-  const r = spawnSync(process.execPath, ['--permission', `--allow-fs-read=${wt}`, `--allow-fs-write=${wt}`, path.join('tests', t)], { cwd: wt, env, encoding: 'utf8', timeout: 300e3, maxBuffer: 32 << 20, windowsHide: true });
+  const r = spawnSync(process.execPath, ['--permission', `--allow-fs-read=${wt}`, path.join('tests', t)], { cwd: wt, env, encoding: 'utf8', timeout: 300e3, maxBuffer: 32 << 20, windowsHide: true });
   if (r.status === 0) console.log(`PASS tests/${t}`);
   else {
     failed++;

@@ -136,7 +136,11 @@ async function player(req, env) {
 
 function isAdmin(req, env) {
   const h = req.headers.get('Authorization') || '';
-  return !!env.ADMIN_TOKEN && env.ADMIN_TOKEN.length >= 24 && h === `Bearer ${env.ADMIN_TOKEN}`;
+  const want = `Bearer ${env.ADMIN_TOKEN || ''}`;
+  if (!env.ADMIN_TOKEN || env.ADMIN_TOKEN.length < 24 || h.length !== want.length) return false;
+  let diff = 0; // constant time: how long the check takes says nothing about the token
+  for (let i = 0; i < want.length; i++) diff |= want.charCodeAt(i) ^ h.charCodeAt(i);
+  return diff === 0;
 }
 
 async function body(req) { try { return await req.json(); } catch (e) { return {}; } }

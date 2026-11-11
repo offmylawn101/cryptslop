@@ -67,6 +67,13 @@ function moderate(cfg, wishes) {
 
 function sh(cmd, argv, cwd) { return spawnSync(cmd, argv, { cwd, encoding: 'utf8', timeout: 900e3, maxBuffer: 64 << 20, windowsHide: true }); }
 
+// builder.md with this PC's path to check.cjs filled in (the file in the repo has no paths)
+function builderPrompt() {
+  const out = path.join(dir, 'builder.md');
+  fs.writeFileSync(out, fs.readFileSync(path.join(__dirname, 'builder.md'), 'utf8').split('{{CHECK}}').join(C.CHECK));
+  return out;
+}
+
 function buildOne(cfg, wt, w) {
   const before = C.git(['rev-parse', 'HEAD'], wt);
   const settings = { permissions: { allow: [`Bash(node ${C.CHECK})`, `Bash(node ${C.CHECK} *)`] } };
@@ -75,7 +82,7 @@ function buildOne(cfg, wt, w) {
   const t0 = Date.now();
   try {
     const j = C.claude(['-p', '--restricted', '--tools', 'Read,Edit,Write,Glob,Grep,Bash', '--permission-mode', 'acceptEdits', '--permission-prompts', 'none',
-      '--settings', JSON.stringify(settings), '--append-system-prompt-file', path.join(__dirname, 'builder.md'), '--model', cfg.builderModel,
+      '--settings', JSON.stringify(settings), '--append-system-prompt-file', builderPrompt(), '--model', cfg.builderModel,
       '--output-format', 'json', '--no-session-persistence', '--json-schema', JSON.stringify(BUILD_SCHEMA)], { cwd: wt, input, minutes: cfg.builderMinutes });
     res = j.structured_output || JSON.parse(j.result);
     res.cost = j.total_cost_usd; res.turns = j.num_turns; res.denied = (j.permission_denials || []).map((d) => d.tool_input && String(d.tool_input.command || d.tool_input.file_path || '').replace(/\s+/g, ' ').slice(0, 120)).filter(Boolean).slice(0, 10);

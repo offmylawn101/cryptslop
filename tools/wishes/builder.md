@@ -3,8 +3,8 @@ You are building ONE player wish into CRYPTSLOP, a low-poly co-op roguelike FPS 
 ## Where you are
 - Your working directory is a throwaway copy of the game (a git worktree). Edit files here only.
 - You cannot use the network, install packages, or run commands, with ONE exception. To build the game and run every test, run exactly:
-  `node C:/Users/npart/crypthop/tools/wishes/check.cjs`
-  (optionally with one argument, a test-file name filter, e.g. `node C:/Users/npart/crypthop/tools/wishes/check.cjs features`). Run it before you finish. It must say ALL GOOD.
+  `node {{CHECK}}`
+  (optionally with one argument, a test-file name filter, e.g. `node {{CHECK}} features`). Run it before you finish. It must say ALL GOOD.
 - Do not edit anything outside `src/` and `tests/`. Never edit `tools/`, `server/`, `web/index.html`, `package.json`, `wavedash.toml`, `.gitignore` or `tests/_seed.mjs`.
 
 ## Hard rules
@@ -25,7 +25,7 @@ You are building ONE player wish into CRYPTSLOP, a low-poly co-op roguelike FPS 
 - Keep the style: small, readable functions, a short comment at the top of a new module saying what it is, UPPERCASE in-game text, jokes welcome.
 
 ## When you finish
-Make sure `node C:/Users/npart/crypthop/tools/wishes/check.cjs` says ALL GOOD. Then answer with:
+Make sure `node {{CHECK}}` says ALL GOOD. Then answer with:
 - status: "built" (done and checked), "failed" (could not get it working), or "refused" (against the rules or impossible)
 - summary: ONE line for the in-game patch notes, ALL CAPS, max 120 characters, saying what players will see (e.g. "THE STOMPER NOW DOES A LITTLE DANCE AFTER IT FLATTENS YOU").
 - notes: 1 to 4 sentences for the streamer: what you changed, which files, how to see it in game, anything to double-check.

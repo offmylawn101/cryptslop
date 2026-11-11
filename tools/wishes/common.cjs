@@ -90,7 +90,8 @@ const CODE_RED_FLAGS = [
   [/getUserJwt/, 'reads the Wavedash login token'], [/document\.cookie/, 'cookies'], [/https?:\/\//, 'a URL'],
   [/\.(innerHTML|outerHTML)\s*=/, 'innerHTML (injection risk)'], [/insertAdjacentHTML|document\.write/, 'raw HTML'],
   [/window\.open|location\.(href|assign|replace)\s*=/, 'navigates the page'], [/\bWorker\s*\(|importScripts/, 'web worker'],
-  [/WebAssembly/, 'WebAssembly'], [/atob\s*\(|String\.fromCharCode\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+/, 'encoded strings'],
+  [/WebAssembly/, 'WebAssembly'], [/child_process|\bspawn\(|\bexecSync|\bexecFile/, 'starts programs'], [/process\.env/, 'reads environment variables'],
+  [/writeFile|appendFile|createWriteStream|unlink|rmSync|mkdirSync/, 'writes or deletes files'], [/homedir|USERPROFILE|APPDATA|\.ssh|\.cargo|\.cryptslop/, 'looks in your home folder'], [/atob\s*\(|String\.fromCharCode\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+/, 'encoded strings'],
 ];
 // what a day's wishes may change. Anything else needs a human to say so.
 const ALLOWED_PATHS = [/^src\//, /^tests\/[\w-]+\.test\.mjs$/, /^web\/models\//, /^web\/audio\//];
@@ -98,8 +99,8 @@ const ALLOWED_PATHS = [/^src\//, /^tests\/[\w-]+\.test\.mjs$/, /^web\/models\//,
 function scanDiff(cwd, base) {
   const files = git(['diff', '--name-only', `${base}..HEAD`], cwd).split('\n').filter(Boolean);
   const badPaths = files.filter((f) => !ALLOWED_PATHS.some((re) => re.test(f)));
-  // only code that ships to players is scanned (tests run in check.cjs's sandbox)
-  const added = git(['diff', '-U0', `${base}..HEAD`, '--', 'src', 'web/index.html'], cwd, { maxBuffer: 64 << 20 }).split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'));
+  // the game code and the tests (tests also run on this PC when the day is uploaded)
+  const added = git(['diff', '-U0', `${base}..HEAD`, '--', 'src', 'tests', 'web/index.html'], cwd, { maxBuffer: 64 << 20 }).split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'));
   const flags = [];
   for (const [re, what] of CODE_RED_FLAGS) {
     const hits = added.filter((l) => re.test(l));

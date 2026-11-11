@@ -21,11 +21,11 @@ http.createServer((req, res) => {
   }
   const url = decodeURIComponent((req.url || '/').split('?')[0]);
   const file = path.normalize(path.join(root, url === '/' ? 'index.html' : url));
-  if (!file.startsWith(root)) { res.writeHead(403); return res.end(); }
+  if (file !== root && !file.startsWith(root + path.sep)) { res.writeHead(403); return res.end(); } // never outside web/
   fs.readFile(file, (err, data) => {
     const headers = { 'Cross-Origin-Embedder-Policy': 'require-corp', 'Cross-Origin-Opener-Policy': 'same-origin', 'Cache-Control': 'no-store' };
     if (err) { res.writeHead(404, headers); return res.end('not found'); }
     res.writeHead(200, { ...headers, 'Content-Type': types[path.extname(file)] || 'application/octet-stream' });
     res.end(data);
   });
-}).listen(port, () => console.log(`Cryptslop dev server: http://localhost:${port}`));
+}).listen(port, process.env.HOST || '127.0.0.1', () => console.log(`Cryptslop dev server: http://localhost:${port}`)); // this PC only (HOST=0.0.0.0 to test from a phone on your network)
