@@ -34,7 +34,7 @@ export const GATE_KINDS = {
   nest: { name: 'HIGH NEST', hint: 'WALL-JUMP UP THE LEDGE' },
 };
 export const NEST_H = 3.0;
-export const PROP_KINDS = ['slots', 'wheel', 'derby', 'booth', 'typing']; // the HONEY SHOP opens in the boss room once the boss is dead (economy.js)
+export const PROP_KINDS = ['petition', 'slots', 'wheel', 'derby', 'booth', 'typing']; // petition: the PETITION BEE (wishes.js) // the HONEY SHOP opens in the boss room once the boss is dead (economy.js)
 
 // REAL ROOMS: from floor 5, half the floors have real-life rooms. Then a coin flip: some hive rooms are
 // replaced by real ones, or the hive grows an artificial HALLWAY made only of real rooms. Only RANDOMLINGS live there.

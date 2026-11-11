@@ -52,13 +52,16 @@ async function boot() {
     game.makeOnlineNet();
     WD.readyForEvents();
     // CLOUD SAVES: pull the profile down and merge it in (a new build can start with empty storage)
-    if (game.cloud) game.cloud.pull().then((changed) => { if (changed) game.reloadProfile(); game.persist(true); }).catch(() => {});
+    if (game.cloud) game.cloud.pull().then((changed) => { if (changed) game.reloadProfile(); game.persist(true); }).catch(() => {}).finally(() => game.checkWishNews());
+    else game.checkWishNews();
     // followed an invite link? jump straight into that lobby
     try {
       const params = WD.getLaunchParams() || {};
       if (params.lobby) game.joinCoop(params.lobby);
     } catch (e) { /* ignore */ }
   }
+
+  if (!WD) game.checkWishNews(); // the local build: the local Petition Bee server
 
   window.addEventListener('beforeunload', () => {
     try { game.stats.commit(); game.persist(true); } catch (e) { /* ignore */ }

@@ -21,8 +21,10 @@ export const FLAIR = {
   wings: { name: 'PREMIUM WINGS', cost: 30000, kind: 'back', desc: 'GOLD GLASS WINGS. THEY DO NOT FLY. THEY FLAP' },
   cloud: { name: 'STORMCLOUD OF REGRET', cost: 40000, kind: 'head', desc: 'A SMALL CLOUD THAT RAINS ON YOU, PERSONALLY' },
   plinth: { name: 'THE PEDESTAL', cost: 50000, kind: 'feet', desc: 'A GOLD PLINTH UNDER YOUR FEET AT ALL TIMES' },
+  // not for sale: the Petition Bee gives it to players whose wish was built into the game (wishes.js)
+  wishcrown: { name: 'WISHMAKER CROWN', cost: 0, gift: true, kind: 'head', desc: 'CHAT BUILT YOUR WISH INTO THE GAME' },
 };
-export const FLAIR_IDS = Object.keys(FLAIR);
+export const FLAIR_IDS = Object.keys(FLAIR).filter((id) => !FLAIR[id].gift); // what the exclusive shop sells
 
 // ---------------- the models ----------------
 function box(parent, geo, color, { emissive = [0, 0, 0], pos = [0, 0, 0], rot = [0, 0, 0], opacity = 1 } = {}) {
@@ -83,6 +85,13 @@ export function makeFlair(id) {
       box(g, new THREE.CylinderGeometry(0.55, 0.62, 0.3, 8), [1, 0.8, 0.25], { emissive: [0.45, 0.32, 0.05], pos: [0, -0.15, 0] });
       box(g, new THREE.CylinderGeometry(0.62, 0.62, 0.04, 8), [1, 0.9, 0.5], { emissive: [0.5, 0.4, 0.1], pos: [0, 0.01, 0] });
       break;
+    case 'wishcrown': { // a gold crown with a star that turns over your head
+      box(g, new THREE.CylinderGeometry(0.24, 0.22, 0.12, 8, 1, true), [1, 0.82, 0.25], { emissive: [0.55, 0.4, 0.06], pos: [0, HEAD + 0.06, 0] });
+      for (let k = 0; k < 5; k++) { const a = (k / 5) * Math.PI * 2; box(g, new THREE.ConeGeometry(0.05, 0.12, 4), [1, 0.85, 0.3], { emissive: [0.6, 0.45, 0.08], pos: [Math.cos(a) * 0.22, HEAD + 0.17, Math.sin(a) * 0.22] }); }
+      const star = box(g, new THREE.OctahedronGeometry(0.09, 0), [1, 1, 0.7], { emissive: [1, 0.85, 0.3], pos: [0, HEAD + 0.42, 0] });
+      u.tick = (t) => { star.rotation.y = t * 2.2; star.position.y = HEAD + 0.42 + Math.sin(t * 2) * 0.04; };
+      break;
+    }
     default: return null;
   }
   return g;
@@ -121,6 +130,7 @@ export function installPorridge(Game) {
     },
     buyFlair(id) {
       const f = FLAIR[id]; if (!f) return 'NOT FOR SALE';
+      if (f.gift && !(this.meta.flair || []).includes(id)) return 'NOT FOR SALE. CHAT HAS TO BUILD YOUR WISH';
       const owned = this.meta.flair || [];
       if (owned.includes(id)) { this.meta.flairOn = this.meta.flairOn === id ? null : id; this.saveMeta(); return this.meta.flairOn ? `WEARING: ${f.name}` : 'FLAIR OFF'; }
       if (!this.porridgeShopActive()) return 'THE EXCLUSIVE SHOP IS CLOSED';

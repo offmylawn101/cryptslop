@@ -7,3 +7,4 @@ wishes/
 server/wishes/.wrangler/
 server/wishes/node_modules/
 *.log
+server/wishes/.local.sqlite*

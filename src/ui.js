@@ -15,7 +15,7 @@ const C = {
   text: '#f2ead8', dim: '#8c88a8', hot: '#ffd040', red: '#ff4a5a', green: '#6aff9a', blue: '#4ff0ff', pink: '#ff6ad8',
   panel: 'rgba(14,10,28,0.86)', edge: '#4ff0ff', edgeB: '#ff4fd8', edgeHot: '#ffd040',
 };
-const PROP_NAMES = { slots: 'HONEY SLOTS', wheel: 'THE BUZZ WHEEL', derby: 'BEE-DERBY', booth: 'HIVE HEARTS (DATING)', shop: 'HONEY SHOP', typing: 'TYPING STAND (TYPE FAST, HIT HARD)' };
+const PROP_NAMES = { slots: 'HONEY SLOTS', wheel: 'THE BUZZ WHEEL', derby: 'BEE-DERBY', booth: 'HIVE HEARTS (DATING)', shop: 'HONEY SHOP', typing: 'TYPING STAND (TYPE FAST, HIT HARD)', petition: 'THE PETITION BEE (MAKE A WISH)' };
 const META_LINES = ['A VIDEO GAME THAT DOES NOT EXIST', 'WHICH MEANS IT DOES', 'IT WAS ALWAYS LIKE THIS', 'PLEASE INSERT MEMORY CARD (FOUND ONE IN THE CLOUD)', 'NOTHING HERE IS REAL EXCEPT THE HORSE', 'THIS DISC IS NOT FOR SALE', 'A HIVE YOU HALF REMEMBER'];
 
 function wrap(text, maxChars) {
@@ -275,10 +275,12 @@ export class UI {
       this.button('ARCHIVE', sx, sy, sw, bh, () => { this.screen = 'archive'; this.archPage = 0; this.archOpen = null; }, { color: C.blue }); sy += bh + 3;
       if (g.xr && g.xr.supported) { this.button('ENTER VR', sx, sy, sw, bh, () => g.xr.enter(), { color: C.green }); sy += bh + 3; }
       this.button('BEE PASS', sx, sy, sw, bh, () => { this.screen = 'beepass'; }, { color: C.pink }); sy += bh + 3;
+      this.button('WISHES', sx, sy, sw, bh, () => g.openWishes(), { color: C.hot }); sy += bh + 3;
     } else {
       this.button('ARCHIVE', bx, by, Math.floor(bw / 2) - 2, bh, () => { this.screen = 'archive'; this.archPage = 0; this.archOpen = null; }, { color: C.blue });
       if (g.xr && g.xr.supported) this.button('VR', bx + Math.floor(bw / 2) + 2, by, Math.floor(bw / 2) - 2, bh, () => g.xr.enter(), { color: C.green });
       by += bh + 3;
+      this.button('WISHES', bx, by, bw, bh, () => g.openWishes(), { color: C.hot }); by += bh + 3;
     }
     if (this.invite) {
       this.button(`JOIN ${this.invite.from}`, bx, by, bw, bh, () => { const id = this.invite.lobbyId; this.invite = null; g.joinCoop(id); }, { color: C.green });
@@ -404,6 +406,7 @@ export class UI {
     }
     if (g.porridgeShopActive && g.porridgeShopActive()) { this.button(`EXCLUSIVE SHOP ${Math.ceil(g.porridgeShopLeft())}S`, bx, by, bw, bh, () => g.showPorridgeShop(), { color: C.pink }); by += bh + 4; }
     else if ((g.meta.porridge || 0) > 0 && g.openPorridgeShop) { this.button(`PORRIDGE SHOP X${g.meta.porridge}`, bx, by, bw, bh, () => { const msg = g.openPorridgeShop(); if (this.screen !== 'porridge') this.toast(msg); }, { color: C.pink }); by += bh + 4; }
+    this.button('MAKE A WISH', bx, by, bw, bh, () => g.openWishes(), { color: C.hot }); by += bh + 4;
     this.button('SETTINGS', bx, by, bw, bh, () => { this.screen = 'settings'; this.back = 'pause'; }); by += bh + 4;
     this.button('HOW TO PLAY', bx, by, bw, bh, () => { this.screen = 'help'; this.back = 'pause'; }); by += bh + 4;
     if (g.xr && g.xr.supported && !g.xr.session) { this.button('ENTER VR', bx, by, bw, bh, () => g.xr.enter(), { color: C.green }); by += bh + 4; }
@@ -905,6 +908,7 @@ export class UI {
       drawText(ctx, `KILLS ${r.kills ?? w.kills}   SCORE ${r.score ?? 0}   HONEY ${Math.floor(g.honey)}`, cx, cy - 8, C.text, 1, 'center');
       drawText(ctx, `DEEPEST EVER: FLOOR ${g.bestFloor}   WAFERS BANKED: ${g.meta.wafers}`, cx, cy + 4, C.dim, 1, 'center');
       drawText(ctx, `A NEW RUN BEGINS IN ${Math.max(0, Math.ceil(r.t))}`, cx, cy + 22, C.text, 1, 'center');
+      drawText(ctx, 'PRESS Y TO MAKE A WISH FOR THE NEXT PATCH', cx, cy + 36, C.hot, 1, 'center');
     }
 
     if (g.keys.has('Tab') && g.locked && !g.casino.open) {
