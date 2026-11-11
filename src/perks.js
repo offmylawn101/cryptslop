@@ -142,7 +142,7 @@ export function installPerks(Game) {
         if (q.blast) this.areaBlast(q.blast.x, q.blast.y, q.blast.z, q.blast.r, q.blast.dmg, q.blast.label);
         if (q.meteor) {
           const { x, y, z } = q.meteor, N = PERK_NUM;
-          this.particles.burst(x, y + 0.5, z, 80, [1, 0.45, 0.1], 11, 0.16, 0.9, 0.3);
+          this.fxBoom(x, y + 0.5, z, N.meteorR * 1.1, [1, 0.45, 0.1], 0.45); this.fxSlam(x, y, z, N.meteorR * 1.6, [1, 0.6, 0.2], 0.4);
           this.flashLight = Math.max(this.flashLight || 0, 0.9); this.flashPos = null;
           this.areaBlast(x, y, z, N.meteorR, N.meteorDmg * (1 + 0.1 * (((this.world && this.world.floor) || 1) - 1)), 'METEOR');
         }

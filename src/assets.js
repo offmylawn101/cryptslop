@@ -35,7 +35,7 @@ export const hasAsset = (id) => !!loaded[id];
 
 // the STOMPER's surface: an oily, swirling noise (Blender's procedural texture does not survive export)
 let oil = null;
-function oilTexture() {
+export function oilTexture() {
   if (oil || typeof document === 'undefined') return oil;
   const N = 64, c = document.createElement('canvas'); c.width = c.height = N;
   const g = c.getContext('2d'), img = g.createImageData(N, N);

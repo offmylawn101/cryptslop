@@ -8,6 +8,10 @@ import { installFister } from './fisterPort.js';
 import { installClasses2 } from './classes2.js';
 import { installPorridge } from './porridge.js';
 import { installWishes } from './wishes.js';
+import { installShapeFx } from './shapefx.js';
+import { installBugsClient } from './bugs.js';
+import { installBestiaryClient } from './bestiary.js';
+import { installRooftopsClient } from './rooftops.js';
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
@@ -978,7 +982,7 @@ export class Game {
       case 'nuke':
         this.flashLight = 1; this.hurtFlash = 0; this.nukeFlash = 1.4;
         this.sound.play('boom'); this.sound.play('boom', at(m.x, m.y, m.z));
-        for (let i = 0; i < 4; i++) this.particles.burst(m.x, m.y + 2 + i * 3, m.z, 120, [1, 0.9 - i * 0.15, 0.6 - i * 0.15], 18, 0.3, 2.5, -0.5);
+        this.fxBoom(m.x, m.y + 2, m.z, 45, [1, 0.95, 0.75], 1.3); this.fxBoom(m.x, m.y + 2, m.z, 28, [1, 0.55, 0.15], 0.9); this.fxSlam(m.x, m.y, m.z, 60, [1, 0.8, 0.4], 1.1);
         this.ui.banner(m.by === this.myId ? 'NUCLEAR FOOTBALL: DETONATED' : `${this.net.nameOf(m.by)} USED THE NUCLEAR FOOTBALL`, 3);
         break;
       case 'kill': {
@@ -1071,8 +1075,7 @@ export class Game {
         this.sound.play('splat', at(m.x, m.y, m.z));
         break;
       case 'boom':
-        this.particles.burst(m.x, m.y, m.z, 60, [1, 0.75, 0.1], 9, 0.14, 0.7, 0.3);
-        this.particles.burst(m.x, m.y, m.z, 20, [0.3, 0.3, 0.3], 4, 0.3, 1.2, -0.2);
+        this.fxBoom(m.x, m.y, m.z, m.r || 3.5, [1, 0.6, 0.12], 0.34);
         this.sound.play('boom', at(m.x, m.y, m.z));
         this.flashLight = Math.max(this.flashLight, 0.8); this.flashPos = new THREE.Vector3(m.x, m.y, m.z);
         break;
@@ -1087,13 +1090,13 @@ export class Game {
         }
         break;
       case 'slam': { // the warning: a red ring where the wave will go. JUMP.
-        for (let i = 0; i < 48; i++) { const a = (i / 48) * Math.PI * 2; this.particles.emit(m.x + Math.cos(a) * m.r, m.y + 0.1, m.z + Math.sin(a) * m.r, 0, 0.6, 0, 1, 0.15, 0.1, 0.07, m.w || 0.7, 0); }
+        this.fxMark(m.x, m.y, m.z, m.r, [1, 0.15, 0.1], m.w || 0.7);
         this.sound.play('growl', at(m.x, m.y, m.z));
         if (Math.hypot(m.x - this.mover.pos.x, m.z - this.mover.pos.z) < m.r + 2 && !this.slamTipShown) { this.slamTipShown = true; this.ui.banner('GROUND SLAM! JUMP OVER THE SHOCKWAVE', 1.5); }
         break;
       }
       case 'quake': {
-        for (let ring = 1; ring <= 3; ring++) for (let i = 0; i < 36; i++) { const a = (i / 36) * Math.PI * 2, r = (m.r * ring) / 3; this.particles.emit(m.x + Math.cos(a) * r, m.y + 0.15, m.z + Math.sin(a) * r, Math.cos(a) * 6, 1.5, Math.sin(a) * 6, 1, 0.7, 0.3, 0.09, 0.45, 0.3); }
+        this.fxSlam(m.x, m.y, m.z, m.r * 1.15, [1, 0.6, 0.25], 0.38); this.fxSlam(m.x, m.y, m.z, m.r * 0.6, [1, 0.85, 0.5], 0.25, { filled: true });
         this.sound.play('boom', at(m.x, m.y, m.z));
         if (Math.hypot(m.x - this.mover.pos.x, m.z - this.mover.pos.z) < m.r * 1.5) this.landDip = Math.max(this.landDip || 0, 0.12);
         if (Math.hypot(m.x - this.mover.pos.x, m.z - this.mover.pos.z) < m.r && !this.mover.onGround && !this.dead) this.addStyle(10, 'DODGED SLAM');
@@ -1571,7 +1574,7 @@ export class Game {
     const ws = weaponStats(this.myUps, this.honey);
     const hits = new Map();
     for (const e of this.enemies.values()) { const p = e.model.position; if (Math.hypot(p.x - x, p.z - z) < r && Math.abs(p.y - y) < 3) { hits.set(e.id, dmg * (ws.pelletDmg / 6)); e.flash = 0.1; } }
-    this.particles.burst(x, y + 0.8, z, 50, [1, 0.8, 0.3], 8, 0.12, 0.6, 0.2);
+    this.fxBoom(x, y + 0.8, z, r, [1, 0.75, 0.25], 0.3);
     this.sound.play('boom', { x, y, z });
     if (hits.size) { this.sendHits(hits, 'boon'); this.addStyle(6 + hits.size * 3, label); }
   }
@@ -1921,8 +1924,7 @@ export class Game {
     const floorY = k >= 0 && k < W * H ? Math.max(map.fh[k], isPit(map.fh[k]) ? map.fh[k] : -99) : 0;
     this.fires.push({ x: t.x, y: Math.max(floorY, Math.min(t.y, floorY + 0.3)), z: t.z, t: 5, mine: t.mine, tick: 0, r: t.mine ? this.modMul('fireRadiusPct') : 1 });
     this.sound.play('fire', { x: t.x, y: t.y, z: t.z });
-    this.particles.burst(t.x, t.y, t.z, 40, [1, 0.5, 0.1], 6, 0.1, 0.6, 0.2);
-    this.particles.burst(t.x, t.y, t.z, 14, [0.4, 0.8, 0.3], 3, 0.06, 0.4); // glass
+    this.fxBoom(t.x, t.y, t.z, 2.4, [1, 0.45, 0.08], 0.3);
   }
 
   updateFires(dt) {
@@ -1979,7 +1981,7 @@ export class Game {
         break;
       case 'bigstick':
         area(8, 110, true);
-        this.particles.burst(o.x + fwd.x * 3, o.y, o.z + fwd.z * 3, 40, [0.8, 0.5, 0.2], 6, 0.12, 0.5);
+        this.fxSlam(this.mover.pos.x + fwd.x * 3, this.mover.pos.y, this.mover.pos.z + fwd.z * 3, 8, [0.9, 0.6, 0.3], 0.35);
         break;
       case 'tapes': {
         const past = this.history.find((h) => this.time - h.t <= 3.05) || this.history[0];
@@ -2039,7 +2041,7 @@ export class Game {
       if (d < 6) hits.set(e.id, 90 * (ws.pelletDmg / 6) * this.dmgMul() * (1 - d / 12));
     }
     this.sendHits(hits, 'active');
-    this.particles.burst(m.pos.x, m.pos.y + 0.2, m.pos.z, 80, [0.9, 0.9, 1], 9, 0.12, 0.6, 1, 1);
+    this.fxSlam(m.pos.x, m.pos.y, m.pos.z, 7, [0.85, 0.9, 1], 0.4);
     this.sound.play('boom');
     this.landDip = 0.4;
     if (hits.size) this.addStyle(10 + hits.size * 4, 'TUB SLAM');
@@ -2563,7 +2565,7 @@ export class Game {
         this.particles.emit(L.x + Math.cos(a) * r, L.y + 0.5 + Math.random(), L.z + Math.sin(a) * r, -Math.cos(a) * r * 2, 0, -Math.sin(a) * r * 2, 1, 0.75, 0.2, 0.06, 0.4, 0);
       }
       if (L.t > 0) continue;
-      this.particles.burst(L.x, L.y + 0.4, L.z, 60, [1, 0.7, 0.15], 9, 0.12, 0.6, 0.3);
+      this.fxBoom(L.x, L.y + 0.4, L.z, 3.5, [1, 0.65, 0.15], 0.34);
       this.sound.play('boom', { x: L.x, y: L.y, z: L.z });
       this.flashLight = Math.max(this.flashLight, 0.8); this.flashPos = { x: L.x, y: L.y + 1, z: L.z };
       // rocket jump: your own blast throws you, it never hurts you
@@ -2906,6 +2908,10 @@ installFister(Game); // JOHN FISTER (fisterPort.js + src/fister/)
 installClasses2(Game, Sim); // SIEGER, KOOLCILLER, INTERCEPTOR, BLASPHEMOUS, PARKOUR, the ULTRAs, the wild EVIL HORSE (classes2.js)
 installEconomy(Game); // the post-boss shop, the rooftop clock, starting deeper, newer wafer upgrades (economy.js)
 installPorridge(Game); // the PIXEL PORRIDGE EXCLUSIVE SHOP and its flair (porridge.js)
+installRooftopsClient(Game, UI); // rooftop events, fake hives, shacks, missiles, wire puzzles (rooftops.js)
+installBestiaryClient(Game, UI); // the deep floors' foes: models, looks, warnings, frozen floors (bestiary.js)
+installBugsClient(Game); // the looks of the reworked bugs (bugs.js; the host side installs itself in sim.js)
+installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)
 installParryFx(Game); // the BEEKEEPER PARRY PUNCH and juicier parries (parryfx.js)

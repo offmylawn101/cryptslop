@@ -1,4 +1,7 @@
 // Authoritative game simulation. Runs only on the lobby host (or in solo play).
+import { installBugs } from './bugs.js';
+import { installBestiary } from './bestiary.js';
+import { installRooftops } from './rooftops.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -874,7 +877,7 @@ export class Sim {
     }
 
     // portal
-    if (this.portalOpen) {
+    if (this.portalOpen && !(this.roofLocked && this.roofLocked())) { // a rooftop hive stays shut until its puzzles are fixed (rooftops.js)
       if (this.countdown < 0) {
         for (const p of alive) {
           if (Math.hypot(p.x - this.map.exit.x, p.z - this.map.exit.z) < (this.transit ? 2.6 : 1.8) && Math.abs(p.y - (this.map.exit.y || 0)) < 2.5) {
@@ -1196,7 +1199,7 @@ export class Sim {
       const tx = (p.x - e.x) / d, tz = (p.z - e.z) / d, k = d < 9 ? -0.6 : d > 14 ? 0.6 : 0;
       mx = tx * k - tz * e.strafe; mz = tz * k + tx * e.strafe;
       if (Math.random() < dt * 0.4) e.strafe = -e.strafe;
-    } else if ((e.type === 'spider' || e.type === 'locust' || e.type === 'cicada' || e.type === 'bombardier') && vis && d < 7) {
+    } else if ((e.type === 'spider' || e.type === 'cicada' || e.type === 'bombardier' || e.type === 'hivemind') && vis && d < (e.type === 'hivemind' ? 10 : 7)) {
       mx = -(p.x - e.x) / d; mz = -(p.z - e.z) / d; speed *= 0.8;
     } else if (e.type === 'spitter') {
       if (vis && d < 6) { mx = -(p.x - e.x) / d; mz = -(p.z - e.z) / d; }
@@ -1505,7 +1508,9 @@ export class Sim {
     const id = this.nextId++;
     const pm = modPct(this.mods, 'proj', 0.3);
     vx *= pm; vy *= pm; vz *= pm;
-    this.projs.set(id, { id, x, y, z, vx, vy, vz, dmg, life: 4 });
+    const pr = { id, x, y, z, vx, vy, vz, dmg, life: 4 };
+    this.projs.set(id, pr);
+    return pr;
   }
 
   stepProjectiles(dt, alive) {
@@ -1542,6 +1547,7 @@ export class Sim {
           }
           if (dd < 0.55) {
             this.hurtPlayer(p, pr.dmg, pr.x - pr.vx, pr.z - pr.vz);
+            if (pr.fx && this.projFx) this.projFx(pr, p); // webs and venom (bugs.js)
             dead = true;
             this.ev({ k: 'splat', x: r2(pr.x), y: r2(pr.y), z: r2(pr.z) });
             break;
@@ -1599,8 +1605,8 @@ export class Sim {
     for (const en of this.enemies.values()) {
       const row = [en.id, ENEMY_TYPES.indexOf(en.type), r2(en.x), r2(en.y), r2(en.z), r2(en.yaw), r2(Math.max(0, en.hp / en.maxHp)), en.awake ? en.state : 0];
       // tier, affixes; then the element and flags (bit 0: a sulking cruiser; bits 1+: a person's shirt + 1)
-      const imm = (en.immuneUntil || 0) > this.time && this.time >= (en.immuneFrom || 0) ? 1 : 0;
-      const fl = imm | (en.def.npc ? ((en.shirt | 0) + 1) << 1 : 0);
+      const imm = ((en.immuneUntil || 0) > this.time && this.time >= (en.immuneFrom || 0)) || (this.beastImmune && this.beastImmune(en)) ? 1 : 0;
+      const fl = imm | (en.def.npc ? ((en.shirt | 0) + 1) << 1 : 0) | (this.beastFlags ? this.beastFlags(en) : 0); // bits 6+: bestiary.js
       if (en.tier || en.el || fl) row.push(en.tier || 0, (en.affixes || []).map((a) => AFFIX_IDS.indexOf(a)).join(''));
       if (en.el || fl) row.push(en.el || 0, fl);
       e.push(row);
@@ -1614,3 +1620,8 @@ export class Sim {
     this.out.broadcast({ t: 's', n: this.seq, run: this.run, floor: this.floor, st: this.stage, e, pr, o, pl, cd: r2(this.countdown), po: this.portalOpen ? 1 : 0, ro: this.runOverTimer >= 0 ? r2(this.runOverTimer) : -1, ls: this.lastStand || '', bq: this.stage === 'boss' ? this.bossQueue.length : 0, th: threatLevel(this.runTime), rn: Math.round(this.runTime || 0), rt: this.stage === 'city' && this.roofT != null ? r2(this.roofT) : null }, false);
   }
 }
+
+// the bugs fight like the real thing (bugs.js), and the deep floors have new foes (bestiary.js)
+installBugs(Sim);
+installBestiary(Sim);
+installRooftops(Sim); // the rooftop events and wire puzzles (rooftops.js)

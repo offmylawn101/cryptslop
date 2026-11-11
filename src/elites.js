@@ -284,7 +284,8 @@ export function installElites(Game) {
       e.el = el;
       e.immune = !!(fl & 1);
       if (e.shield) e.shield.visible = e.immune;
-      if (fl >> 1 && fl >> 1 !== 1) neutral++; // a civilian who is not wearing red
+      const shirt = (fl >> 1) & 31;
+      if (shirt && shirt !== 1) neutral++; // a civilian who is not wearing red
     }
     if (neutral && Number.isFinite(this.world.left)) this.world.left = Math.max(0, this.world.left - neutral);
   };
@@ -301,7 +302,7 @@ export function installElites(Game) {
         tag.position.y = ((ENEMIES[ENEMY_TYPES[e.type]] || {}).height || 2) / e.model.scale.y + 0.6; e.model.add(tag);
       }
     }
-    if (fl >> 1) { e.shirt = (fl >> 1) - 1; if (u.setShirt) u.setShirt(e.shirt); }
+    if ((fl >> 1) & 31) { e.shirt = ((fl >> 1) & 31) - 1; if (u.setShirt) u.setShirt(e.shirt); }
     if (ENEMY_TYPES[e.type] === 'cruiser') {
       const h = (ENEMIES.cruiser.height || 2.6);
       const m = retroMaterial({ color: [0.5, 0.9, 1], emissive: [0.4, 0.8, 1], transparent: true, opacity: 0.3, side: THREE.DoubleSide });

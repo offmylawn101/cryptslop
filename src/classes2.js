@@ -57,6 +57,27 @@ function geos() {
   };
   return geo;
 }
+// ONE material per projectile kind and ONE javelin model, shared by every copy. (Every stone, shard and
+// javelin used to build its own materials, and javelins their own geometry too, and none of it was
+// ever freed: a BLASPHEMOUS ring made 16 models a throw, which is what made it lag.)
+let projMats = null, javProto = null;
+function projMat(kind) {
+  if (!projMats) {
+    projMats = {
+      stone: retroMaterial({ color: [0.6, 0.56, 0.5], emissive: [0.18, 0.16, 0.14] }),
+      shard: retroMaterial({ color: [0.7, 0.65, 0.55], emissive: [0.35, 0.3, 0.25] }),
+    };
+  }
+  return projMats[kind];
+}
+function javelinMesh() {
+  if (!javProto) {
+    javProto = makeJavelin();
+    javProto.scale.setScalar(0.7);
+    for (const mm of javProto.userData.mats) if (mm.uniforms && mm.uniforms.uEmissive) mm.uniforms.uEmissive.value.set(0.3, 0.05, 0.4);
+  }
+  return javProto.clone(); // shares the geometry and the materials
+}
 
 function box(group, w, h, d, color, emissive, pos, rot) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), retroMaterial({ color, emissive: emissive || color.map((v) => v * 0.3) }));
@@ -196,7 +217,7 @@ export function installClasses2(Game, Sim) {
       const out = [];
       for (const e of this.enemies.values()) {
         if (e.goneT || (skip && skip.has(e.id))) continue;
-        const def = ENEMIES[ENEMY_TYPES[e.type]]; if (!def || !def.hit) continue;
+        const def = ENEMIES[ENEMY_TYPES[e.type]]; if (!def || !def.hit || !def.hit.length) continue;
         const p = e.model.position, sc = e.scale || 1, cy = p.y + def.hit[0][0] * sc;
         const d = Math.hypot(p.x - x, cy - y, p.z - z);
         if (d < r) out.push({ x: p.x, y: cy, z: p.z, id: e.id, d });
@@ -205,7 +226,7 @@ export function installClasses2(Game, Sim) {
     },
     stoneBurst(t, nx = 0, ny = 1, nz = 0) {
       const mine = t.mine, small = !!t.small;
-      this.particles.burst(t.x, t.y, t.z, small ? 14 : 30, [0.6, 0.55, 0.5], 6, 0.1, 0.6, 1);
+      if ((this.c2BlastN = (this.c2BlastN || 0) + 1) <= 12 && this.fxBoom) this.fxBoom(t.x, t.y, t.z, SIEGER.blastR * (small ? 0.6 : 1), [0.85, 0.75, 0.6], 0.28);
       this.sound.play('break', { x: t.x, y: t.y, z: t.z });
       if (mine) {
         const k = this.c2Dmg() * this.modMul('sgDmgPct') * (small ? 0.5 : 1), r = SIEGER.blastR * (this.inv ? this.wSize() : 1);
@@ -237,13 +258,21 @@ export function installClasses2(Game, Sim) {
         const l = Math.hypot(dx, dy, dz) || 1, sp = SIEGER.shardSpeed * (0.75 + Math.random() * 0.5);
         this.spawnC2('shard', [t.x + nx * 0.6, t.y + ny * 0.6, t.z + nz * 0.6], [dx / l * sp, dy / l * sp, dz / l * sp], mine, { dmgMul: shardMul });
       }
-      const liveStones = this.c2p ? this.c2p.reduce((a, q) => a + (q.kind === 'stone' ? 1 : 0), 0) : 0;
-      // only a thrown stone splits: never a small one, never an ultra second burst (that was the endless chain)
-      if (mine && !small && !t.second && this.mod('sgSplit') && liveStones < SIEGER.maxStones) for (let i = 0; i < 3; i++) {
-        const a = Math.random() * Math.PI * 2;
-        this.spawnC2('stone', [t.x + nx * 0.3, t.y + ny * 0.3 + 0.2, t.z + nz * 0.3], [Math.cos(a) * 6, 8, Math.sin(a) * 6], true, { small: true });
+      // SPLITTING STONE: the stone breaks into heavy CHUNKS of shrapnel (3 per pick, at most 9). Chunks
+      // are shrapnel: they hit hard and bounce, but they never burst or split. Only a stone you throw
+      // makes a stone, so nothing can chain (it used to split into stones that split into stones...).
+      const split = mine && !t.second ? Math.min(SIEGER.maxChunks, 3 * this.mod('sgSplit')) : 0;
+      for (let i = 0; i < split; i++) {
+        const a = (i / split) * Math.PI * 2 + Math.random() * 0.6;
+        const q = near.length ? near[i % near.length] : null;
+        let v;
+        if (q) { const ax = q.x - t.x, ay = q.y - t.y, az = q.z - t.z, al = Math.hypot(ax, ay, az) || 1; v = [ax / al * SIEGER.chunkSpeed, ay / al * SIEGER.chunkSpeed + 2, az / al * SIEGER.chunkSpeed]; }
+        else v = [Math.cos(a) * SIEGER.chunkSpeed, 4 + Math.random() * 3, Math.sin(a) * SIEGER.chunkSpeed];
+        this.spawnC2('shard', [t.x + nx * 0.5, t.y + ny * 0.5 + 0.2, t.z + nz * 0.5], v, true, { chunk: true, dmgMul: SIEGER.chunkDmgMul });
       }
-      if (mine && !t.second && this.mod('sgUltra')) this.c2Later(0.4, () => this.stoneBurst({ x: t.x + nx * 0.2, y: t.y + ny * 0.2, z: t.z + nz * 0.2, mine: true, second: true, small }, nx, ny, nz)); // bursts again ONCE, as the same size
+      // the ULTRA: the stone bursts again, once more per ULTRA you hold (at most 3 more)
+      const again = mine && !t.second ? Math.min(SIEGER.maxRebursts, this.mod('sgUltra')) : 0;
+      for (let k = 1; k <= again; k++) this.c2Later(0.35 * k, () => this.stoneBurst({ x: t.x + nx * 0.2, y: t.y + ny * 0.2, z: t.z + nz * 0.2, mine: true, second: true, small }, nx, ny, nz));
       if (mine) this.addStyle(4, 'SIEGE');
     },
     c2Later(s, fn) { (this.c2timers = this.c2timers || []).push({ t: s, fn }); },
@@ -337,7 +366,7 @@ export function installClasses2(Game, Sim) {
       this.ui.banner('ENRAGED', 2); this.sound.play('rank'); this.sound.play('growl');
       this.stats.add('rages');
     },
-    kkRageAddKill() { const st = this.kkState; if (st.rage > 0 && this.mod('kkUltra')) st.rage += 1; },
+    kkRageAddKill() { const st = this.kkState; if (st.rage > 0 && this.mod('kkUltra')) st.rage += Math.min(3, this.mod('kkUltra')); }, // a second per ULTRA held
 
     // ---------------- INTERCEPTOR: lasers ----------------
     icMaxN() { return LASER.max + this.mod('icMax'); },
@@ -352,7 +381,7 @@ export function installClasses2(Game, Sim) {
       if (vox && vox.size) for (let t = 0.3; t < len; t += 0.25) if (hasVoxel(vox, o.x + fwd.x * t, o.y + fwd.y * t, o.z + fwd.z * t)) { len = t; break; }
       const s0 = Math.min(0.9, len * 0.5); // start a little ahead of the eye, so it never fills the screen
       const a = [o.x + fwd.x * s0, o.y - 0.2 + fwd.y * s0, o.z + fwd.z * s0], b = [o.x + fwd.x * len, o.y + fwd.y * len, o.z + fwd.z * len];
-      const life = LASER.life * (this.mod('icUltra') ? 2 : 1), w = LASER.width * (this.mod('icWide') ? 2 : 1);
+      const life = LASER.life * (1 + Math.min(3, this.mod('icUltra'))), w = LASER.width * (this.mod('icWide') ? 2 : 1);
       this.addLaser(a, b, life, w, true);
       this.toHost({ t: 'zap', o: a.map(r2), e: b.map(r2), d: life, w: r2(w) }, true);
       this.net.broadcast({ t: 'c2', k: 'lz', o: a.map(r2), e: b.map(r2), d: life, w: r2(w) }, true);
@@ -398,9 +427,9 @@ export function installClasses2(Game, Sim) {
     // ---------------- my projectiles (stones, shrapnel, javelins) and lasers ----------------
     spawnC2(kind, p, v, mine, extra) {
       let mesh;
-      if (kind === 'stone') { mesh = new THREE.Mesh(geos().stone, retroMaterial({ color: [0.6, 0.56, 0.5], emissive: [0.18, 0.16, 0.14] })); if (extra.small) mesh.scale.setScalar(0.55); }
-      else if (kind === 'shard') mesh = new THREE.Mesh(geos().shard, retroMaterial({ color: [0.7, 0.65, 0.55], emissive: [0.35, 0.3, 0.25] }));
-      else { mesh = makeJavelin(); mesh.scale.setScalar(0.7); for (const mm of mesh.userData.mats) if (mm.uniforms && mm.uniforms.uEmissive) mm.uniforms.uEmissive.value.set(0.3, 0.05, 0.4); }
+      if (kind === 'stone') { mesh = new THREE.Mesh(geos().stone, projMat('stone')); if (extra.small) mesh.scale.setScalar(0.55); }
+      else if (kind === 'shard') { mesh = new THREE.Mesh(geos().shard, projMat('shard')); if (extra.chunk) mesh.scale.setScalar(2.4); }
+      else mesh = javelinMesh();
       mesh.position.set(p[0], p[1], p[2]);
       this.entityRoot.add(mesh);
       const t = { kind, mesh, mine, x: p[0], y: p[1], z: p[2], vx: v[0], vy: v[1], vz: v[2], life: kind === 'stone' ? 5 : kind === 'shard' ? SIEGER.shardLife : 4, bounces: 0, hit: new Set(), stuck: 0, ...extra };
@@ -417,18 +446,18 @@ export function installClasses2(Game, Sim) {
         for (const tm of this.c2timers) { tm.t -= dt; if (tm.t <= 0) tm.fn(); }
         this.c2timers = this.c2timers.filter((tm) => tm.t > 0);
       }
-      const k = this.c2Dmg();
+      const k = this.c2Dmg(), homing = this.mod('blUltra') > 0;
       for (const t of this.c2p) {
         if (t.kind === 'laser') { this.stepLaser(t, dt, k); continue; }
         if (t.stuck > 0) { t.stuck -= dt; if (t.stuck <= 0) t.life = 0; continue; }
         t.life -= dt;
         const grav = t.kind === 'stone' ? SIEGER.grav : t.kind === 'shard' ? SIEGER.shardGrav : JAVRING.grav;
-        const steps = t.kind === 'shard' ? 6 : 3; // shrapnel is fast: smaller steps so it never skips a foe
+        const steps = t.kind === 'shard' ? 6 : t.kind === 'jav' ? 2 : 3; // shrapnel is fast: smaller steps so it never skips a foe
+        // the HORSE'S BLESSING: javelins bend toward the nearest foe ahead (looked up once a frame)
+        if (t.kind === 'jav' && t.mine && homing) this.homeJav(t, dt);
         for (let s = 0; s < steps && t.life > 0; s++) {
           const h = dt / steps;
           t.vy -= grav * h;
-          // the HORSE'S BLESSING: javelins bend toward the nearest foe ahead
-          if (t.kind === 'jav' && t.mine && this.mod('blUltra')) this.homeJav(t, h);
           const sp = Math.hypot(t.vx, t.vy, t.vz) || 1, d = { x: t.vx / sp, y: t.vy / sp, z: t.vz / sp }, len = sp * h;
           const wall = raycastLevel(map, t.x, t.y, t.z, d.x, d.y, d.z, len);
           let wt = wall.miss ? Infinity : wall.t, wn = { x: wall.nx, y: wall.ny, z: wall.nz };
@@ -444,7 +473,7 @@ export function installClasses2(Game, Sim) {
             }
             this.particles.burst(hx, hy, hz, 6, [0.8, 0.2, 0.15], 3, 0.06, 0.35);
             if (t.kind === 'stone') { t.x = hx; t.y = hy; t.z = hz; this.stoneBurst(t, -d.x, -d.y, -d.z); t.life = 0; break; }
-            if (t.kind === 'shard' && t.hit.size >= 3) { t.life = 0; break; }
+            if (t.kind === 'shard' && t.hit.size >= (t.chunk ? 5 : 3)) { t.life = 0; break; }
             if (t.kind === 'jav' && t.hit.size >= t.pierce) { t.life = 0; break; }
           }
           if (wt < len) {
@@ -452,13 +481,13 @@ export function installClasses2(Game, Sim) {
             if (t.kind === 'stone') { this.stoneBurst(t, wn.x, wn.y, wn.z); t.life = 0; break; }
             if (t.kind === 'jav') {
               t.stuck = 2.5; this.sound.play('thunk', { x: t.x, y: t.y, z: t.z });
-              if (t.mine && this.mod('blUltra')) this.c2Blast(t.x, t.y, t.z, 2.6, JAVRING.dmg * 0.6 * this.modMul('blDmgPct'));
+              if (t.mine && this.mod('blUltra')) { const u = Math.min(3, this.mod('blUltra')); this.c2Blast(t.x, t.y, t.z, 2.6 + 0.6 * (u - 1), JAVRING.dmg * 0.6 * u * this.modMul('blDmgPct')); }
               break;
             }
             // shrapnel bounces like crazy
-            if (++t.bounces > SIEGER.shardBounces + (t.mine ? this.mod('sgBounce') : 0)) {
+            if (++t.bounces > (t.chunk ? SIEGER.chunkBounces : SIEGER.shardBounces) + (t.mine ? this.mod('sgBounce') : 0)) {
               t.life = 0;
-              if (t.mine && this.mod('sgUltra')) this.c2Blast(t.x, t.y, t.z, 1.8, SIEGER.shardDmg * 1.5 * this.modMul('sgDmgPct'));
+              if (t.mine && this.mod('sgUltra')) this.c2Blast(t.x, t.y, t.z, 1.8, SIEGER.shardDmg * 1.5 * Math.min(3, this.mod('sgUltra')) * this.modMul('sgDmgPct'));
               break;
             }
             const dot = t.vx * wn.x + t.vy * wn.y + t.vz * wn.z;
@@ -491,7 +520,7 @@ export function installClasses2(Game, Sim) {
       t.tick -= dt;
       if (t.tick > 0) return;
       t.tick = 0.1; // damage in tenths of a second
-      const dmg = LASER.dps * 0.1 * k * this.modMul('icDmgPct') * (this.mod('icUltra') ? 1.5 : 1);
+      const dmg = LASER.dps * 0.1 * k * this.modMul('icDmgPct') * (1 + 0.5 * Math.min(3, this.mod('icUltra')));
       const seen = new Set();
       this.eachSphere((e, x, y, z, r) => {
         if (seen.has(e.id)) return false;
@@ -499,7 +528,7 @@ export function installClasses2(Game, Sim) {
       });
     },
     homeJav(t, h) {
-      let best = null, bd = 14;
+      let best = null, bd = 14 + 4 * (Math.min(3, this.mod('blUltra')) - 1);
       for (const e of this.enemies.values()) {
         if (e.goneT || t.hit.has(e.id)) continue;
         const p = e.model.position, dx = p.x - t.x, dy = p.y + 1 - t.y, dz = p.z - t.z, d = Math.hypot(dx, dy, dz);
@@ -512,11 +541,11 @@ export function installClasses2(Game, Sim) {
     c2Blast(x, y, z, r, dmg) {
       const k = this.c2Dmg();
       this.eachSphere((e, ex, ey, ez) => { if (Math.hypot(ex - x, ey - y, ez - z) < r) { this.c2Hit(e, dmg * k); return false; } });
-      if ((this.c2BlastN = (this.c2BlastN || 0) + 1) <= 10) this.particles.burst(x, y, z, 18, [1, 0.6, 0.3], 5, 0.09, 0.4, 0.3); // the damage always lands; past 10 a frame, skip the sparks
+      if ((this.c2BlastN = (this.c2BlastN || 0) + 1) <= 12 && this.fxBoom) this.fxBoom(x, y, z, r, [1, 0.6, 0.3], 0.26); // the damage always lands; past 12 a frame, skip the look
     },
 
     // ---------------- PARKOUR: moving is attacking ----------------
-    pkMul() { return this.c2Dmg() * this.modMul('pkDmgPct') * (this.mod('pkUltra') ? 2 : 1) * (1 + this.mover.horizontalSpeed() / 30); },
+    pkMul() { return this.c2Dmg() * this.modMul('pkDmgPct') * (1 + Math.min(3, this.mod('pkUltra'))) * (1 + this.mover.horizontalSpeed() / 30); },
     updateParkour(dt) {
       const m = this.mover;
       this.pkStompCd = Math.max(0, this.pkStompCd - dt);
@@ -574,7 +603,7 @@ export function installClasses2(Game, Sim) {
       const hs = m.horizontalSpeed();
       if (hs > 0.5) { const b = Math.min(PARKOUR.maxSpeed, hs * 1.12 + 3) / hs; m.vel.x *= b; m.vel.z *= b; }
       this.landDip = Math.max(this.landDip || 0, 0.25);
-      this.particles.burst(m.pos.x, m.pos.y + 0.2, m.pos.z, 40, [1, 0.3, 0.25], 8, 0.1, 0.5, 1, 1);
+      if (this.fxSlam) this.fxSlam(m.pos.x, m.pos.y, m.pos.z, PARKOUR.slamR * 1.2, [1, 0.3, 0.25], 0.32);
       this.sound.play('boom');
       if (n) this.addStyle(10 + n * 5, 'SLAM');
     },
@@ -681,7 +710,7 @@ export function installClasses2(Game, Sim) {
         if (m.id === this.myId) {
           this.addStyle(4 * m.n, m.n > 1 ? `INTERCEPTED X${m.n}` : 'INTERCEPTED');
           if (this.mod('icRefund')) this.icCharges = Math.min(this.icMaxN() + 10, this.icCharges + m.n);
-          if (this.mod('icUltra')) this.toHost({ t: 'heal', a: 2 * m.n }, true);
+          if (this.mod('icUltra')) this.toHost({ t: 'heal', a: 2 * m.n * Math.min(3, this.mod('icUltra')) }, true);
           this.stats.add('bulletsErased', m.n);
         }
         return true;
@@ -700,7 +729,11 @@ export function installClasses2(Game, Sim) {
       const r = orig.onFeatureEvent.call(this, m);
       if (m.k === 'giga' && r && this.offers[0] && this.offers[0].giga) { // the ULTRA: always one of the cards
         const u = ultraFor(this.cls);
-        if (UPGRADES[u] && !this.myUps.includes(u)) { this.offers[0][0] = u; this.ui.banner('GIGA UPGRADE! CARD 1 IS YOUR CLASS ULTRA (SHIFT + 1 2 3)', 4); }
+        if (UPGRADES[u]) { // it stacks, so it is always card 1
+          const held = this.myUps.filter((x) => x === u).length;
+          this.offers[0][0] = u;
+          this.ui.banner(held ? `GIGA UPGRADE! CARD 1 STACKS YOUR ULTRA (YOU HAVE ${held})` : 'GIGA UPGRADE! CARD 1 IS YOUR CLASS ULTRA (SHIFT + 1 2 3)', 4);
+        }
       }
       return r;
     },

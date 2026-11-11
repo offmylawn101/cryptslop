@@ -11,7 +11,7 @@ function flat(geo) {
   return g;
 }
 
-function part(group, geo, color, { emissive = [0, 0, 0], pos = [0, 0, 0], rot = [0, 0, 0], scale = null, mats = null, opacity = 1 } = {}) {
+export function part(group, geo, color, { emissive = [0, 0, 0], pos = [0, 0, 0], rot = [0, 0, 0], scale = null, mats = null, opacity = 1 } = {}) {
   const m = retroMaterial({ color, emissive, transparent: opacity < 1, opacity, side: opacity < 1 ? THREE.DoubleSide : THREE.FrontSide });
   if (opacity < 1) m.depthWrite = false;
   const mesh = new THREE.Mesh(flat(geo), m);
@@ -24,7 +24,7 @@ function part(group, geo, color, { emissive = [0, 0, 0], pos = [0, 0, 0], rot = 
 }
 
 // limb hanging from a pivot so it can swing
-function limb(group, w, h, d, color, pivot, mats) {
+export function limb(group, w, h, d, color, pivot, mats) {
   const pv = new THREE.Group();
   pv.position.set(...pivot);
   group.add(pv);
@@ -465,7 +465,7 @@ export function setXray(model, on) {
 export function xrayPulse(t) { XRAY_MAT.opacity = 0.35 + 0.2 * Math.sin(t * 5); }
 
 
-function flapWings(u, t, speed = 40, amp = 0.6) {
+export function flapWings(u, t, speed = 40, amp = 0.6) {
   if (!u.wings) return;
   const a = Math.sin(t * speed) * amp;
   u.wings[0].rotation.z = 0.25 + a; u.wings[1].rotation.z = -0.25 - a;

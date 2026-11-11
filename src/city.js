@@ -20,6 +20,16 @@ export const districtFor = (seed, floor) => DISTRICT_IDS[((seed >>> 3) + floor) 
 export const KICK = { gap: 3, towerRise: 7, drop: [0.5, 1.5] };
 export const SURF = { gapMin: 6, gapMax: 8, dropMin: 5, dropMax: 7, minRoof: 10, w: 2.2, s: 1.4, startBelow: 1.2, endAbove: 3.0 };
 export const surfDrop = (h0) => Math.max(SURF.dropMin, Math.min(SURF.dropMax, h0 - 5));
+// HOW BIG the rooftops are, by stage: stage 4 is the classic size (one run, corner to corner). Before
+// that the next hive is closer; after it the route keeps going, round the edge of the city, for longer.
+export const ROOF_SIZE = { ref: 4, min: 0.4, max: 2.5 };
+export const roofScale = (floor) => {
+  const f = Math.max(1, floor | 0);
+  if (f <= ROOF_SIZE.ref) return ROOF_SIZE.min + (1 - ROOF_SIZE.min) * (f - 1) / (ROOF_SIZE.ref - 1);
+  return Math.min(ROOF_SIZE.max, f / ROOF_SIZE.ref);
+};
+// the sunset clock grows with the route, a little slower than the route does
+export const roofTimeScale = (floor) => 0.5 + 0.5 * roofScale(floor);
 
 export function generateCity(seed, floor) {
   const R = rng((seed ^ 0x5bd1e995) >>> 0);
@@ -50,21 +60,33 @@ export function generateCity(seed, floor) {
     return b;
   };
 
-  // the route: a chain of rooftops from one corner to the other
+  // the route: a chain of rooftops from one corner to the other (see ROOF_SIZE: early stages stop
+  // short of the far corner, later ones go on round the city's edge)
   const start = place(2, 2, 6, 6, 10 + ri(0, 4));
   const route = [start];
   let cur = start;
-  const goal = { x: W - 9, y: H - 9 };
-  for (let step = 0; step < 40; step++) {
-    const dxg = goal.x - cur.x, dyg = goal.y - cur.y;
-    if (Math.abs(dxg) < 4 && Math.abs(dyg) < 4) break;
+  const scale = roofScale(floor);
+  const far = { x: W - 9, y: H - 9 };
+  const goal = scale >= 1 ? { ...far } : { x: Math.round(start.x + (far.x - start.x) * scale), y: Math.round(start.y + (far.y - start.y) * scale) };
+  const legs = [{ x: W - 9, y: 2 }, { x: 12, y: 2 }, { x: 2, y: H - 9 }]; // past stage 4: up the far side, back along the top...
+  let legsLeft = scale > 1 ? legs.slice() : [], firstLegRoofs = 0, wantRoofs = 0;
+  for (let step = 0; step < 40 + 40 * (scale > 1 ? 1 : 0); step++) {
+    let dxg = goal.x - cur.x, dyg = goal.y - cur.y;
+    if (Math.abs(dxg) < 4 && Math.abs(dyg) < 4) {
+      if (!firstLegRoofs) { firstLegRoofs = route.length; wantRoofs = Math.round(firstLegRoofs * scale); }
+      if (!legsLeft.length || route.length >= wantRoofs) break;
+      Object.assign(goal, legsLeft.shift());
+      dxg = goal.x - cur.x; dyg = goal.y - cur.y;
+    }
+    if (firstLegRoofs && route.length >= wantRoofs) break;
+    const dirX = !firstLegRoofs || goal.x >= cur.x ? 1 : -1, dirY = !firstLegRoofs || goal.y >= cur.y ? 1 : -1; // only the later legs run left and up
     let placed = null;
     for (let attempt = 0; attempt < 12 && !placed; attempt++) {
       const horiz = Math.abs(dxg) > Math.abs(dyg) ? R() < 0.75 : R() < 0.25;
       const w = ri(3, 6), h = ri(3, 6);
       // a special link? a KICK ALLEY (wall kick between two towers) or a SURF CANAL (ride a ramp down)
       const roll = R();
-      const special = attempt < 8 && cur.height >= 8 && roll < D.surf && cur.height >= SURF.minRoof ? 'surf' : attempt < 8 && cur.height >= 8 && roll >= D.surf && roll < D.surf + D.kick ? 'kick' : null;
+      const special = dirX > 0 && dirY > 0 && attempt < 8 && cur.height >= 8 && roll < D.surf && cur.height >= SURF.minRoof ? 'surf' : attempt < 8 && cur.height >= 8 && roll >= D.surf && roll < D.surf + D.kick ? 'kick' : null;
       if (special) {
         const gap = special === 'kick' ? KICK.gap : ri(SURF.gapMin, SURF.gapMax);
         const height = Math.round((special === 'kick' ? cur.height - KICK.drop[0] - R() * (KICK.drop[1] - KICK.drop[0]) : cur.height - surfDrop(cur.height)) * 10) / 10;
@@ -110,21 +132,21 @@ export function generateCity(seed, floor) {
       height = Math.round(Math.max(5, Math.min(22, height)) * 10) / 10;
       if (!pad && gap === 1 && height > cur.height + 0.7) height = Math.floor((cur.height + 0.7) * 10) / 10;
       let x, y;
-      if (horiz) { x = cur.x + cur.w + gap; y = Math.max(1, Math.min(H - h - 2, cur.y + ri(-(h - 2), cur.h - 2))); }
-      else { y = cur.y + cur.h + gap; x = Math.max(1, Math.min(W - w - 2, cur.x + ri(-(w - 2), cur.w - 2))); }
+      if (horiz) { x = dirX > 0 ? cur.x + cur.w + gap : cur.x - gap - w; y = Math.max(1, Math.min(H - h - 2, cur.y + ri(-(h - 2), cur.h - 2))); }
+      else { y = dirY > 0 ? cur.y + cur.h + gap : cur.y - gap - h; x = Math.max(1, Math.min(W - w - 2, cur.x + ri(-(w - 2), cur.w - 2))); }
       // the two roofs must face each other across the gap for at least 2 tiles
       const overlap = horiz ? Math.min(y + h, cur.y + cur.h) - Math.max(y, cur.y) : Math.min(x + w, cur.x + cur.w) - Math.max(x, cur.x);
       if (overlap < 2 || occupied(x, y, w, h, 0)) continue;
       // the gap itself must be open street
       let gapClear = true;
-      if (horiz) { for (let i = cur.x + cur.w; i < x && gapClear; i++) for (let j = Math.max(y, cur.y); j < Math.min(y + h, cur.y + cur.h); j++) if (roomOf[idx(i, j)] >= 0) { gapClear = false; break; } }
-      else { for (let j = cur.y + cur.h; j < y && gapClear; j++) for (let i = Math.max(x, cur.x); i < Math.min(x + w, cur.x + cur.w); i++) if (roomOf[idx(i, j)] >= 0) { gapClear = false; break; } }
+      if (horiz) { for (let i = dirX > 0 ? cur.x + cur.w : x + w; i < (dirX > 0 ? x : cur.x) && gapClear; i++) for (let j = Math.max(y, cur.y); j < Math.min(y + h, cur.y + cur.h); j++) if (roomOf[idx(i, j)] >= 0) { gapClear = false; break; } }
+      else { for (let j = dirY > 0 ? cur.y + cur.h : y + h; j < (dirY > 0 ? y : cur.y) && gapClear; j++) for (let i = Math.max(x, cur.x); i < Math.min(x + w, cur.x + cur.w); i++) if (roomOf[idx(i, j)] >= 0) { gapClear = false; break; } }
       if (!gapClear) continue;
       placed = place(x, y, w, h, height);
       if (pad) {
         // a jump pad on the low roof, on the edge facing the next one
-        const pi = horiz ? cur.x + cur.w - 1 : Math.max(x, cur.x);
-        const pj = horiz ? Math.max(y, cur.y) : cur.y + cur.h - 1;
+        const pi = horiz ? (dirX > 0 ? cur.x + cur.w - 1 : cur.x) : Math.max(x, cur.x);
+        const pj = horiz ? Math.max(y, cur.y) : (dirY > 0 ? cur.y + cur.h - 1 : cur.y);
         type[idx(pi, pj)] = PAD; pads.push({ i: pi, j: pj });
       }
       placed.via = { from: cur, horiz, gap };
@@ -167,6 +189,6 @@ export function generateCity(seed, floor) {
   return {
     seed, floor, W, H, type, fh, ch, roomOf, rooms, route: route.map((b) => rooms.indexOf(b)), pads, spawn, exit, lights,
     props: [], horse: null, vaults: [], gates: [], pickups, challenges: [], broken: [], world: 'city', city: true, theme: { ...CITY_THEME, ...D.theme, name: D.name },
-    district, ramps, links,
+    district, ramps, links, size: scale,
   };
 }

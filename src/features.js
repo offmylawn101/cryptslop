@@ -475,6 +475,7 @@ export function installFeatures(Game) {
     addShockFx(m) {
       this.shockFx = this.shockFx || [];
       this.shockFx.push({ x: m.x, y: m.y, z: m.z, r: 0.5, v: m.v, max: m.m });
+      this.fxSlam(m.x, m.y, m.z, m.m, [1, 0.55, 0.2], Math.max(0.1, (m.m - 0.5) / Math.max(0.1, m.v)), { from: 0.5, linear: true, alpha: 0.95 }); // the ring rolls out at the wave's real speed
       this.sound.play('boom', { x: m.x, y: m.y, z: m.z });
       if (Math.hypot(m.x - this.mover.pos.x, m.z - this.mover.pos.z) < m.m && !this.shockTip) { this.shockTip = true; this.ui.banner('SHOCKWAVE! JUMP OVER THE RING', 1.8); }
     },
@@ -482,8 +483,6 @@ export function installFeatures(Game) {
       if (!this.shockFx) return;
       for (const s of this.shockFx) {
         s.r += s.v * dt;
-        const n = Math.round(10 + s.r * 5);
-        for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + Math.random() * 0.1; this.particles.emit(s.x + Math.cos(a) * s.r, s.y + 0.15, s.z + Math.sin(a) * s.r, Math.cos(a), 1.2, Math.sin(a), 1, 0.55, 0.2, 0.09, 0.18, 0.4); }
         const d = Math.hypot(s.x - this.mover.pos.x, s.z - this.mover.pos.z);
         if (Math.abs(d - s.r) < 1.2 && !this.dead) this.landDip = Math.max(this.landDip || 0, 0.05);
       }

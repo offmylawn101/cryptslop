@@ -89,6 +89,7 @@ export class UI {
   key(e) {
     if (this.screen === 'archive' && archiveKey(this, e)) return; // the archive's list and its entry files (archive.js)
     if (this.screen === 'porridge' && this.g.porridgeKey && this.g.porridgeKey(e)) return; // the PIXEL PORRIDGE shop (porridge.js)
+    if (this.screen === 'wires' && this.g.wiresKey && this.g.wiresKey(e)) return; // a rooftop WIRE PUZZLE (rooftops.js)
     if (e.code === 'Escape' && (this.screen === 'settings' || this.screen === 'help' || this.screen === 'browser')) this.screen = this.back === 'pause' ? null : 'title';
     else if (e.code === 'Escape' && (this.screen === 'archive' || this.screen === 'beepass')) this.screen = 'title';
     else if (e.code === 'Escape' && this.screen === 'quit') this.screen = null;
@@ -147,6 +148,7 @@ export class UI {
     if (this.screen === 'class') this.drawClassPick();
     else if (this.screen === 'archive') this.drawArchive();
     else if (this.screen === 'porridge' && g.drawPorridgeShop) g.drawPorridgeShop(this);
+    else if (this.screen === 'wires' && g.drawWires) g.drawWires(this);
     else if (this.screen === 'beepass') this.drawBeePass();
     else if (this.screen === 'quit') this.drawQuit();
     else if (this.screen === 'title') this.drawTitle();

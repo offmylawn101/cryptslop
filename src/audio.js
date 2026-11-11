@@ -263,7 +263,7 @@ export class SoundSystem {
   setTrack(name) {
     if (!this.ctx || this.trackName === name) return;
     this.trackName = name;
-    const files = { main: 'cryptslop1', last: 'laststand' };
+    const files = { main: 'cryptslop1', last: 'laststand', frozen: 'frozen.mp3' }; // a name with an extension is used as it is
     if (!this.tracks) this.tracks = {};
     for (const [k, t] of Object.entries(this.tracks)) if (k !== name) { try { t.el.pause(); } catch (e) { /* ignore */ } }
     // the synthesized score steps aside for a song, except the throat-singing drone, which keeps going underneath, quietly
@@ -273,7 +273,7 @@ export class SoundSystem {
     if (!t) {
       const el = new Audio();
       const ogg = el.canPlayType && el.canPlayType('audio/ogg; codecs=opus');
-      el.src = `./audio/${files[name]}.${ogg ? 'ogg' : 'm4a'}`;
+      el.src = files[name].includes('.') ? `./audio/${files[name]}` : `./audio/${files[name]}.${ogg ? 'ogg' : 'm4a'}`;
       el.loop = true; el.preload = 'auto'; el.crossOrigin = 'anonymous';
       t = { el, node: null };
       try { t.node = this.ctx.createMediaElementSource(el); t.node.connect(this.music); } catch (e) { el.volume = this.musicVol; }

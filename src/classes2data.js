@@ -20,7 +20,7 @@ export const NEW_CLASS_UNLOCKS = {
 };
 
 // tuning
-export const SIEGER = { cd: 0.85, speed: 23, up: 4.5, grav: 20, dmg: 75, blastR: 3, blastDmg: 30, shards: 12, shardDmg: 22, shardSpeed: 44, shardBounces: 8, shardLife: 2.4, shardGrav: 7, seekR: 10, seekBounce: 0.5, perBurst: 28, maxShards: 220, maxStones: 24, minCd: 0.25 };
+export const SIEGER = { cd: 0.85, speed: 23, up: 4.5, grav: 20, dmg: 75, blastR: 3, blastDmg: 30, shards: 12, shardDmg: 22, shardSpeed: 44, shardBounces: 8, shardLife: 2.4, shardGrav: 7, seekR: 10, seekBounce: 0.5, perBurst: 28, maxShards: 220, maxStones: 24, minCd: 0.25, maxChunks: 9, chunkSpeed: 26, chunkDmgMul: 3, chunkBounces: 3, maxRebursts: 3 };
 // unlock windows: SIEGER kills a boss within this many seconds of it appearing; KOOLCILLER holds SSS this long
 export const UNLOCK_TIMES = { sieger: 5, kool: 22 };
 export const KOOL = { pokeDmg: 40, pokeRange: 3.0, pokeChargeRange: 2.2, pokeCd: 0.4, lunge: 8, lungeCharge: 13, chargeTime: 0.8, parryCd: 2.4, parryHitCd: 1.2, rage: 33, rageSpeed: 1.7, rageFov: 22, flurryCd: 0.12, flurryR: 6.5, flurryDmg: 22, whirlR: 7, whirlDmg: 120, crashT: 4, crashSpeed: 0.5, crashAtk: 0.45, rankBonus: 4 };
@@ -34,7 +34,7 @@ export const NEW_CLASS_UPGRADES = {
   sg_frag: { cls: 'sieger', name: 'FRAG MASONRY', desc: '+8 SHRAPNEL PER STONE', color: '#d0c0a0', mods: { sgShards: 8 } },
   sg_trebuchet: { cls: 'sieger', name: 'TREBUCHET ARM', desc: '-30% TIME BETWEEN STONES', color: '#a08060', mods: { sgCdPct: 30 } },
   sg_rubble: { cls: 'sieger', name: 'LIVE RUBBLE', desc: 'SHRAPNEL BOUNCES 4 MORE TIMES', color: '#e0d0b0', mods: { sgBounce: 4 } },
-  sg_split: { cls: 'sieger', name: 'SPLITTING STONE', desc: 'STONES BREAK INTO 3 SMALLER STONES THAT ALSO BURST', color: '#c0b090', mods: { sgSplit: 1 } },
+  sg_split: { cls: 'sieger', name: 'SPLITTING STONE', desc: 'STONES BREAK INTO 3 HEAVY CHUNKS OF SHRAPNEL THAT SEEK FOES (STACKS)', color: '#c0b090', mods: { sgSplit: 1 } },
   // KOOLCILLER
   kk_serrated: { cls: 'koolciller', name: 'SERRATED EDGE', desc: '+40% KNIFE DAMAGE', color: '#d01020', mods: { kkDmgPct: 40 } },
   kk_bloodthirst: { cls: 'koolciller', name: 'BLOODTHIRST', desc: 'POKES THRUST 50% FURTHER. KILLS RESET THE POKE', color: '#ff2040', mods: { kkLunge: 50, kkKillReset: 1 } },
@@ -71,11 +71,11 @@ export const ULTRA_UPGRADES = {
   u_cleaver: { cls: 'cleaver', ultra: true, giga: true, name: 'ULTRA: THE GUILLOTINE', desc: '+100% SLASH DAMAGE, SLASHES GO FULL CIRCLE, 3X DAMAGE TO FOES UNDER 30%', color: '#ff40c0', mods: { cleaverDmgPct: 100, cleaverArc: 1, cleaverExecutePct: 200 } },
   u_fister: { cls: 'fister', ultra: true, giga: true, name: 'ULTRA: FINEST HOUR', desc: 'THE PARRY BAR IS ALWAYS FULL: TOP SPEED, AND EVERY PARRY EXPLODES', color: '#ff6a3a', mods: { fisterUltra: 1 } },
   u_pestilent: { cls: 'pestilent', ultra: true, giga: true, name: 'ULTRA: BLACK DEATH', desc: '+60% CLOUD SIZE, +80% ROT, +3 COUGHS, DEATHS SPREAD IT', color: '#a0e040', mods: { cloudRadiusPct: 60, cloudDmgPct: 80, coughMax: 3, cloudSpread: 1 } },
-  u_sieger: { cls: 'sieger', ultra: true, giga: true, name: 'ULTRA: THE SIEGE OF EVERYTHING', desc: 'EVERY STONE BURSTS TWICE. SHRAPNEL EXPLODES WHEN IT STOPS', color: '#b0a090', mods: { sgUltra: 1, sgShards: 6 } },
-  u_koolciller: { cls: 'koolciller', ultra: true, giga: true, name: 'ULTRA: 33', desc: 'RAGE NEVER CRASHES, AND EVERY KILL WHILE ENRAGED ADDS A SECOND', color: '#d01020', mods: { kkUltra: 1 } },
-  u_interceptor: { cls: 'interceptor', ultra: true, giga: true, name: 'ULTRA: THE LAST LINE', desc: 'LASERS LAST TWICE AS LONG AND HIT 50% HARDER. ERASED BULLETS HEAL YOU', color: '#40ffd0', mods: { icUltra: 1 } },
-  u_blasphemous: { cls: 'blasphemous', ultra: true, giga: true, name: 'ULTRA: THE HORSE\'S BLESSING', desc: 'JAVELINS SEEK FOES AND EXPLODE WHERE THEY LAND', color: '#8020c0', mods: { blUltra: 1 } },
-  u_parkour: { cls: 'parkour', ultra: true, giga: true, name: 'ULTRA: TERMINAL VELOCITY', desc: 'MOVING HITS 2X HARDER, AND KILLS GIVE YOU YOUR DASHES BACK', color: '#ff3030', mods: { pkUltra: 1 } },
+  u_sieger: { cls: 'sieger', ultra: true, giga: true, name: 'ULTRA: THE SIEGE OF EVERYTHING', desc: 'EVERY STONE BURSTS AGAIN (+1 PER COPY, MAX 3). SHRAPNEL EXPLODES WHEN IT STOPS', color: '#b0a090', mods: { sgUltra: 1, sgShards: 6 } },
+  u_koolciller: { cls: 'koolciller', ultra: true, giga: true, name: 'ULTRA: 33', desc: 'RAGE NEVER CRASHES, AND EVERY KILL WHILE ENRAGED ADDS A SECOND (+1 PER COPY)', color: '#d01020', mods: { kkUltra: 1 } },
+  u_interceptor: { cls: 'interceptor', ultra: true, giga: true, name: 'ULTRA: THE LAST LINE', desc: 'LASERS LAST LONGER AND HIT 50% HARDER, ERASED BULLETS HEAL YOU (ALL STACK)', color: '#40ffd0', mods: { icUltra: 1 } },
+  u_blasphemous: { cls: 'blasphemous', ultra: true, giga: true, name: 'ULTRA: THE HORSE\'S BLESSING', desc: 'JAVELINS SEEK FOES AND EXPLODE WHERE THEY LAND (BIGGER PER COPY)', color: '#8020c0', mods: { blUltra: 1 } },
+  u_parkour: { cls: 'parkour', ultra: true, giga: true, name: 'ULTRA: TERMINAL VELOCITY', desc: 'MOVING HITS 2X HARDER (+1X PER COPY), KILLS GIVE YOUR DASHES BACK', color: '#ff3030', mods: { pkUltra: 1 } },
 };
 export const ultraFor = (cls) => `u_${cls}`;
 export const NEW_CLASS_MOD_KEYS = ['sgDmgPct', 'sgShards', 'sgCdPct', 'sgBounce', 'sgSplit', 'sgUltra', 'kkDmgPct', 'kkLunge', 'kkKillReset', 'kkRageS', 'kkSoft', 'kkWhirlPct', 'kkUltra',

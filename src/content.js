@@ -2,8 +2,11 @@
 // class-only upgrades, GIGA upgrades, and the archive lore. Merged into data.js.
 
 // ---------- enemies ----------
-export const NEW_ENEMY_TYPES = ['stomper', 'marauder', 'cruiser', 'nyaslop', 'seamstress', 'apiarist', 'combstack', 'lampmother', 'tyrant', 'swarmheart', 'evilhorse', 'civilian'];
-export const NEW_ENEMY_NAMES = ['STOMPER', 'MARAUDER', 'CRUISER', 'NYASLOP, THE GREMLIN CAT', 'THE SEAMSTRESS', 'THE APIARIST', 'COMBSTACK', 'LAMPMOTHER', 'THE TARANTULA TYRANT', 'SWARMHEART', 'THE EVIL HORSE', 'A PERSON'];
+export const NEW_ENEMY_TYPES = ['stomper', 'marauder', 'cruiser', 'nyaslop', 'seamstress', 'apiarist', 'combstack', 'lampmother', 'tyrant', 'swarmheart', 'evilhorse', 'civilian',
+  // the deep floors (bestiary.js): floor 5 and beyond, then floor 10 and beyond
+  'mothman', 'plaguebringer', 'construction', 'antlion', 'honeypot', 'frostboom', 'personifier', 'wanderer', 'necrotick', 'hivemind'];
+export const NEW_ENEMY_NAMES = ['STOMPER', 'MARAUDER', 'CRUISER', 'NYASLOP, THE GREMLIN CAT', 'THE SEAMSTRESS', 'THE APIARIST', 'COMBSTACK', 'LAMPMOTHER', 'THE TARANTULA TYRANT', 'SWARMHEART', 'THE EVIL HORSE', 'A PERSON',
+  'MOTHMAN', 'PLAGUEBRINGERS', 'CONSTRUCTION', 'ANTLION', 'HONEYPOT ANT', 'FROSTBOOM', 'RANDOMLING PERSONIFIER', 'THE WANDERER', 'NECRO-TICK', 'HIVEMIND'];
 export const NEW_ENEMIES = {
   // RANDOMLINGS: they only live in the real rooms (an office, a kitchen...) that replace hive rooms after floor 6
   stomper: { // heavy: every step shakes the ground, its attack is a shockwave you have to jump
@@ -33,9 +36,32 @@ export const NEW_ENEMIES = {
   evilhorse: { hp: 500, speed: 8.5, radius: 0.8, melee: { range: 2.3, dmg: 30, windup: 0.35, cooldown: 0.8 }, hunter: true, hit: [[1.2, 0.8, 1], [2.0, 0.4, 2]], height: 2.3 },
   // a lost PERSON (npcs.js). RED shirts fight you; every other color wanders and runs away.
   civilian: { hp: 70, speed: 4.2, radius: 0.45, melee: { range: 2.0, dmg: 12, windup: 0.4, cooldown: 1.0 }, npc: true, hit: [[1.0, 0.45, 1], [1.62, 0.25, 2]], height: 1.8 },
+  // ---- floor 5 and beyond (bestiary.js) ----
+  // hangs from the ceiling in the dark, drops on whoever walks under it, then flies back up to wait again
+  mothman: { hp: 240, speed: 6.2, radius: 0.6, melee: { range: 2.4, dmg: 24, windup: 0.3, cooldown: 1.0 }, hit: [[1.6, 0.65, 1], [2.75, 0.35, 2]], height: 3.1, deep: 5 },
+  // a cloud of tiny green flies: cannot be killed, only lives in the narrow halls, and rots whoever it touches
+  plaguebringer: { hp: 1, speed: 3.6, radius: 0.7, hit: [], height: 2.0, hover: 0.6, deep: 5, unkillable: true },
+  // a COMBSTACK the hive has not finished building: half its health, and it keeps building itself
+  construction: { hp: 1300, speed: 1.4, radius: 1.4, melee: { range: 2.9, dmg: 20, windup: 0.8, cooldown: 1.8 }, hit: [[1.5, 1.5, 1]], height: 3.0, deep: 5 },
+  // buried in a sand pit; walk over it and it erupts, drags you in and bites
+  antlion: { hp: 180, speed: 3.4, radius: 0.8, melee: { range: 2.2, dmg: 18, windup: 0.35, cooldown: 1.1 }, hit: [[0.6, 0.8, 1], [0.95, 0.35, 2]], height: 1.3, deep: 5 },
+  // a living honey jar: feeds the foes around it (they heal) and bursts into honey when it dies
+  honeypot: { hp: 150, speed: 2.2, radius: 0.9, hit: [[0.9, 0.95, 1], [1.6, 0.35, 2]], height: 1.9, deep: 5 },
+  // ---- floor 10 and beyond ----
+  // a heart-shaped engine frozen in ice. It calls glacier guards; kill them all in time or it goes off
+  frostboom: { hp: 800, speed: 0, radius: 1.8, hit: [[1.8, 1.7, 1]], height: 3.6, deep: 10 },
+  // an oily randomling pillar from floor to ceiling: dashes through rooms, turning bugs into randomlings
+  personifier: { hp: 700, speed: 2.6, radius: 0.75, melee: { range: 1.9, dmg: 22, windup: 0.4, cooldown: 1.2 }, randomling: true, hit: [[1.2, 0.85, 1], [3.0, 0.85, 1], [4.8, 0.85, 1.3]], height: 6.0, deep: 10 },
+  // a black-and-white beekeeper: tougher, tougher bees, and he gets back up three times
+  wanderer: { hp: 1300, speed: 3.2, radius: 1.1, melee: { range: 2.8, dmg: 30, windup: 0.6, cooldown: 1.3 }, pattern: ['summon:grunt:3', 'spread', 'charge', 'summon:yellowjacket:2', 'rain'], hit: [[1.6, 1.25, 1], [3.4, 0.6, 1.6]], height: 4.0, deep: 10 },
+  // a zombie tick: it latches onto another foe, takes a quarter of its health, and makes it rise again
+  necrotick: { hp: 30, speed: 6.4, radius: 0.35, melee: { range: 1.4, dmg: 8, windup: 0.2, cooldown: 0.8 }, hit: [[0.3, 0.45, 1]], height: 0.6, deep: 10 },
+  // a floating brain that links the foes around it: hit one and every linked foe shares the damage
+  hivemind: { hp: 320, speed: 3.0, radius: 0.8, ranged: { dmg: 10, speed: 12, cooldown: 2.4, range: 22 }, hover: 2.4, hit: [[2.6, 0.85, 1]], height: 3.3, deep: 10 },
 };
-export const NEW_SCORE = { stomper: 120, marauder: 80, cruiser: 140, nyaslop: 600, seamstress: 600, apiarist: 550, combstack: 650, lampmother: 550, tyrant: 650, swarmheart: 700, evilhorse: 300, civilian: 5 };
-export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3];
+export const NEW_SCORE = { stomper: 120, marauder: 80, cruiser: 140, nyaslop: 600, seamstress: 600, apiarist: 550, combstack: 650, lampmother: 550, tyrant: 650, swarmheart: 700, evilhorse: 300, civilian: 5,
+  mothman: 90, plaguebringer: 0, construction: 220, antlion: 70, honeypot: 80, frostboom: 400, personifier: 260, wanderer: 600, necrotick: 15, hivemind: 160 };
+export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30];
 export const RANDOMLINGS = ['stomper', 'marauder', 'cruiser'];
 
 // ---------- bosses ----------
@@ -143,6 +169,16 @@ export const LORE = {
   tyrant: 'A TARANTULA WHO TAXES EVERYTHING THAT WALKS PAST. YOU OWE BACK TAXES.',
   evilhorse: 'IT HEARD WHAT YOU SAID IN CHAT. IT IS NOT ANGRY. IT IS DISAPPOINTED. IT IS ALSO GOING TO SKIN YOU ALIVE.',
   swarmheart: 'TEN THOUSAND GNATS AGREED, FOR ONE MOMENT, TO BE A HEART. IT IS STILL BEATING.',
+  mothman: 'SEVEN FEET OF WINGS AND RED EYES. IT HANGS FROM THE CEILING AND WAITS. YOU WILL NOT LOOK UP. NOBODY EVER LOOKS UP.',
+  plaguebringer: 'TEN THOUSAND GREEN FLIES WHO HATE OPEN SPACES. YOU CANNOT KILL THEM. YOU CAN ONLY GET OUT OF THE HALLWAY.',
+  construction: 'A COMBSTACK, HALF BUILT. THE HIVE IS STILL WORKING ON IT. IF YOU LET THEM FINISH, IT WILL BE ANGRY ABOUT THE WAIT.',
+  antlion: 'DIGS A FUNNEL IN THE SAND AND WAITS AT THE BOTTOM. IT HAS BEEN WAITING FOR YOU SPECIFICALLY.',
+  honeypot: 'AN ANT WHOSE WHOLE JOB IS TO BE A JAR. IT FEEDS EVERYONE AROUND IT. POP IT FIRST, AND MIND THE HONEY.',
+  frostboom: 'AN ENGINE SHAPED LIKE A HEART, FROZEN SOLID. IT IS STILL BEATING. THE ICE IS THE ONLY THING HOLDING IT IN.',
+  personifier: 'A RANDOMLING THAT IS JUST A PILLAR. FLOOR TO CEILING. IT DOES NOT KNOW WHAT IT IS, SO IT MAKES EVERYTHING ELSE INTO WHAT IT IS.',
+  wanderer: 'THE BEEKEEPER, WITH ALL THE COLOR DRAINED OUT. HE HAS DIED BEFORE. IT DID NOT TAKE.',
+  necrotick: 'A TICK THAT DIED AND KEPT DRINKING. WHAT IT BITES GETS BACK UP.',
+  hivemind: 'A BRAIN THE SIZE OF A BEANBAG. IT DOES NOT FIGHT. IT MAKES EVERYTHING AROUND IT AGREE TO SHARE THE PAIN.',
   civilian: 'A PERSON IN A RED SHIRT. NOBODY KNOWS HOW THEY GOT INTO A BEEHIVE, AND THEY ARE NOT ASKING FOR DIRECTIONS. THEY WANT TO FIGHT. THE ONES IN OTHER COLORS LEFT A LONG TIME AGO.',
 };
 

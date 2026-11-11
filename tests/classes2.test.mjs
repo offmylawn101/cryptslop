@@ -90,7 +90,7 @@ installClasses2(G, Sim);
   g.cls = 'sieger'; g.onFeatureEvent({ k: 'giga' });
   ok(g.offers[0][0] === 'u_sieger' && g.offers[0].giga && g.offers[0].length === 3, 'the boss rush GIGA pick always offers your class ULTRA');
   g.ups.push('u_sieger'); g.offers = []; g.onFeatureEvent({ k: 'giga' });
-  ok(!g.offers[0].includes('u_sieger'), 'not once you have it');
+  ok(g.offers[0][0] === 'u_sieger', 'the ULTRA stacks, so it is offered again once you have it');
   // KOOLCILLER: right click is the counter, not the sting
   g.cls = 'koolciller'; g.parryCd = 0; g.dead = false; g.mode = 'play'; g.casino = { open: false }; g.chatOpen = false;
   g.inSafeZone = () => false; g.mover = { pos: { x: 0, y: 0, z: 0 } }; g.aim = () => ({ fwd: { x: 0, y: 0, z: -1 } }); g.stung = false;
@@ -168,11 +168,12 @@ installClasses2(G, Sim);
   ok(a.y > b.y + 1, `a wall run holds you up (${a.y.toFixed(2)} vs ${b.y.toFixed(2)})`);
 }
 
-// SIEGER: SPLITTING STONE + the ULTRA used to chain forever (each second burst split again). Burst every
-// stone that exists for 30 rounds, run the ultra timers, and the world must stay small.
+// SIEGER: SPLITTING STONE + the ULTRA used to chain forever (stones split into stones that split
+// again). Now a stone breaks into shrapnel CHUNKS, never stones, and the ULTRA stacks extra bursts.
+// Burst every stone that exists for 30 rounds, run the ultra timers, and the world must stay small.
 {
   const g = new G();
-  g.cls = 'sieger'; g.ups = ['sg_split', 'sg_split', 'u_sieger', 'sg_frag', 'sg_frag', 'sg_frag', 'sg_frag'];
+  g.cls = 'sieger'; g.ups = ['sg_split', 'sg_split', 'sg_split', 'sg_split', 'u_sieger', 'u_sieger', 'u_sieger', 'u_sieger', 'sg_frag', 'sg_frag', 'sg_frag', 'sg_frag'];
   g.enemies = new Map(); g.honey = 0; g.particles = { burst() {}, emit() {} }; g.entityRoot = { add() {}, remove() {} };
   g.dmgMul = () => 1; g.wSize = () => 1; g.addStyle = () => {}; g.c2p = []; g.c2hits = new Map(); g.c2timers = [];
   g.spawnC2 = (kind, pos, vel, mine, extra) => { const t = { kind, mine, x: pos[0], y: pos[1], z: pos[2], ...extra }; g.c2p.push(t); return t; }; // no meshes in node
@@ -186,9 +187,18 @@ installClasses2(G, Sim);
     peakShards = Math.max(peakShards, g.c2p.filter((t) => t.kind === 'shard').length);
     peakStones = Math.max(peakStones, g.c2p.filter((t) => t.kind === 'stone').length);
   }
-  ok(bursts <= 8 && !g.c2timers.length && !g.c2p.some((t) => t.kind === 'stone'), `split + ultra ends: one stone makes ${bursts} bursts in all (it used to chain forever)`);
+  ok(bursts === 4 && !g.c2timers.length && !g.c2p.some((t) => t.kind === 'stone') && peakStones === 0, `split + 4 ULTRAs ends: one stone makes ${bursts} bursts (1 + 3 stacked, capped) and never another stone`);
+  const chunks = g.c2p.filter((t) => t.chunk);
+  ok(chunks.length === 9 && chunks.every((t) => t.kind === 'shard' && t.dmgMul === 3), `4x SPLITTING STONE: 9 heavy shrapnel chunks (capped), not stones (${chunks.length})`);
   ok(peakShards <= 220 && peakStones <= 24, `shrapnel and stones stay capped (${peakShards} shards, ${peakStones} stones at most)`);
   ok(g.c2p.filter((t) => t.kind === 'shard').every((t) => t.dmgMul >= 1), 'shrapnel past the cap hits harder instead of being dropped');
+  // one ULTRA: one extra burst, as before
+  const g1 = new G();
+  g1.cls = 'sieger'; g1.ups = ['u_sieger']; g1.enemies = new Map(); g1.honey = 0; g1.particles = { burst() {}, emit() {} }; g1.entityRoot = { add() {}, remove() {} };
+  g1.dmgMul = () => 1; g1.wSize = () => 1; g1.addStyle = () => {}; g1.c2p = []; g1.c2hits = new Map(); g1.c2timers = []; g1.spawnC2 = g.spawnC2.bind(g1);
+  g1.spawnC2 = (kind, pos, vel, mine, extra) => { const t = { kind, mine, ...extra }; g1.c2p.push(t); return t; };
+  g1.stoneBurst({ x: 0, y: 0, z: 0, mine: true }, 0, 1, 0);
+  ok(g1.c2timers.length === 1 && !g1.c2p.some((t) => t.chunk), 'one ULTRA: the stone bursts once more; no SPLITTING STONE: no chunks');
 }
 
 console.log(fails ? `\n${fails} FAILURE(S)` : '\nALL CLASS TESTS PASSED');
