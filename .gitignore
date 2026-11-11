@@ -3,7 +3,7 @@ web/main.bundle.js
 web/main.bundle.js.map
 .claude/
 store/*.mp4
-wishes/
+/wishes/
 server/wishes/.wrangler/
 server/wishes/node_modules/
 *.log
