@@ -86,7 +86,7 @@ export function generateCity(seed, floor) {
       const w = ri(3, 6), h = ri(3, 6);
       // a special link? a KICK ALLEY (wall kick between two towers) or a SURF CANAL (ride a ramp down)
       const roll = R();
-      const special = dirX > 0 && dirY > 0 && attempt < 8 && cur.height >= 8 && roll < D.surf && cur.height >= SURF.minRoof ? 'surf' : attempt < 8 && cur.height >= 8 && roll >= D.surf && roll < D.surf + D.kick ? 'kick' : null;
+      const special = !firstLegRoofs && attempt < 8 && cur.height >= 8 && roll < D.surf && cur.height >= SURF.minRoof ? 'surf' : attempt < 8 && cur.height >= 8 && roll >= D.surf && roll < D.surf + D.kick ? 'kick' : null;
       if (special) {
         const gap = special === 'kick' ? KICK.gap : ri(SURF.gapMin, SURF.gapMax);
         const height = Math.round((special === 'kick' ? cur.height - KICK.drop[0] - R() * (KICK.drop[1] - KICK.drop[0]) : cur.height - surfDrop(cur.height)) * 10) / 10;
@@ -98,7 +98,7 @@ export function generateCity(seed, floor) {
         const line = lo + ((hi - lo) >> 1); // the corridor's tile line across the gap
         const g0 = horiz ? cur.x + cur.w : cur.y + cur.h, g1 = horiz ? x : y; // the gap tiles along travel
         let clear = true;
-        for (let a = g0; a < g1 && clear; a++) for (let b = line - 1; b <= line + 1; b++) { const k = horiz ? idx(a, b) : idx(b, a); if (roomOf[k] >= 0) { clear = false; break; } }
+        for (let a = g0; a < g1 && clear; a++) for (let b = line - 1; b <= line + 1; b++) { const k = horiz ? idx(a, b) : idx(b, a); if (roomOf[k] >= 0 || roomOf[k] === -2) { clear = false; break; } } // -2: another surf corridor
         if (!clear) continue;
         placed = place(x, y, w, h, height);
         const tileAt = (a, b) => (horiz ? idx(a, b) : idx(b, a));

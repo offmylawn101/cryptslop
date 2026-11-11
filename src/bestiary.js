@@ -405,6 +405,7 @@ export function installBestiary(Sim) {
       const F = DEEP.frostboom;
       e.state = e.ice ? 0 : 1;
       if (!e.armed && e.ice) {
+        if (this.grace > 0) return true; // nothing wakes during the title card
         const seen = alive.some((p) => Math.hypot(p.x - e.x, p.z - e.z) < F.wake && lineOfSight(this.map, e.x, e.z, p.x, p.z));
         if (!seen) return true;
         e.armed = true; e.awake = true; e.timer = F.time; e.guards = [];
@@ -417,7 +418,7 @@ export function installBestiary(Sim) {
           makeElemental(g, EL.frost); g.awake = true; g.guardOf = e.id;
           e.guards.push(g.id);
         }
-        this.ev({ k: 'bug', s: 'frostboom', id: e.id, t: F.time, n: e.guards.length, x: r2(e.x), y: r2(e.y), z: r2(e.z) });
+        this.ev({ k: 'bug', s: 'frostboom', id: e.id, tt: F.time, n: e.guards.length, x: r2(e.x), y: r2(e.y), z: r2(e.z) });
         return true;
       }
       if (!e.armed) return true;
@@ -442,7 +443,7 @@ export function installBestiary(Sim) {
       this.frozenFrom = this.floor; this.frozenTo = this.floor + 1;
       this.enemies.delete(e.id);
       this.freezeFoes(0.3, 8);
-      this.ev({ k: 'bug', s: 'frostbomb', x: r2(e.x), y: r2(e.y + 1.5), z: r2(e.z), t: F.freeze });
+      this.ev({ k: 'bug', s: 'frostbomb', x: r2(e.x), y: r2(e.y + 1.5), z: r2(e.z), tt: F.freeze });
       if (this.hostiles() === 0 && !this.portalOpen) this.onCleared();
     },
 
@@ -825,8 +826,8 @@ export function installBestiaryClient(Game, UI) {
         case 'feed': if (this.deepLinks) this.deepLinks.set(m.id, { ids: m.l || [], feed: true, until: this.time + 0.6 }); break;
         case 'burst': if (this.fxBoom) this.fxBoom(m.x, m.y, m.z, 3, [1, 0.75, 0.15], 0.3); this.sound.play('coin', at(m.x, m.y, m.z)); break;
         case 'frostboom':
-          if (this.frostbooms) this.frostbooms.set(m.id, { until: this.time + m.t, n: m.n });
-          this.ui.banner(`A FROSTBOOM WOKE UP! KILL ITS ${m.n} GLACIER GUARDS IN ${m.t} SECONDS`, 3);
+          if (this.frostbooms) this.frostbooms.set(m.id, { until: this.time + m.tt, n: m.n });
+          this.ui.banner(`A FROSTBOOM WOKE UP! KILL ITS ${m.n} GLACIER GUARDS IN ${m.tt} SECONDS`, 3);
           this.sound.play('boss');
           break;
         case 'thaw':
@@ -839,7 +840,7 @@ export function installBestiaryClient(Game, UI) {
           this.frostbooms = new Map();
           if (this.fxBoom) { this.fxBoom(m.x, m.y, m.z, 30, [0.7, 0.95, 1], 0.9); this.fxSlam(m.x, m.y - 1.5, m.z, 40, [0.6, 0.9, 1], 0.9); }
           this.sound.play('boom');
-          this.frozenT = m.t; this.frozenFloor = true;
+          this.frozenT = m.tt; this.frozenFloor = true;
           this.ui.banner('THE FROSTBOOM WENT OFF. YOU ARE FROZEN. THIS FLOOR AND THE NEXT ARE ICE', 3.5);
           break;
         case 'corrupt': if (this.fxBoom) this.fxBoom(m.x, m.y + 1, m.z, 1.8, [0.7, 0.7, 0.75], 0.25); this.sound.play('splat', at(m.x, m.y, m.z)); break;

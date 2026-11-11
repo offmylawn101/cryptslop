@@ -37,7 +37,7 @@ try {
   try {
     run(node, [esbuild, 'src/main.js', '--bundle', '--format=esm', '--target=es2022', '--minify', '--outfile=web/main.bundle.js']);
   } catch (e) { say(`build failed, not uploading: ${String(e.stderr || e.message).split('\n').filter(Boolean).slice(-1)[0]}`); process.exit(0); }
-  for (const t of ['tests/logic.test.mjs', 'tests/features.test.mjs', 'tests/fister.test.mjs', 'tests/classes2.test.mjs', 'tests/wishes.test.mjs']) {
+  for (const t of ['tests/logic.test.mjs', 'tests/features.test.mjs', 'tests/fister.test.mjs', 'tests/classes2.test.mjs', 'tests/wishes.test.mjs', 'tests/bugs.test.mjs', 'tests/bestiary.test.mjs', 'tests/rooftops.test.mjs']) {
     try { run(node, [t]); } catch (e) {
       const fails = String(e.stdout || '').split('\n').filter((l) => l.startsWith('FAIL')).slice(0, 2).join('; ');
       say(`${t} failed, not uploading: ${fails || e.message}`); process.exit(0);

@@ -30,7 +30,7 @@ export const ROOFX = {
   laser: { every: 3.2, n: [2, 4], warn: 1.2, fire: 0.8, r: 1.5, dmg: 22, near: [3, 16] },
   hail: { dps: 3, regen: 1.6, shelterR: 1.8, everyRoofs: 2 },
   fake: { base: 3, perStages: 3, r: 2.2, dmg: 14, wasps: 2 },
-  missile: { first: 8, every: 20, warn: 3, dmg: 30, drop: 3, minH: 4 },
+  missile: { first: 8, every: 20, warn: 3, dmg: 30, drop: 3, minH: 4, padClimb: 4.2 },
   swarm: { first: 6, every: 14, n: [3, 5], cap: 18, randomling: 0.7 },
   puzzle: { firstFloor: 2, chance: 0.35, n: [2, 4], reach: 4.5 },
 };
@@ -51,6 +51,17 @@ export function destroyRoof(map, ri) {
   }
   b.height = h; b.destroyed = true;
   return true;
+}
+
+// can a missile take this route roof out without cutting the way? Only if the hop off it is a plain
+// one-tile jump: the rubble's jump pads cover that, but not a long jump, a kick alley or a surf canal.
+export function missileOk(map, ri) {
+  const n = map.route.indexOf(ri), b = map.rooms[ri];
+  if (n <= 0 || n >= map.route.length - 1 || !b || b.destroyed || b.tower) return false;
+  const next = map.rooms[map.route[n + 1]];
+  if (!(next && next.via && next.via.from === b && next.via.gap === 1 && !next.via.special)) return false;
+  const rubble = Math.max(ROOFX.missile.minH, Math.round((b.height - ROOFX.missile.drop) * 10) / 10);
+  return next.height - rubble <= ROOFX.missile.padClimb; // a jump pad on the rubble must still reach the next roof
 }
 
 // ================= host =================
@@ -229,11 +240,11 @@ export function installRooftops(Sim) {
       rf.misT -= dt;
       if (rf.misT > 0) return;
       rf.misT = M.every;
-      const ri = this.roofAhead(alive, (r) => this.map.rooms[r].destroyed || rf.pz.some((z) => z.ri === r && !z.done));
+      const ri = this.roofAhead(alive, (r) => !missileOk(this.map, r) || rf.pz.some((z) => z.ri === r && !z.done));
       if (ri < 0) return;
       const b = this.map.rooms[ri];
       rf.missile = { ri, t: M.warn };
-      this.ev({ k: 'rf', s: 'mis', r: ri, x: r2((b.cx + 0.5) * T), y: r2(b.height), z: r2((b.cz ?? b.cy + 0.5) * T), rr: r2(Math.max(b.w, b.h) * T * 0.6), t: M.warn });
+      this.ev({ k: 'rf', s: 'mis', r: ri, x: r2((b.cx + 0.5) * T), y: r2(b.height), z: r2((b.cz ?? b.cy + 0.5) * T), rr: r2(Math.max(b.w, b.h) * T * 0.6), tt: M.warn }); // (not t: every event's t is 'ev')
     },
     roofSwarm(rf, alive, dt) {
       const Sw = ROOFX.swarm, m = this.map;
@@ -314,9 +325,10 @@ export function installRooftopsClient(Game, UI) {
       this.roofGroup = g; this.scene.add(g);
       if (this.roof.ev.length) {
         const names = this.roof.ev.map((e) => EVENT_NAMES[e]).join(' + ');
-        setTimeout(() => { if (this.roof) this.ui.banner(`ROOFTOP EVENT: ${names}`, 3.5); }, 2600);
+        const seed = msg.seed;
+        setTimeout(() => { if (this.roof && this.world && this.world.seed === seed) this.ui.banner(`ROOFTOP EVENT: ${names}`, 3.5); }, 2600);
       }
-      if (this.roof.pz.length) setTimeout(() => { if (this.roof) this.ui.toast(`THE HIVE IS LOCKED: FIX ${this.roof.pz.length} WIRE PUZZLES ON THE WAY`); }, 4200);
+      if (this.roof.pz.length) { const seed = msg.seed; setTimeout(() => { if (this.roof && this.world && this.world.seed === seed) this.ui.toast(`THE HIVE IS LOCKED: FIX ${this.roof.pz.length} WIRE PUZZLES ON THE WAY`); }, 4200); }
     },
     clearRoofFx() {
       if (this.roofGroup) { this.scene.remove(this.roofGroup); this.roofGroup = null; }
@@ -374,8 +386,8 @@ export function installRooftopsClient(Game, UI) {
       switch (m.s) {
         case 'lz': if (R) for (const [x, z] of m.b) R.beams.push({ x, z, t: m.w, fire: m.f, max: m.f }); this.sound.play('growl'); break;
         case 'mis':
-          if (R) R.missile = { x: m.x, y: m.y, z: m.z, t: m.t, max: m.t };
-          if (this.fxMark) this.fxMark(m.x, m.y, m.z, m.rr || 5, [1, 0.1, 0.05], m.t);
+          if (R) R.missile = { x: m.x, y: m.y, z: m.z, t: m.tt, max: m.tt };
+          if (this.fxMark) this.fxMark(m.x, m.y, m.z, m.rr || 5, [1, 0.1, 0.05], m.tt);
           this.sound.play('boss'); this.ui.toast('MISSILE INCOMING! GET OFF THE RED ROOF');
           break;
         case 'hit': {

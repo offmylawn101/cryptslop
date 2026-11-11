@@ -120,16 +120,16 @@ export class WirePuzzle {
       this.end(ctx, L, lx, ly(i), this.sel === i, done);
       drawSmall(ctx, String(i + 1), lx - 10, ly(i) - 2, '#8c88a8', 'right');
       if (L.order) drawSmall(ctx, `#${L.order}`, lx + 12, ly(i) - 2, '#ffd040');
-      ui.buttons.push({ x: lx - 8, y: ly(i) - 7, w: 17, h: 14, action: () => this.pickLeft(i) }); // a click area, nothing drawn
+      ui.buttons.push({ x: lx - 16, y: ly(i) - Math.floor(gap / 2), w: 46, h: Math.max(12, Math.floor(gap)), action: () => this.pickLeft(i) }); // a click area (the whole row end), nothing drawn
       // right end
       const hidden = this.kind === 'memory' && this.memoryT <= 0;
       this.end(ctx, hidden ? { color: '#3a3848', label: '?' } : R, rx, ly(i), false, [...this.links.values()].includes(i));
       drawSmall(ctx, String(i + 1), rx + 10, ly(i) - 2, '#8c88a8');
-      ui.buttons.push({ x: rx - 8, y: ly(i) - 7, w: 17, h: 14, action: () => this.pickRight(i, game) });
+      ui.buttons.push({ x: rx - 44, y: ly(i) - Math.floor(gap / 2), w: 60, h: Math.max(12, Math.floor(gap)), action: () => this.pickRight(i, game) }); // wide enough for a color NAME
     }
     if (this.kind === 'opposites') drawSmall(ctx, 'RED-GREEN  BLUE-ORANGE  YELLOW-PURPLE  WHITE-BLACK', W / 2, py + ph - 18, '#8c88a8', 'center');
     if (this.kind === 'memory' && this.memoryT > 0) drawSmall(ctx, `REMEMBER: ${Math.ceil(this.memoryT)}`, W / 2, py + ph - 18, '#ff8a4a', 'center');
-    drawSmall(ctx, 'CLICK A LEFT END, THEN A RIGHT END (OR PRESS TWO NUMBERS). ESC TO LEAVE', W / 2, py + ph - 9, '#6a6680', 'center');
+    drawSmall(ctx, 'CLICK LEFT, THEN RIGHT (OR TWO NUMBERS). ESC LEAVES', W / 2, py + ph - 9, '#6a6680', 'center');
   }
   end(ctx, e, x, y, selected, done) {
     if (selected) { ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 7, y - 6, 15, 13); }

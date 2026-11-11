@@ -1331,7 +1331,8 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
     for (const p of sm.players.values()) p.seen = 1e9;
     out.length = 0; for (let i = 0; i < 100; i++) sm.step(1 / 20);
     const snap = out.filter((m) => m.t === 's').pop();
-    ok(snap && snap.rt > 60 && snap.rt < 70, `the rooftop clock ticks in the snapshot (${snap && snap.rt})`);
+    const full = D.roofTime(1) * (await import('../src/city.js')).roofTimeScale(1); // stage 1's rooftops are smaller, so its clock is shorter
+    ok(snap && snap.rt > full - 10 && snap.rt < full, `the rooftop clock ticks in the snapshot (${snap && snap.rt} of ${full})`);
     sm.loadFloor(); out.length = 0; sm.step(1 / 20);
     const s2 = out.filter((m) => m.t === 's').pop();
     ok(s2 && s2.rt === null, 'no clock in the hive');
