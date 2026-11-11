@@ -1,5 +1,6 @@
 // Tests for the hive update: lounge, vaults, gates, horses, expressive movement, parry, gambling, content.
 // Run with `node tests/features.test.mjs`
+import './_seed.mjs'; // repeatable randomness
 import { generateFloor, bfs, W, H, T, WALL, FLOOR, openVault, gateAt, propUnder, NEST_H, spawnSlot, MAX_PLAYERS } from '../src/mapgen.js';
 import { Mover, MV } from '../src/movement.js';
 import { Sim } from '../src/sim.js';
@@ -1167,7 +1168,7 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
     // the nuke clears the floor (the FINGLER survives)
     const fing = s.addEnemy('fingler', 10, 0, 10, 1);
     s.handle('a', { t: 'nuke' });
-    ok(s.enemies.has(fing.id) && [...s.enemies.values()].every((e) => e.type === 'fingler'), 'the nuclear football clears the floor; the FINGLER survives (a floor can roll its own rare fingler too)');
+    ok(s.enemies.has(fing.id) && [...s.enemies.values()].every((e) => e.type === 'fingler'), `the nuclear football clears the floor; the FINGLER survives (a floor can roll its own rare fingler too) [left: ${[...s.enemies.values()].filter((e) => e.type !== 'fingler').map((e) => `${e.type}${e.hp > 0 ? '' : '(dead)'}`).join(',')}]`);
     // a botched backflip explodes and hurts you
     a.x = vx; a.z = vz; a.hp = 100;
     s.handle('a', { t: 'flop' });

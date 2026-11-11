@@ -35,7 +35,7 @@ const DEFAULTS = {
 
 function config() {
   let c = {};
-  try { c = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')); } catch (e) { /* none yet */ }
+  try { c = JSON.parse(fs.readFileSync(process.env.WISH_CONFIG || CONFIG_FILE, 'utf8')); } catch (e) { /* none yet */ }
   return { ...DEFAULTS, ...c };
 }
 function saveConfig(c) {

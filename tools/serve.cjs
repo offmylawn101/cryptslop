@@ -2,7 +2,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const root = path.join(__dirname, '..', 'web');
+const root = path.resolve(process.env.WEB_ROOT || path.join(__dirname, '..', 'web')); // WEB_ROOT: preview a wish build (tools/wishes/preview.cjs)
 const port = Number(process.env.PORT || 8080);
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.map': 'application/json', '.png': 'image/png', '.css': 'text/css', '.gltf': 'model/gltf+json', '.glb': 'model/gltf-binary', '.ogg': 'audio/ogg', '.m4a': 'audio/mp4', '.mp3': 'audio/mpeg' };
 http.createServer((req, res) => {

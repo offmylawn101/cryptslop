@@ -1,6 +1,7 @@
 // Translation of kit/core/tests/SimTest.cpp: standalone checks for the Fister simulation port against
 // the numbers in docs/fister-moveset-spec.md. Flat ground at z = 0, body centre 0.8 above the feet.
 // Run with `node tests/fister.test.mjs`.
+import './_seed.mjs'; // repeatable randomness
 import { Sim, EventType, PunchKind, ParryKind, RailingTravelSpeed, MakeInput, MakeEnvironment, Vec3, k } from '../src/fister/FisterSim.js';
 import { kPi } from '../src/fister/FisterMath.js';
 import { PoseAnimator, MakePoseInput, kRightArm, kHead, kTorso } from '../src/fister/Pose.js';

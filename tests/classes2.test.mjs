@@ -1,6 +1,7 @@
 // Tests for the five hard-won classes (SIEGER, KOOLCILLER, INTERCEPTOR, BLASPHEMOUS, PARKOUR), the ULTRA
 // upgrades, the unlocks, laser bullet erasing, the rage timer, wall running and the wild EVIL HORSE.
 // Run with `node tests/classes2.test.mjs`
+import './_seed.mjs'; // repeatable randomness
 import { W, H, T, WALL, FLOOR, inLounge } from '../src/mapgen.js';
 import { Mover, MV } from '../src/movement.js';
 import { Sim } from '../src/sim.js';

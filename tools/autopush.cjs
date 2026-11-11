@@ -56,6 +56,13 @@ try {
   const id = (out.match(/\b[a-z0-9]{32}\b/) || [])[0];
   fs.mkdirSync(path.dirname(STATE), { recursive: true });
   fs.writeFileSync(STATE, JSON.stringify({ hash, build: id || null, at: stamp }, null, 2));
+  // keep git in step with what was uploaded (the daily wish build branches from main)
+  try {
+    if (fs.existsSync(path.join(ROOT, '.git')) && run('git', ['status', '--porcelain']).trim()) {
+      run('git', ['add', '-A']);
+      run('git', ['commit', '-q', '-m', `Uploaded build ${id || stamp}`]);
+    }
+  } catch (e) { /* the upload still happened */ }
   say(`uploaded build ${id || '(see CLI output)'}. Publish it in the Developer Portal.`);
 } catch (e) {
   say(`hook error: ${e.message}`);

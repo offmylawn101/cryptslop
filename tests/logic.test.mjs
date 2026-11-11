@@ -1,4 +1,5 @@
 // Headless logic tests: run with `node tests/logic.test.mjs`
+import './_seed.mjs'; // repeatable randomness
 import { generateFloor, bfs, W, H, T, WALL, FLOOR, raycastLevel } from '../src/mapgen.js';
 import { Mover, MV, U } from '../src/movement.js';
 import { Sim } from '../src/sim.js';
