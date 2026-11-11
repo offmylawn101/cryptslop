@@ -118,6 +118,11 @@ function report(st) {
   for (const r of st.results) for (const f of r.flags || []) warn.push(`Wish #${r.id} adds ${f.what}: \`${f.lines[0]}\``);
   for (const r of st.picked) if (r.rawFlag) warn.push(`Wish #${r.id}'s original text has red-flag words (${r.rawFlag}); the builder only saw the moderator's rewrite`);
   if (warn.length) { L.push('## Look at these before approving', ''); for (const x of warn) L.push(`- ${x}`); L.push(''); }
+  if (st.phase === 'dry') {
+    L.push('## Would build (dry run)', '');
+    for (const w of st.picked) L.push(`- #${w.id} ${w.title} (${w.votes} votes${w.wildcard ? ', WILDCARD' : ''}) by ${w.name}: ${w.spec}`);
+    L.push('');
+  }
   L.push('## Built today', '');
   for (const r of st.results) {
     const w = st.picked.find((p) => p.id === r.id);
@@ -175,7 +180,7 @@ async function main() {
       else { const raw = w.text.match(C.SPEC_RED_FLAGS); builds.push({ ...item, spec, title, rawFlag: raw ? raw[0] : null }); }
     } else st.skipped.push(item);
   }
-  if (st.hidden.length) await C.api(cfg, 'POST', '/api/admin/hide', { ids: st.hidden.map((w) => w.id), reason: 'moderation' });
+  if (st.hidden.length && !DRY) await C.api(cfg, 'POST', '/api/admin/hide', { ids: st.hidden.map((w) => w.id), reason: 'moderation' });
   log(`moderated: ${builds.length} buildable, ${st.skipped.length} skipped, ${st.rejected.length} rejected, ${st.hidden.length} hidden, ${st.flagged.length} flagged`);
 
   const n = ONLY || cfg.build;
