@@ -36,6 +36,9 @@ export function mergeProfiles(local, cloud) {
     m.seen = union(a.seen, b.seen);
     m.hats = union(a.hats, b.hats); // cosmetics are kept forever
     m.flair = union(a.flair, b.flair);
+    m.wished = Math.max(Number(a.wished) || 0, Number(b.wished) || 0); // the Petition Bee (wishes.js)
+    m.wishIntro = Math.max(Number(a.wishIntro) || 0, Number(b.wishIntro) || 0);
+    m.wishPaid = !!(a.wishPaid || b.wishPaid);
     m.killed = maxObj(a.killed, b.killed);
     m.wafers = Number.isFinite(a.wafers) ? a.wafers : Number(b.wafers) || 0;
     if (!lt) m.wafers = Math.max(Number(a.wafers) || 0, Number(b.wafers) || 0); // a wiped device never wins on wafers

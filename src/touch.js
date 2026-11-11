@@ -70,7 +70,7 @@ export class TouchControls {
       ['kit0', '', 21, 40, 11, 'play'], ['kit1', '', 34, 36, 11, 'play'], ['kit2', '', 41, 20, 11, 'play'],
       ['use', 'USE', 50, 18, 10, 'play'], ['active', 'RELIC', 56, 4, 10, 'play'],
       ['pause', 'II', 2, 'top:2', 9, 'any', true], ['bag', 'BAG', 13, 'top:2', 9, 'play', true], ['ping', 'PING', 24, 'top:2', 9, 'play', true],
-      ['w', 'W', 35, 'top:2', 9, 'play', true], ['build', 'BUILD', 46, 'top:2', 9, 'play', true], ['flip', 'FLIP', 57, 'top:2', 9, 'play', true], ['swap', 'SWAP', 68, 'top:2', 9, 'play', true], ['med', 'MED', 79, 'top:2', 9, 'play', true], ['saber', 'SABR', 90, 'top:2', 9, 'play', true],
+      ['w', 'W', 35, 'top:2', 9, 'play', true], ['build', 'BUILD', 46, 'top:2', 9, 'play', true], ['flip', 'FLIP', 57, 'top:2', 9, 'play', true], ['swap', 'SWAP', 68, 'top:2', 9, 'play', true], ['med', 'MED', 79, 'top:2', 9, 'play', true], ['saber', 'SABR', 90, 'top:2', 9, 'play', true], ['wish', 'WISH', 101, 'top:2', 9, 'play', true],
       ['qte', 'TAP!', 'center', 'center', 22, 'qte'],
       ['up', '▲', 16, 30, 12, 'pad', true], ['down', '▼', 16, 4, 12, 'pad', true], ['left', '◀', 29, 17, 12, 'pad', true], ['right', '▶', 3, 17, 12, 'pad', true],
       ['ok', 'OK', 'left:4', 18, 15, 'pad'], ['back', 'BACK', 'left:22', 6, 11, 'pad'], ['tab', 'TAB', 'left:22', 26, 10, 'casino', true],
@@ -257,6 +257,7 @@ export class TouchControls {
       case 'ping': g.doPing(); break;
       case 'bag': g.casino.openInventory(0); break;
       case 'w': g.quickChat('W'); break;
+      case 'wish': g.openWishes(); break;
       case 'pause': g.touchPause(); break;
       case 'qte': if (g.qte.active) g.qte.key(g.qte.active.code); break;
       case 'specL': g.specCycle(-1); break;

@@ -262,6 +262,11 @@ export class UI {
     const online = !!g.WD;
     // multiplayer first: PLAY drops you into an open lobby (or opens one)
     this.button('PLAY', bx, by, bw, bh + 4, () => g.quickPlay(), { color: C.green }); by += bh + 7;
+    // the Petition Bee, right under PLAY: chat builds this game (wishes.js)
+    if (g.wishes && g.wishes.api.ready) {
+      const pulse = !g.wished && Math.sin(t * 5) > 0;
+      this.button(g.wished ? 'MAKE A WISH' : 'MAKE A WISH (NEW!)', bx, by, bw, bh + 2, () => g.openWishes(), { color: pulse ? C.green : C.hot }); by += bh + 6;
+    }
     this.button('SOLO RUN', bx, by, bw, bh, () => g.startSolo()); by += bh + 3;
     this.button(online ? 'HOST A LOBBY' : 'HOST (TABS)', bx, by, bw, bh, () => g.hostCoop()); by += bh + 3;
     this.button('BROWSE LOBBIES', bx, by, bw, bh, () => { this.screen = 'browser'; this.back = 'title'; this.lobbyTimer = 0; }); by += bh + 3;
@@ -275,15 +280,18 @@ export class UI {
       this.button('ARCHIVE', sx, sy, sw, bh, () => { this.screen = 'archive'; this.archPage = 0; this.archOpen = null; }, { color: C.blue }); sy += bh + 3;
       if (g.xr && g.xr.supported) { this.button('ENTER VR', sx, sy, sw, bh, () => g.xr.enter(), { color: C.green }); sy += bh + 3; }
       this.button('BEE PASS', sx, sy, sw, bh, () => { this.screen = 'beepass'; }, { color: C.pink }); sy += bh + 3;
-      this.button('WISHES', sx, sy, sw, bh, () => g.openWishes(), { color: C.hot }); sy += bh + 3;
     } else {
       this.button('ARCHIVE', bx, by, Math.floor(bw / 2) - 2, bh, () => { this.screen = 'archive'; this.archPage = 0; this.archOpen = null; }, { color: C.blue });
       if (g.xr && g.xr.supported) this.button('VR', bx + Math.floor(bw / 2) + 2, by, Math.floor(bw / 2) - 2, bh, () => g.xr.enter(), { color: C.green });
       by += bh + 3;
-      this.button('WISHES', bx, by, bw, bh, () => g.openWishes(), { color: C.hot }); by += bh + 3;
     }
     if (this.invite) {
       this.button(`JOIN ${this.invite.from}`, bx, by, bw, bh, () => { const id = this.invite.lobbyId; this.invite = null; g.joinCoop(id); }, { color: C.green });
+    }
+    if (g.wishes && g.wishes.api.ready) { // the wish ticker
+      const n = g.wishWaiting, l = g.wishLatest;
+      const news = l && l.built.length && Date.now() / 1000 - l.created < 3 * 86400 ? `CHAT JUST BUILT ${l.built.length} WISH${l.built.length === 1 ? '' : 'ES'}. ` : '';
+      drawSmall(ctx, `${news}${n ? `${n} WISHES WAITING. ` : ''}THE TOP ONES GET BUILT LIVE AT 3 PM EASTERN`, W / 2, H - 31, C.hot, 'center');
     }
     const streak = g.meta.streak && g.meta.streak.n > 1 ? `   DAY ${g.meta.streak.n} STREAK` : '';
     drawText(ctx, g.bestFloor ? `DEEPEST FLOOR: ${g.bestFloor}   WAFERS: ${g.meta.wafers}${streak}` : 'BHOP. STRAFE. DESCEND.', W / 2, H - 22, C.dim, 1, 'center');
@@ -363,7 +371,7 @@ export class UI {
       ['WASD / MOUSE', 'MOVE / LOOK'], ['LMB', 'FIRE (JAVELIN ON HORSEBACK)'], ['SPACE / WHEEL', 'JUMP, WALL-KICK IN AIR'],
       ['SHIFT / C', 'CROUCH, SLIDE AT SPEED'], ['Q / MOUSE 4-5', 'DASH (BREAKS WAX WALLS)'], ['RMB', 'PARRY + STING'], ['V (HOLD)', 'HIVE CLEAVER SLASH (CHARGE FOR MASSIVE)'],
       ['G', 'THROW SPIN BALL'], ['F', 'PRESIDENTIAL ACTIVE'], ['E', 'MACHINES, SEALS, DISMOUNT'], ['R', 'RELOAD'],
-      ['1-3 / 4 / 5', 'BOON / DOUBLE-OR-NOTHING / REROLL'], ['I / M', 'INVENTORY / MAP'], ['T', 'CHAT (SPAM W FOR BUFFS)'], ['TAB', 'SCOREBOARD'], ['` / F1', 'DEVELOPER CONSOLE'], ['Z / MMB', 'PING'], ['X', 'DROPKICK'], ['K / H', 'THROWING KNIFE / MOLOTOV'], ['B', 'HONEY SHOP (IN THE LOUNGE)'],
+      ['1-3 / 4 / 5', 'BOON / DOUBLE-OR-NOTHING / REROLL'], ['I / M', 'INVENTORY / MAP'], ['T', 'CHAT (SPAM W FOR BUFFS)'], ['TAB', 'SCOREBOARD'], ['` / F1', 'DEVELOPER CONSOLE'], ['Z / MMB', 'PING'], ['X', 'DROPKICK'], ['K / H', 'THROWING KNIFE / MOLOTOV'], ['B', 'HONEY SHOP (IN THE LOUNGE)'], ['Y', 'MAKE A WISH: CHAT BUILDS THE TOP WISHES DAILY'],
     ];
     let y = 24;
     const cx = Math.round(W / 2);
@@ -908,7 +916,7 @@ export class UI {
       drawText(ctx, `KILLS ${r.kills ?? w.kills}   SCORE ${r.score ?? 0}   HONEY ${Math.floor(g.honey)}`, cx, cy - 8, C.text, 1, 'center');
       drawText(ctx, `DEEPEST EVER: FLOOR ${g.bestFloor}   WAFERS BANKED: ${g.meta.wafers}`, cx, cy + 4, C.dim, 1, 'center');
       drawText(ctx, `A NEW RUN BEGINS IN ${Math.max(0, Math.ceil(r.t))}`, cx, cy + 22, C.text, 1, 'center');
-      drawText(ctx, 'PRESS Y TO MAKE A WISH FOR THE NEXT PATCH', cx, cy + 36, C.hot, 1, 'center');
+      drawText(ctx, 'PRESS Y TO MAKE A WISH FOR THE NEXT PATCH', cx, cy + 36, Math.sin(g.time * 5) > 0 ? C.hot : C.green, 1, 'center');
     }
 
     if (g.keys.has('Tab') && g.locked && !g.casino.open) {

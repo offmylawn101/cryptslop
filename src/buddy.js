@@ -4,6 +4,7 @@
 import { drawSmall, smallWidth, drawText, textWidth } from './font.js';
 
 const LINES = {
+  wish: ['PRESS Y AND WISH FOR SOMETHING. CHAT BUILDS IT.', 'THE PETITION BEE IN THE LOUNGE TAKES WISHES!', 'WISH FOR A HAT FOR ME. PRESS Y.', 'YOUR FIRST WISH PAYS 2 WAFERS. PRESS Y!'],
   hello: ['HI! I LIVE HERE NOW.', 'BUZZBY, AT YOUR SERVICE.', 'NEED A FRIEND? I AM ONE.'],
   title: ['PICK SOLO, IT IS COZIER.', 'I HAVE NEVER SEEN THE BOTTOM FLOOR.', 'PET ME. CLICK. RIGHT HERE.'],
   floor: ['NEW FLOOR! SMELLS LIKE WAX.', 'I MEMORIZED NONE OF THIS.', 'STAY CLOSE. I MEAN YOU STAY CLOSE.'],
@@ -32,7 +33,7 @@ const LINES = {
   micro: ['MICROGAME! DO THE THING!', 'QUICK! READ THE WORD!', 'YOU GOT THIS!'],
   microfail: ['...YOU DID NOT DO THE THING.', 'THE RULES ARE THE RULES.'],
 };
-const PRIORITY = { micro: 3, microfail: 3, jackpot: 3, starving: 3, death: 3, lowhp: 2, boss: 2, horse: 2, parry: 1, hello: 2, sunrise: 3 };
+const PRIORITY = { wish: 2, micro: 3, microfail: 3, jackpot: 3, starving: 3, death: 3, lowhp: 2, boss: 2, horse: 2, parry: 1, hello: 2, sunrise: 3 };
 
 function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 

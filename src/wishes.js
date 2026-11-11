@@ -2,8 +2,12 @@
 // Every day at 3 PM Eastern the stream builds the top wishes into the game (tools/wishes/), and the
 // patch notes come back here with the names of the players whose wishes were built.
 //
-// Where you find it: the PETITION BEE stands in every Honey Lounge (walk up, press E), the title
-// screen has a WISHES button, the pause menu has MAKE A WISH, and when a run ends, Y opens it.
+// Where you find it: Y opens it any time in a run. The PETITION BEE stands in every Honey Lounge
+// (walk up, press E) under a gold beam. The title screen has a big MAKE A WISH button, and the pause
+// menu has one too.
+// Making sure every player finds it: until you have made your first wish, the board opens by itself
+// once on the title screen and once when your first run ends (with a short HOW IT WORKS), a hint sits
+// on the HUD, BUZZBY points you at the Petition Bee, and the first wish pays 2 wafers.
 // The board is an HTML overlay (real text boxes: typing, pasting, long wishes all just work).
 // Player text is only ever set as textContent, never as HTML.
 import * as THREE from 'three';
@@ -68,6 +72,7 @@ export class WishClient {
   vote(id, on) { return this.call('POST', '/api/vote', { id, on }); }
   report(id) { return this.call('POST', '/api/report', { id }); }
   notes() { return this.call('GET', '/api/notes'); }
+  waiting() { return this.call('GET', '/api/wishes?sort=new&limit=1', null, false).then((j) => j.total); }
 }
 
 // ---------------- the Petition Bee in the lounge ----------------
@@ -116,8 +121,26 @@ export function makePetition() {
   const board = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.6), retroMaterial({ map: tex, color: [1, 1, 1], emissive: [0.55, 0.55, 0.55], side: THREE.DoubleSide }));
   board.position.set(-0.6, 2.25, -0.06);
   g.add(board);
+  // the beacon: a gold star turning over the bee and a beam of light you can see from across the
+  // lounge. Full size until you have made your first wish, then just the small star.
+  const star = add(new THREE.OctahedronGeometry(0.22, 0), [1, 0.9, 0.4], [0, 3.05, -0.35], [1, 0.8, 0.25]);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 9, 8, 1, true), retroMaterial({ color: [1, 0.85, 0.3], emissive: [1, 0.8, 0.25], transparent: true, opacity: 0.22, side: THREE.DoubleSide }));
+  beam.material.depthWrite = false;
+  beam.position.set(0, 4.5, -0.35);
+  g.add(beam);
   g.userData.petition = true;
+  beacons.push({ star, beam });
+  if (beacons.length > 12) beacons.splice(0, beacons.length - 12); // only the current floors' bees
   return g;
+}
+const beacons = [];
+export function animateBeacons(t, loud) {
+  for (const b of beacons) {
+    b.star.rotation.y = t * 2;
+    b.star.position.y = 3.05 + Math.sin(t * 2.4) * 0.12;
+    b.star.scale.setScalar(loud ? 1.2 + Math.sin(t * 5) * 0.15 : 0.7);
+    b.beam.visible = loud;
+  }
 }
 PROP_BUILDERS.petition = makePetition;
 
@@ -158,6 +181,10 @@ const CSS = `
 .wb-note{padding:10px 12px;border-bottom:2px solid ${C.line}}
 .wb-note h3{margin:0 0 4px;font-size:15px;color:${C.hot}}
 .wb-note h4{margin:8px 0 2px;font-size:12px}
+.wb-intro{margin:10px 14px 0;padding:10px 12px;border:2px dashed ${C.green};background:#0f1a14}
+.wb-intro-h{color:${C.green};font-weight:900;font-size:15px}
+.wb-steps{margin:6px 0 4px 20px;padding:0;font-size:13px;line-height:1.45}
+.wb-intro-r{font-size:12px;color:${C.hot};font-weight:700}
 .wb-foot{padding:0 14px 10px;font-size:11px;color:${C.dim};display:flex;gap:10px;align-items:center}
 `;
 
@@ -199,6 +226,16 @@ export class WishBoard {
     this.clock = el('div', 'wb-clock'); ht.appendChild(this.clock);
     const x = el('button', 'wb-x', 'X'); x.title = 'CLOSE (ESC)'; x.onclick = () => this.close(true); head.appendChild(x);
 
+    // HOW IT WORKS: shown until you have made your first wish
+    this.intro = el('div', 'wb-intro'); box.appendChild(this.intro);
+    this.intro.appendChild(el('div', 'wb-intro-h', 'NEW! THIS GAME IS BUILT BY ITS PLAYERS'));
+    const steps = el('ol', 'wb-steps'); this.intro.appendChild(steps);
+    for (const line of [
+      'WISH FOR ANYTHING: AN ENEMY, A WEAPON, A HAT, A DUMB JOKE. TYPE IT BELOW.',
+      'VOTE FOR THE OTHER WISHES YOU WANT TO SEE.',
+      'EVERY DAY AT 3 PM EASTERN THE TOP WISHES GET BUILT INTO THE GAME, LIVE ON STREAM. YOUR NAME GOES IN THE PATCH NOTES.',
+    ]) steps.appendChild(el('li', null, line));
+    this.intro.appendChild(el('div', 'wb-intro-r', 'YOUR FIRST WISH EARNS 2 WAFERS. COME BACK ANY TIME: PRESS Y IN A RUN, OR FIND THE PETITION BEE IN THE LOUNGE.'));
     const comp = el('div', 'wb-compose'); box.appendChild(comp);
     this.ta = el('textarea', 'wb-ta'); this.ta.maxLength = WISH_MAX; this.ta.placeholder = 'What should chat build next? (a new enemy, a weapon, a dumb hat, a whole new floor...)';
     this.ta.addEventListener('input', () => this.count());
@@ -246,6 +283,7 @@ export class WishBoard {
     if (g.casino && g.casino.open) g.casino.close();
     this.root.style.display = 'flex';
     this.tickClock(); this.crownLabel();
+    this.intro.style.display = (g.meta.wished || 0) > 0 ? 'none' : '';
     clearInterval(this.clockTimer); this.clockTimer = setInterval(() => this.tickClock(), 20e3);
     if (!this.api.ready) this.say('THE PETITION BEE IS NOT OPEN YET', C.red);
     else this.say('');
@@ -271,10 +309,21 @@ export class WishBoard {
     try {
       await this.api.wish(text);
       this.ta.value = ''; this.count();
-      this.say('WISH SENT. GET YOUR FRIENDS TO VOTE FOR IT', C.green);
-      this.g.sound.play('coin');
-      if (this.g.stats) this.g.stats.add('wishes');
-      if (this.tab === 'notes' || this.tab === 'top') this.show('new'); else this.load(false);
+      const g = this.g, first = !(g.meta.wished > 0);
+      g.meta.wished = (g.meta.wished || 0) + 1;
+      if (first && !g.meta.wishPaid) { g.meta.wishPaid = true; g.meta.wafers = (g.meta.wafers || 0) + 2; }
+      g.saveMeta();
+      g.sound.play(first ? 'rank' : 'coin');
+      if (g.stats) g.stats.add('wishes');
+      if (first) {
+        this.intro.style.display = 'none';
+        this.say('YOUR FIRST WISH! +2 WAFERS. NOW VOTE FOR WISHES YOU LIKE', C.green);
+        g.ui.banner('FIRST WISH MADE! +2 WAFERS', 3);
+        this.show('top');
+      } else {
+        this.say('WISH SENT. GET YOUR FRIENDS TO VOTE FOR IT', C.green);
+        if (this.tab === 'notes' || this.tab === 'top') this.show('new'); else this.load(false);
+      }
     } catch (e) {
       this.say(e.message, C.red); this.g.sound.play('deny');
     } finally { this.sendBtn.disabled = false; }
@@ -406,12 +455,59 @@ export class WishBoard {
 }
 
 // ---------------- hooking it into the game ----------------
-export function installWishes(Game) {
+export function installWishes(Game, UI) {
   const P = Game.prototype;
-  const orig = { interact: P.interact };
+  const orig = { interact: P.interact, update: P.update };
+  if (UI) {
+    // the HUD hint, until you have made your first wish
+    const draw = UI.prototype.draw;
+    UI.prototype.draw = function (dt) {
+      draw.call(this, dt);
+      const g = this.g;
+      if (!g.wishHint) return;
+      this.ctx.globalAlpha = 0.65 + Math.sin(g.time * 3) * 0.35;
+      const touch = g.touch && g.touch.enabled; // on touch, below the top row of buttons
+      drawText(this.ctx, touch ? 'TAP WISH: TELL US WHAT TO BUILD NEXT' : 'PRESS Y: WISH FOR WHAT WE BUILD NEXT', this.W / 2, touch ? Math.ceil(this.H * 0.14) : 3, '#ffd040', 1, 'center');
+      this.ctx.globalAlpha = 1;
+    };
+  }
   Object.defineProperties(P, Object.getOwnPropertyDescriptors({
     get wishes() { if (!this._wishes) this._wishes = new WishBoard(this); return this._wishes; },
     get wishOpen() { return !!this._wishes && this._wishes.open; },
+    get wished() { return (this.meta && this.meta.wished) > 0; },
+    // the HUD hint shows in a run until the first wish (and only once the Petition Bee is online)
+    get wishHint() {
+      return !this.wished && this.mode === 'play' && this.locked && !this.dead && !this.runOver && !!this.world && !(this.casino && this.casino.open) && !this.ui.screen && this.wishes.api.ready;
+    },
+    update(dt) {
+      orig.update.call(this, dt);
+      try { this.wishTick(dt); } catch (e) { /* never break the frame */ }
+    },
+    wishTick(dt) {
+      animateBeacons(this.time || 0, !this.wished);
+      if (this.wished || this.wishOpen || !this.wishes.api.ready) return;
+      const m = this.meta;
+      // 1. the first time on the title screen: open the board with HOW IT WORKS
+      if (this.mode === 'menu' && this.ui.screen === 'title' && !(m.wishIntro >= 1)) {
+        this.wishTitleT = (this.wishTitleT || 0) + dt;
+        if (this.wishTitleT > 1.5) { m.wishIntro = 1; this.saveMeta(); this.openWishes('top'); }
+        return;
+      }
+      // 2. the first run you finish without having wished: open it on the run-over screen
+      if (this.runOver && !(m.wishIntro >= 2)) {
+        this.wishRunT = (this.wishRunT || 0) + dt;
+        if (this.wishRunT > 1.2) { m.wishIntro = 2; this.saveMeta(); this.openWishes('top'); }
+        return;
+      }
+      if (!this.runOver) this.wishRunT = 0;
+      // 3. BUZZBY points at the Petition Bee on the first few floors of a session
+      const f = this.world && this.mode === 'play' ? `${this.world.run}:${this.world.floor}` : null;
+      if (f && f !== this.wishFloorSeen) { this.wishFloorSeen = f; this.wishBuzzT = 5; }
+      if (this.wishBuzzT > 0) {
+        this.wishBuzzT -= dt;
+        if (this.wishBuzzT <= 0 && (this.wishBuzzN || 0) < 3 && this.buddy) { this.wishBuzzN = (this.wishBuzzN || 0) + 1; this.buddy.event('wish', true); }
+      }
+    },
     openWishes(tab) { this.wishes.openBoard(tab); },
     interact() {
       if (this.world && !this.dead && !this.riding) {
@@ -424,7 +520,9 @@ export function installWishes(Game) {
     checkWishNews() {
       const b = this.wishes;
       if (!b.api.ready) return;
+      b.api.waiting().then((n) => { this.wishWaiting = n; }).catch(() => {});
       b.api.notes().then((j) => {
+        if ((j.notes || [])[0]) this.wishLatest = j.notes[0];
         const r = b.takeNotes(j.notes || []);
         if (r && r.fresh && r.fresh.built.length) {
           const n = r.fresh.built.length;

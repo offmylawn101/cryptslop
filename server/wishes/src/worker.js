@@ -18,6 +18,7 @@
 //   POST /api/admin/claim   {batch, ids}                mark wishes as being built today
 //   POST /api/admin/resolve {batch, title, results}     write the outcome and the patch notes
 //   POST /api/admin/hide    {ids, reason}               take wishes off the board
+//   GET  /api/admin/stats                               how many players wished and voted
 
 export const LIMITS = {
   textMax: 2000,     // a wish can be long; this only keeps one wish from being a novel
@@ -279,6 +280,23 @@ async function adminResolve(req, env) {
   return json({ ok: true, built: built.length, rejected: rejected.length });
 }
 
+// how many players have tried it (for the streamer: is everyone finding the Petition Bee?)
+async function adminStats(env) {
+  const day = now() - 86400;
+  const one = async (sql, ...a) => (await env.DB.prepare(sql).bind(...a).first()).n;
+  return json({
+    ok: true,
+    wishers: await one('SELECT COUNT(DISTINCT uid) AS n FROM wishes'),
+    voters: await one('SELECT COUNT(DISTINCT uid) AS n FROM votes'),
+    wishes: await one('SELECT COUNT(*) AS n FROM wishes'),
+    votes: await one('SELECT COUNT(*) AS n FROM votes'),
+    open: await one("SELECT COUNT(*) AS n FROM wishes WHERE status = 'open'"),
+    built: await one("SELECT COUNT(*) AS n FROM wishes WHERE status = 'built'"),
+    wishers24h: await one('SELECT COUNT(DISTINCT uid) AS n FROM wishes WHERE created > ?', day),
+    wishes24h: await one('SELECT COUNT(*) AS n FROM wishes WHERE created > ?', day),
+  });
+}
+
 async function adminHide(req, env) {
   const b = await body(req);
   const ids = (b.ids || []).map(Number).filter(Number.isFinite);
@@ -303,6 +321,7 @@ export async function handle(req, env) {
       if (p === '/api/admin/claim' && req.method === 'POST') return await adminClaim(req, env);
       if (p === '/api/admin/resolve' && req.method === 'POST') return await adminResolve(req, env);
       if (p === '/api/admin/hide' && req.method === 'POST') return await adminHide(req, env);
+      if (p === '/api/admin/stats' && req.method === 'GET') return await adminStats(env);
     }
     return fail(404, 'not found');
   } catch (e) {

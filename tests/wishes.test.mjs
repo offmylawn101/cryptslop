@@ -98,6 +98,9 @@ ok(r.status === 404, 'cannot vote on a built wish');
 await call('POST', '/api/admin/hide', { tok: ADMIN, body: { ids: [4], reason: 'test' } });
 ok(!(await call('GET', '/api/wishes')).j.wishes.some((w) => w.id === 4), 'admin hide');
 ok((await call('OPTIONS', '/api/wishes')).status === 204, 'CORS preflight');
+const stats = (await call('GET', '/api/admin/stats', { tok: ADMIN })).j;
+ok(stats.wishers === 3 && stats.voters === 2 && stats.wishes === 4 && stats.built === 1 && stats.wishers24h === 3, `admin stats (${JSON.stringify(stats)})`);
+ok((await call('GET', '/api/admin/stats', { tok: 'dev:alice' })).status === 403, 'stats are admin only');
 
 // --- JWT verification (a fake Wavedash with our own RSA key) ---
 const kp = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']);

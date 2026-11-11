@@ -261,7 +261,7 @@ export class Game {
       if (this.console.open) { e.preventDefault(); this.console.key(e); return; }
       if (this.micro.open && this.mode === 'play') { e.preventDefault(); this.micro.key(e); return; }
       if (this.chatOpen) { this.chatKey(e); e.preventDefault(); return; }
-      if (e.code === 'KeyY' && this.runOver && this.mode === 'play' && !e.repeat) { e.preventDefault(); this.openWishes(); return; } // the run is over: make a wish
+      if (e.code === 'KeyY' && this.mode === 'play' && !e.repeat && !(this.casino && this.casino.open)) { e.preventDefault(); this.openWishes(); return; } // Y: make a wish, any time in a run (wishes.js)
       if (this.mode === 'play' && this.locked) {
         if (['Space', 'Tab', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'KeyC', 'KeyQ', 'KeyE', 'KeyF', 'KeyG', 'KeyI', 'KeyM', 'KeyV', 'KeyB', 'KeyJ', 'KeyR', 'KeyN', 'KeyL'].includes(e.code)) e.preventDefault();
         if (this.casino.open) { if (!e.repeat) this.casino.key(e); return; }
@@ -2906,7 +2906,7 @@ installFister(Game); // JOHN FISTER (fisterPort.js + src/fister/)
 installClasses2(Game, Sim); // SIEGER, KOOLCILLER, INTERCEPTOR, BLASPHEMOUS, PARKOUR, the ULTRAs, the wild EVIL HORSE (classes2.js)
 installEconomy(Game); // the post-boss shop, the rooftop clock, starting deeper, newer wafer upgrades (economy.js)
 installPorridge(Game); // the PIXEL PORRIDGE EXCLUSIVE SHOP and its flair (porridge.js)
-installWishes(Game); // the PETITION BEE: players wish for what chat builds next (wishes.js)
+installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)
 installParryFx(Game); // the BEEKEEPER PARRY PUNCH and juicier parries (parryfx.js)
 installQuests(Game); // QUESTS: three honey bounties per floor (quests.js)
