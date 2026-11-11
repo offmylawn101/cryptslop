@@ -4,7 +4,15 @@ Players make wishes in the game. Each day the top wishes get built, and you ship
 
 ## How players take part
 
-- **In the game:** the Petition Bee stands in every Honey Lounge (walk up, press E). The title screen has a WISHES button, the pause menu has MAKE A WISH, and Y opens it when a run ends.
+- **In the game:** Y opens the board any time in a run, and touch players get a WISH button. The Petition Bee stands in every Honey Lounge under a gold beam (walk up, press E). The title screen has MAKE A WISH right under PLAY, and the pause menu has one too.
+- **Making sure every player finds it:** until a player makes their first wish:
+  - The board opens by itself once on the title screen, and once when their first run ends. Both times it shows a HOW IT WORKS box.
+  - A hint pulses at the top of the HUD.
+  - BUZZBY (the buddy bee) points them at the Petition Bee.
+  - The beam shows over the Petition Bee.
+- **First-wish reward:** 2 wafers.
+- **Title-screen counter:** shows how many wishes are waiting and when the next build happens.
+- **Tracking adoption:** `node tools/wishes/stats.cjs` shows how many players have wished and voted.
 - **Wishing:** unlimited, up to 2,000 characters each. The only limit is one wish every 2 seconds, to stop scripts.
 - **Voting:** players upvote other people's wishes (not their own). The board has TOP, NEW, MINE and PATCH NOTES tabs.
 - **Credit:** built wishes go in the in-game patch notes under the wisher's name. Their names appear on the lounge sign, and they get the WISHMAKER CROWN cosmetic, which can't be bought.
