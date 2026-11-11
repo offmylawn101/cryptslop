@@ -77,7 +77,7 @@ function saveState(st) { fs.mkdirSync(path.dirname(statePath(st.date)), { recurs
 function latestPending() {
   if (!fs.existsSync(STATE_DIR)) return null;
   const days = fs.readdirSync(STATE_DIR).filter((d) => fs.existsSync(statePath(d))).sort().reverse();
-  for (const d of days) { const st = loadState(d); if (st.phase === 'ready' || st.phase === 'building') return st; }
+  for (const d of days) { const st = loadState(d); if (['ready', 'building', 'merged'].includes(st.phase)) return st; }
   return null;
 }
 

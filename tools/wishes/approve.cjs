@@ -23,6 +23,7 @@ async function main() {
   const cfg = C.config();
   const st = dateArg ? C.loadState(dateArg) : C.latestPending();
   if (!st) fail('no day is waiting for approval');
+  if (st.phase === 'merged') fail(`${st.date} is already merged; once the upload works, finish with: node tools/wishes/approve.cjs --notes-only`);
   if (st.phase !== 'ready') fail(`${st.date} is "${st.phase}", not ready`);
 
   // drop wishes the streamer does not want (newest first, so reverts apply cleanly)
@@ -32,6 +33,7 @@ async function main() {
     if (rv.status !== 0) { spawnSync('git', ['revert', '--abort'], { cwd: st.wt }); fail(`could not drop wish #${r.id} cleanly: ${rv.stderr}`); }
     r.status = 'dropped'; console.log(`dropped wish #${r.id}`);
   }
+  C.saveState(st); // the drops stick, even if a later step fails
   const built = st.results.filter((r) => r.status === 'built');
 
   const scan = C.scanDiff(st.wt, st.base);
@@ -53,6 +55,7 @@ async function main() {
     const m = spawnSync('git', ['merge', '--no-ff', st.branch, '-m', `Chat wishes ${st.date}\n\n${titles}`], { cwd: C.ROOT, encoding: 'utf8' });
     if (m.status !== 0) { spawnSync('git', ['merge', '--abort'], { cwd: C.ROOT }); fail(`merge conflict with live edits; resolve by hand (git merge ${st.branch}):\n${m.stdout}${m.stderr}`); }
     console.log(`merged ${built.length} wish(es) into main`);
+    st.phase = 'merged'; C.saveState(st);
     const ap = spawnSync(process.execPath, [path.join(C.ROOT, 'tools', 'autopush.cjs')], { cwd: C.ROOT, encoding: 'utf8', timeout: 900e3 });
     const msg = (String(ap.stdout).match(/"systemMessage":"([^"]*)"/) || [])[1] || ap.stdout || ap.stderr;
     console.log(`autopush: ${msg}`);
@@ -87,7 +90,10 @@ function removeWorktree(st) {
 
 if (require.main === module) {
   if (flag('--notes-only')) {
-    (async () => { const st = dateArg ? C.loadState(dateArg) : C.latestPending(); await writeNotes(C.config(), st); st.phase = 'approved'; C.saveState(st); removeWorktree(st); })().catch((e) => fail(e.message));
+    (async () => {
+      const st = dateArg ? C.loadState(dateArg) : C.latestPending();
+      if (!st || st.phase !== 'merged') fail('--notes-only is for a day that was merged but not uploaded');
+      await writeNotes(C.config(), st); st.phase = 'approved'; C.saveState(st); removeWorktree(st); })().catch((e) => fail(e.message));
   } else main().catch((e) => fail(e.stack || e.message));
 }
 module.exports = { removeWorktree };
