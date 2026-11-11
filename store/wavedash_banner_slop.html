@@ -1,0 +1,279 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>slop</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// CRYPTSLOP banner, deliberately painted as the most AI-generated-looking image possible:
+// teal/orange HDR sunset, god rays, lens flares, bokeh, sparkles, a glossy "epic" centered hero with
+// seven fingers and a gun melting into its hand, nine legs, mismatched eyes, background bees that
+// dissolve into blobs, impossible symmetric architecture, garbled title text and gibberish signage,
+// a fake stock watermark, a smeared signature, and a "masterpiece, 8k, trending" prompt left in.
+const c = document.getElementById('c'), g = c.getContext('2d');
+const W = 1920, H = 1080;
+let seed = 1337; const R = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// ---------- sky: the teal and orange of every AI sunset ----------
+let sky = g.createLinearGradient(0, 0, 0, H);
+sky.addColorStop(0, '#05264a'); sky.addColorStop(0.32, '#0fb3b8'); sky.addColorStop(0.55, '#ff9a3c'); sky.addColorStop(0.7, '#ff4f6d'); sky.addColorStop(1, '#3a0b4f');
+g.fillStyle = sky; g.fillRect(0, 0, W, H);
+// a sun that is somehow also a honeycomb
+const sx = 960, sy = 470;
+let sun = g.createRadialGradient(sx, sy, 10, sx, sy, 520);
+sun.addColorStop(0, 'rgba(255,255,230,1)'); sun.addColorStop(0.12, 'rgba(255,240,160,0.95)'); sun.addColorStop(0.35, 'rgba(255,170,60,0.55)'); sun.addColorStop(1, 'rgba(255,90,60,0)');
+g.fillStyle = sun; g.fillRect(0, 0, W, H);
+// god rays, too many of them
+g.save(); g.globalCompositeOperation = 'lighter';
+for (let i = 0; i < 46; i++) {
+  const a = (i / 46) * Math.PI * 2 + R() * 0.05, w = 0.012 + R() * 0.03;
+  const gr = g.createRadialGradient(sx, sy, 0, sx, sy, 1500);
+  gr.addColorStop(0, `rgba(255,230,170,${0.10 + R() * 0.12})`); gr.addColorStop(1, 'rgba(255,200,120,0)');
+  g.fillStyle = gr; g.beginPath(); g.moveTo(sx, sy); g.arc(sx, sy, 1600, a - w, a + w); g.closePath(); g.fill();
+}
+g.restore();
+
+// ---------- impossible symmetric hive cathedral ----------
+function arches(mirror) {
+  g.save(); if (mirror) { g.translate(W, 0); g.scale(-1, 1); }
+  for (let k = 0; k < 6; k++) {
+    const x = 60 + k * 120, top = 120 + k * 55 + Math.sin(k * 1.7) * 30, bw = 90 + k * 8;
+    let gr = g.createLinearGradient(x, top, x + bw, top);
+    gr.addColorStop(0, '#2b1240'); gr.addColorStop(0.5, '#c86a2a'); gr.addColorStop(1, '#1d3a52');
+    g.fillStyle = gr; g.globalAlpha = 0.9;
+    g.beginPath(); g.moveTo(x, H); g.lineTo(x, top + 80); g.quadraticCurveTo(x + bw / 2, top - 70 - k * 10, x + bw, top + 80 + (k % 2) * 40); g.lineTo(x + bw + (k % 3) * 9, H); g.closePath(); g.fill();
+    // windows that melt into the next pillar
+    g.fillStyle = `rgba(255,${180 + k * 10},90,0.8)`;
+    g.beginPath(); g.ellipse(x + bw / 2, top + 140, 18, 40 + k * 3, 0.15 * k, 0, Math.PI * 2); g.fill();
+    g.fillStyle = 'rgba(255,220,140,0.35)'; g.fillRect(x + bw / 2 - 4, top + 175, 9 + k, 140 + R() * 120);
+  }
+  g.restore();
+}
+arches(false); arches(true);
+// floating islands with waterfalls that fall upward
+for (let i = 0; i < 5; i++) {
+  const x = 200 + i * 380 + R() * 60, y = 140 + R() * 120, w = 120 + R() * 90;
+  g.fillStyle = '#2a5a3a'; g.beginPath(); g.ellipse(x, y, w, 26, 0, Math.PI, 0); g.fill();
+  g.fillStyle = '#5a3a2a'; g.beginPath(); g.moveTo(x - w, y); g.lineTo(x, y + 90 + R() * 60); g.lineTo(x + w, y); g.fill();
+  let wf = g.createLinearGradient(0, y - 120, 0, y);
+  wf.addColorStop(0, 'rgba(160,255,255,0)'); wf.addColorStop(1, 'rgba(160,255,255,0.7)');
+  g.fillStyle = wf; g.fillRect(x - 10, y - 130, 16, 130);
+}
+
+// ---------- background bees that dissolve into blobs ----------
+function blobBee(x, y, s, melt) {
+  g.save(); g.translate(x, y); g.scale(s, s);
+  g.fillStyle = '#f2b81c'; g.beginPath(); g.ellipse(0, 0, 40, 26 + melt * 20, melt, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#1a1208'; for (let k = -1; k <= 1; k++) { g.beginPath(); g.ellipse(k * 16, 0, 5 + melt * 6, 24, 0, 0, Math.PI * 2); g.fill(); }
+  g.fillStyle = 'rgba(200,240,255,0.55)'; g.beginPath(); g.ellipse(-10, -30, 26, 12, -0.5, 0, Math.PI * 2); g.ellipse(14, -34 - melt * 30, 22, 10, 0.6, 0, Math.PI * 2); g.fill();
+  // a face where a face should not be
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(30, -4, 6, 0, 7); g.arc(44, 2 + melt * 10, 4, 0, 7); g.fill();
+  if (melt > 0.5) { g.fillStyle = '#f2b81c'; g.beginPath(); g.moveTo(-30, 10); g.bezierCurveTo(-40, 80, 10, 60, 0, 140); g.bezierCurveTo(-10, 60, 30, 70, 30, 10); g.fill(); }
+  g.restore();
+}
+for (let i = 0; i < 22; i++) blobBee(80 + R() * (W - 160), 160 + R() * 380, 0.35 + R() * 0.6, R());
+
+// ---------- bokeh, because every image needs bokeh ----------
+g.save(); g.globalCompositeOperation = 'lighter';
+for (let i = 0; i < 90; i++) {
+  const x = R() * W, y = R() * H, r = 8 + R() * 60;
+  const b = g.createRadialGradient(x, y, 0, x, y, r);
+  const hue = R() < 0.5 ? '255,180,90' : '90,230,255';
+  b.addColorStop(0, `rgba(${hue},0.0)`); b.addColorStop(0.7, `rgba(${hue},${0.08 + R() * 0.12})`); b.addColorStop(1, `rgba(${hue},0)`);
+  g.fillStyle = b; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+}
+g.restore();
+
+// ---------- the floor: a mirror-shiny honey lake that reflects things that aren't there ----------
+let lake = g.createLinearGradient(0, 760, 0, H);
+lake.addColorStop(0, 'rgba(255,160,60,0.85)'); lake.addColorStop(1, 'rgba(60,10,80,0.95)');
+g.fillStyle = lake; g.fillRect(0, 780, W, H - 780);
+g.save(); g.globalAlpha = 0.25; g.translate(0, 1560); g.scale(1, -1); g.drawImage(c, 0, 0, W, 780, 0, 0, W, 780); g.restore();
+g.fillStyle = 'rgba(255,255,255,0.12)'; for (let i = 0; i < 40; i++) g.fillRect(R() * W, 790 + R() * 280, 80 + R() * 200, 2);
+
+// ---------- THE HERO: an extremely glossy bee warrior, perfectly centered, looking at nothing ----------
+const hx = 960, hy = 640;
+function gloss(x, y, rx, ry, base, hi, rot = 0) {
+  const gr = g.createRadialGradient(x - rx * 0.35, y - ry * 0.45, 2, x, y, Math.max(rx, ry));
+  gr.addColorStop(0, hi); gr.addColorStop(0.25, base); gr.addColorStop(1, '#140a04');
+  g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rx, ry, rot, 0, Math.PI * 2); g.fill();
+  g.fillStyle = 'rgba(255,255,255,0.75)'; g.beginPath(); g.ellipse(x - rx * 0.35, y - ry * 0.5, rx * 0.22, ry * 0.12, -0.5 + rot, 0, 7); g.fill(); // the plastic shine
+}
+// rim light glow
+g.save(); g.shadowColor = 'rgba(80,240,255,0.95)'; g.shadowBlur = 90;
+// wings: four... or five
+g.globalAlpha = 0.6;
+for (const [dx, dy, rx, ry, rot] of [[-170, -170, 170, 70, -0.6], [170, -170, 170, 70, 0.6], [-140, -60, 130, 50, -0.25], [150, -50, 140, 46, 0.3], [40, -250, 90, 40, 1.4]]) {
+  const wg = g.createLinearGradient(hx + dx - rx, 0, hx + dx + rx, 0);
+  wg.addColorStop(0, 'rgba(120,255,255,0.7)'); wg.addColorStop(0.5, 'rgba(255,120,255,0.6)'); wg.addColorStop(1, 'rgba(255,240,120,0.7)');
+  g.fillStyle = wg; g.beginPath(); g.ellipse(hx + dx, hy + dy, rx, ry, rot, 0, 7); g.fill();
+}
+g.restore();
+// nine legs (bees have six)
+g.strokeStyle = '#1a1006'; g.lineCap = 'round';
+for (let i = 0; i < 9; i++) {
+  const side = i % 2 ? 1 : -1, k = Math.floor(i / 2);
+  g.lineWidth = 16 - k * 1.5;
+  g.beginPath(); g.moveTo(hx + side * 40, hy + 40 + k * 30); g.quadraticCurveTo(hx + side * (130 + k * 15), hy + 30 + k * 40, hx + side * (110 + k * 30 + (i === 8 ? 60 : 0)), hy + 160 + k * 25); g.stroke();
+}
+// abdomen, thorax, a chestplate made of honey and chrome
+gloss(hx, hy + 120, 120, 150, '#f6b417', '#fffbe0');
+g.fillStyle = '#120a04'; for (let k = 0; k < 3; k++) { g.beginPath(); g.ellipse(hx, hy + 70 + k * 55, 118 - k * 10, 13, 0, 0, 7); g.fill(); }
+gloss(hx, hy - 30, 105, 95, '#d9cbb8', '#ffffff');
+g.fillStyle = 'rgba(255,170,40,0.9)'; g.beginPath(); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; g.lineTo(hx + Math.cos(a) * 40, hy - 30 + Math.sin(a) * 40); } g.fill();
+// head with two mismatched eyes and a third that is a reflection of a different sun
+gloss(hx, hy - 170, 95, 85, '#f2b81c', '#fff8d0');
+gloss(hx - 40, hy - 185, 32, 38, '#13202e', '#a8f4ff');
+gloss(hx + 44, hy - 178, 24, 30, '#3a1408', '#ffb070', 0.3);
+gloss(hx + 5, hy - 232, 12, 14, '#ff3a6a', '#ffffff');
+// the smile: too many teeth
+g.fillStyle = '#2a0808'; g.beginPath(); g.ellipse(hx + 4, hy - 130, 46, 16, 0.05, 0, Math.PI); g.fill();
+g.fillStyle = '#fffdf2'; for (let k = 0; k < 15; k++) g.fillRect(hx - 38 + k * 5.4, hy - 131, 4, 8 + (k % 3) * 2);
+// antennae that turn into wires that turn into vines
+g.lineWidth = 7; g.strokeStyle = '#1a1006';
+g.beginPath(); g.moveTo(hx - 30, hy - 245); g.bezierCurveTo(hx - 80, hy - 360, hx - 160, hy - 300, hx - 210, hy - 390); g.stroke();
+g.beginPath(); g.moveTo(hx + 30, hy - 245); g.bezierCurveTo(hx + 70, hy - 330, hx + 40, hy - 380, hx + 120, hy - 420); g.stroke();
+g.strokeStyle = '#3aa04a'; g.lineWidth = 4; g.beginPath(); g.moveTo(hx + 120, hy - 420); g.bezierCurveTo(hx + 170, hy - 460, hx + 150, hy - 380, hx + 220, hy - 410); g.stroke();
+gloss(hx - 210, hy - 392, 14, 14, '#ff9a3c', '#fff');
+
+// ---------- THE HAND: seven fingers, two thumbs, gripping a hornet gun that melts into it ----------
+function hand(x, y, s, fingers) {
+  g.save(); g.translate(x, y); g.scale(s, s);
+  gloss(0, 0, 70, 58, '#e8b48e', '#fff2e6');
+  for (let k = 0; k < fingers; k++) {
+    const a = -2.5 + k * (2.2 / (fingers - 1));
+    g.save(); g.rotate(a); g.translate(0, -60);
+    const len = 70 + Math.sin(k * 2.3) * 25;
+    gloss(0, -len / 2, 13, len / 2, '#e8b48e', '#fff2e6');
+    g.fillStyle = 'rgba(255,220,220,0.9)'; g.beginPath(); g.ellipse(0, -len + 6, 9, 7, 0, 0, 7); g.fill(); // a nail, sometimes
+    g.restore();
+  }
+  // the second thumb
+  g.save(); g.rotate(1.2); g.translate(0, -60); gloss(0, -30, 15, 34, '#e8b48e', '#fff2e6'); g.restore();
+  g.restore();
+}
+// the gun: chrome, glowing, its barrel bends
+g.save(); g.shadowColor = '#ff40c0'; g.shadowBlur = 40;
+let gun = g.createLinearGradient(1100, 520, 1500, 640);
+gun.addColorStop(0, '#606a78'); gun.addColorStop(0.4, '#f4f8ff'); gun.addColorStop(0.6, '#8a96a8'); gun.addColorStop(1, '#2a3040');
+g.fillStyle = gun; g.beginPath(); g.moveTo(1080, 560); g.bezierCurveTo(1250, 500, 1380, 540, 1520, 470); g.lineTo(1545, 520); g.bezierCurveTo(1400, 600, 1260, 610, 1100, 650); g.closePath(); g.fill();
+g.fillStyle = '#ffd040'; g.beginPath(); g.ellipse(1530, 495, 22, 30, 0.5, 0, 7); g.fill();
+g.restore();
+hand(1090, 600, 0.95, 7);
+// the gun's grip and the hand become one smooth lump
+let fuse = g.createRadialGradient(1060, 620, 5, 1060, 620, 90); fuse.addColorStop(0, 'rgba(200,170,150,0.9)'); fuse.addColorStop(1, 'rgba(200,170,150,0)');
+g.fillStyle = fuse; g.beginPath(); g.arc(1060, 620, 90, 0, 7); g.fill();
+// the other hand, holding nothing, also seven fingers, also coming out of the honey lake
+hand(560, 900, 1.1, 6);
+hand(1640, 950, 0.7, 8);
+
+// ---------- a melting clock, a chess piece, and a gremlin cat with too many legs (why) ----------
+g.save(); g.translate(330, 720);
+gloss(0, 0, 70, 50, '#e0e0e0', '#ffffff', 0.2);
+g.fillStyle = '#e0e0e0'; g.beginPath(); g.moveTo(-20, 30); g.bezierCurveTo(-30, 120, 30, 90, 10, 170); g.bezierCurveTo(30, 100, 40, 80, 40, 30); g.fill();
+g.strokeStyle = '#222'; g.lineWidth = 4; g.beginPath(); g.moveTo(0, 0); g.lineTo(30, -20); g.moveTo(0, 0); g.lineTo(-10, 35); g.stroke();
+g.fillStyle = '#222'; g.font = 'bold 14px serif'; ['XII', 'III', 'VI', 'IIX', 'Ʃ'].forEach((t, k) => g.fillText(t, -10 + Math.cos(k * 1.3) * 45, 4 + Math.sin(k * 1.3) * 32));
+g.restore();
+g.save(); g.translate(1600, 740);
+gloss(0, 0, 80, 55, '#3a3a44', '#bcbcd0');
+gloss(70, -50, 45, 40, '#3a3a44', '#bcbcd0');
+g.fillStyle = '#3a3a44'; for (let k = 0; k < 7; k++) g.fillRect(-60 + k * 20, 40, 12, 60 + (k % 2) * 15);
+gloss(58, -58, 9, 12, '#9aff40', '#fff'); gloss(84, -54, 9, 12, '#9aff40', '#fff'); gloss(72, -40, 6, 8, '#9aff40', '#fff');
+g.restore();
+
+// ---------- the title: chrome, beveled, glowing, and spelled wrong ----------
+function title(text, x, y, size, rot, warp) {
+  g.save(); g.translate(x, y); g.rotate(rot);
+  g.font = `900 ${size}px "Impact", "Arial Black", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  let cx = -g.measureText(text).width / 2;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i], w = g.measureText(ch).width;
+    g.save(); g.translate(cx + w / 2, Math.sin(i * 1.9) * warp); g.rotate(Math.sin(i * 2.7) * 0.08 * warp / 10); g.scale(1 + Math.sin(i * 3.1) * 0.12, 1 + Math.cos(i * 1.3) * 0.15);
+    g.shadowColor = 'rgba(255,120,30,1)'; g.shadowBlur = 50;
+    const cg = g.createLinearGradient(0, -size / 2, 0, size / 2);
+    cg.addColorStop(0, '#ffffff'); cg.addColorStop(0.45, '#ffe28a'); cg.addColorStop(0.5, '#a05a10'); cg.addColorStop(0.75, '#ffd060'); cg.addColorStop(1, '#ffffff');
+    g.fillStyle = cg; g.fillText(ch, 0, 0);
+    g.shadowBlur = 0; g.lineWidth = 5; g.strokeStyle = '#3a1a00'; g.strokeText(ch, 0, 0);
+    g.restore();
+    cx += w * (0.92 + Math.sin(i) * 0.06);
+  }
+  g.restore();
+}
+title('CRYPTSOLP', 960, 120, 190, -0.02, 14);
+// the letters drip
+g.fillStyle = '#ffcf60';
+for (let k = 0; k < 12; k++) { const x = 560 + k * 72 + R() * 20; g.beginPath(); g.moveTo(x, 190); g.bezierCurveTo(x - 8, 230 + R() * 60, x + 10, 230, x + 4, 260 + R() * 70); g.bezierCurveTo(x + 14, 240, x + 12, 210, x + 14, 190); g.fill(); }
+// the subtitle, confidently garbled
+g.save(); g.font = 'italic 700 46px Georgia, serif'; g.textAlign = 'center'; g.fillStyle = '#e8fbff'; g.shadowColor = '#00e0ff'; g.shadowBlur = 25;
+g.fillText('The Ultimte Bee Rogeulike Expreience of Hnoey', 960, 288);
+g.restore();
+
+// signs and labels in the scene: almost-letters
+g.save(); g.fillStyle = 'rgba(30,10,40,0.85)'; g.fillRect(150, 520, 250, 70); g.fillStyle = '#ffd040'; g.font = 'bold 34px "Courier New", monospace';
+g.fillText('HNOEY ŞHΘP', 165, 568);
+g.translate(1500, 330); g.rotate(0.12); g.fillStyle = 'rgba(30,10,40,0.85)'; g.fillRect(0, 0, 300, 60); g.fillStyle = '#9fffd0'; g.font = 'bold 28px Verdana, sans-serif';
+g.fillText('Bees Beees Bes 2', 14, 40);
+g.restore();
+// tiny gibberish text on the chestplate and the floor
+g.save(); g.font = '18px serif'; g.fillStyle = 'rgba(40,20,0,0.9)'; g.fillText('Sloop Ennnergy', hx - 64, hy + 10);
+g.fillStyle = 'rgba(255,255,255,0.5)'; g.font = '22px sans-serif'; g.fillText('ꟻREE COOPR PLAY NOW NOW', 760, 1060); g.restore();
+
+// ---------- lens flares, so many lens flares ----------
+g.save(); g.globalCompositeOperation = 'lighter';
+const fl = [[sx, sy, 160], [1250, 300, 40], [1420, 210, 70], [700, 650, 55], [520, 760, 30], [1700, 120, 90]];
+for (const [x, y, r] of fl) {
+  const f = g.createRadialGradient(x, y, 0, x, y, r);
+  f.addColorStop(0, 'rgba(255,255,255,0.9)'); f.addColorStop(0.3, 'rgba(120,220,255,0.35)'); f.addColorStop(0.6, 'rgba(255,120,220,0.18)'); f.addColorStop(1, 'rgba(255,120,220,0)');
+  g.fillStyle = f; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  g.strokeStyle = 'rgba(160,240,255,0.25)'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, r * 1.3, 0, 7); g.stroke();
+}
+g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(0, sy - 2, W, 4); // the anamorphic streak
+g.restore();
+// sparkles: the four-point stars of "magic"
+function sparkle(x, y, s) {
+  g.save(); g.translate(x, y); g.fillStyle = 'rgba(255,255,240,0.95)'; g.shadowColor = '#fff'; g.shadowBlur = 20;
+  g.beginPath(); g.moveTo(0, -s); g.quadraticCurveTo(0, 0, s, 0); g.quadraticCurveTo(0, 0, 0, s); g.quadraticCurveTo(0, 0, -s, 0); g.quadraticCurveTo(0, 0, 0, -s); g.fill(); g.restore();
+}
+for (let i = 0; i < 70; i++) sparkle(R() * W, R() * H, 6 + R() * 26);
+
+// ---------- smears: patches where the model gave up ----------
+g.save();
+for (let i = 0; i < 9; i++) {
+  const x = R() * (W - 300), y = 300 + R() * 600, w = 120 + R() * 220, h = 60 + R() * 140;
+  g.filter = 'blur(14px) saturate(2)'; g.drawImage(c, x, y, w, h, x + 10 + R() * 30, y - 10 + R() * 30, w * (1 + R() * 0.4), h);
+}
+g.restore(); g.filter = 'none';
+
+// ---------- chromatic aberration + oversharpened HDR crunch ----------
+const img = g.getImageData(0, 0, W, H), d = img.data, out = new Uint8ClampedArray(d.length);
+for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+  const i = (y * W + x) * 4, off = Math.round(((x - W / 2) / W) * 10);
+  const ir = (y * W + Math.min(W - 1, Math.max(0, x + off))) * 4, ib = (y * W + Math.min(W - 1, Math.max(0, x - off))) * 4;
+  let r = d[ir], gg = d[i + 1], b = d[ib + 2];
+  // crank contrast and saturation like a 2023 thumbnail
+  const avg = (r + gg + b) / 3;
+  r = (r - avg) * 1.45 + avg; gg = (gg - avg) * 1.45 + avg; b = (b - avg) * 1.45 + avg;
+  r = (r - 128) * 1.15 + 140; gg = (gg - 128) * 1.15 + 132; b = (b - 128) * 1.15 + 128;
+  out[i] = r; out[i + 1] = gg; out[i + 2] = b; out[i + 3] = 255;
+}
+img.data.set(out); g.putImageData(img, 0, 0);
+// JPEG-ish block noise in the shadows
+for (let i = 0; i < 2500; i++) { const x = Math.floor(R() * W / 8) * 8, y = Math.floor(R() * H / 8) * 8; g.fillStyle = `rgba(${R() * 60},${R() * 40},${R() * 80},0.12)`; g.fillRect(x, y, 8, 8); }
+
+// ---------- a fake stock watermark tiled over everything (an invented brand) ----------
+g.save(); g.globalAlpha = 0.16; g.fillStyle = '#ffffff'; g.font = 'bold 54px Arial, sans-serif';
+g.translate(W / 2, H / 2); g.rotate(-0.35);
+for (let y = -900; y < 900; y += 230) for (let x = -1400; x < 1400; x += 640) { g.fillText('shutterstonk', x, y); g.font = 'bold 54px Arial, sans-serif'; }
+g.restore();
+g.save(); g.globalAlpha = 0.5; g.fillStyle = '#fff'; g.font = 'bold 26px Arial'; g.fillText('© shutterstonk  ID: 2049 3B47 8K', 1430, 1060); g.restore();
+// the smeared artist signature the model copied from nowhere
+g.save(); g.strokeStyle = 'rgba(20,10,0,0.75)'; g.lineWidth = 3; g.beginPath();
+let px = 40, py = 1040; g.moveTo(px, py);
+for (let k = 0; k < 40; k++) { px += 5 + R() * 6; py = 1040 + Math.sin(k * 1.7) * 14 + (R() - 0.5) * 10; g.lineTo(px, py); }
+g.stroke(); g.restore();
+// the prompt, left in the corner
+g.save(); g.font = '15px monospace'; g.fillStyle = 'rgba(255,255,255,0.55)';
+g.fillText('masterpiece, best quality, 8k, ultra detailed, trending on artstation, epic bee, cinematic lighting, (perfect hands:1.4), NOT ugly', 24, 22);
+g.fillText('negative: extra fingers, extra limbs, text, watermark, bad anatomy', 24, 42);
+g.restore();
+document.title = 'done';
+</script></body></html>

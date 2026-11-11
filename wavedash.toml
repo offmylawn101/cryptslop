@@ -1,0 +1,5 @@
+# Run `wavedash init` here to link this folder to your Wavedash game (it fills in game_id),
+# or paste the game ID from the Developer Portal.
+game_id = "j978vvr8jba829y776b3kbndh18hk3p2"
+upload_dir = "./web"
+entrypoint = "index.html"
