@@ -265,7 +265,7 @@ export class UI {
     // multiplayer first: PLAY drops you into an open lobby (or opens one)
     this.button('PLAY', bx, by, bw, bh + 4, () => g.quickPlay(), { color: C.green }); by += bh + 7;
     // the Petition Bee, right under PLAY: chat builds this game (wishes.js)
-    if (g.wishes && g.wishes.api.ready) {
+    if (g.wishes) { // always there, right under PLAY (before the server is up, the board says so)
       const pulse = !g.wished && Math.sin(t * 5) > 0;
       this.button(g.wished ? 'MAKE A WISH' : 'MAKE A WISH (NEW!)', bx, by, bw, bh + 2, () => g.openWishes(), { color: pulse ? C.green : C.hot }); by += bh + 6;
     }
@@ -580,7 +580,9 @@ export class UI {
       const rel = Math.atan2(dx, dz) - (g.yaw + Math.PI);
       const r = Math.atan2(Math.sin(rel), Math.cos(rel));
       const arrow = Math.abs(r) < 0.4 ? '^' : Math.abs(r) > 2.6 ? 'V' : r > 0 ? '<' : '>';
-      drawText(ctx, `${arrow} ${w.transit ? 'NEXT HIVE' : w.stage === 'hive' ? 'BOSS DOOR' : 'WAY OUT'} ${Math.round(dist)}M ${arrow}`, cx, 6 + top * 1.8, C.green, 1, 'center');
+      if (w.transit && g.hiveHidden && g.hiveHidden()) { // FAKE HIVES: the pointer is scrambled (rooftops.js)
+        drawText(ctx, g.scrambledHive(), cx, 6 + top * 1.8, C.pink, 1, 'center');
+      } else drawText(ctx, `${arrow} ${w.transit ? 'NEXT HIVE' : w.stage === 'hive' ? 'BOSS DOOR' : 'WAY OUT'} ${Math.round(dist)}M ${arrow}`, cx, 6 + top * 1.8, C.green, 1, 'center');
     }
 
     if (w.boss) {

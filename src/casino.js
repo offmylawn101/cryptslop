@@ -68,7 +68,7 @@ export function drawMap(ctx, g, x0, y0, w, h, { cx = null, cz = null, scale = nu
     dot(pk.x, pk.z, pk.kind === 'item' ? '#40ffff' : pk.kind === 'key' ? '#ff40a0' : '#e0c080', pk.kind === 'wafer' ? 0 : 1);
   }
   const ek = Math.floor(map.exit.z / T) * W + Math.floor(map.exit.x / T);
-  if (g.explored[ek] || g.world.portalOpen) dot(map.exit.x, map.exit.z, g.world.portalOpen ? '#6aff7a' : '#406040', 1);
+  if (g.explored[ek] || (g.world.portalOpen && !(g.hiveHidden && g.hiveHidden()))) dot(map.exit.x, map.exit.z, g.world.portalOpen ? '#6aff7a' : '#406040', 1);
   if (g.horse) dot(g.horse.x, g.horse.z, '#c08040', 1);
   if (full) for (const e of g.enemies.values()) { const k = Math.floor(e.tz / T) * W + Math.floor(e.tx / T); if (g.explored[k]) dot(e.tx, e.tz, '#ff4a3a', 0); }
   for (const [id, o] of g.others) dot(o.tx, o.tz, g.colorOf(id), 1);

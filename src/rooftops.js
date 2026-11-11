@@ -344,6 +344,26 @@ export function installRooftopsClient(Game, UI) {
       if (s.material.uniforms.uEmissive) s.material.uniforms.uEmissive.value.set(c[0], c[1], c[2]);
       if (s.material.uniforms.uColor) s.material.uniforms.uColor.value.set(c[0], c[1], c[2]);
     },
+    // FAKE HIVES: the way to the real hive is not given away (the pointer and the map dot)
+    hiveHidden() { return !!(this.roof && this.roof.ev.includes('fake') && this.world && this.world.stage === 'city'); },
+    scrambledHive() {
+      const glyphs = '?#%&*@!$/<>^~|0123456789'; // only glyphs the pixel font has
+      const tick = Math.floor((this.time || 0) * 8);
+      let out = '';
+      const base = '? NEXT HIVE ??M ?';
+      for (let i = 0; i < base.length; i++) {
+        const c = base[i];
+        const h = ((i * 7919 + tick * 104729) >>> 0) % 97;
+        out += c === ' ' ? ' ' : h < 45 ? glyphs[(h + tick) % glyphs.length] : c;
+      }
+      return out;
+    },
+    // the one puzzle still left is lit up so it can be found
+    lastPuzzle() {
+      if (!this.roof || this.roof.pz.length < 1) return null;
+      const left = this.roof.pz.filter((z) => !z.done);
+      return left.length === 1 ? left[0] : null;
+    },
     nearTerminal() {
       if (!this.roof || !this.mover) return null;
       const p = this.mover.pos;
@@ -445,6 +465,21 @@ export function installRooftopsClient(Game, UI) {
           M.mesh.position.set(M.x, M.y + 1.3 + Math.max(0, M.t) / 1.2 * 60, M.z);
         }
       }
+      // the LAST PUZZLE: a tall pulsing beam over its terminal
+      const last = this.lastPuzzle();
+      for (const z of R.pz) {
+        const want = z === last;
+        if (want && !z.beam) {
+          z.beam = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 40, 10, 1, true), new THREE.MeshBasicMaterial({ color: 0xffd040, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+          z.beam.position.set(z.x, z.y + 20, z.z);
+          (this.roofGroup || this.scene).add(z.beam);
+        }
+        if (z.beam) {
+          z.beam.visible = want;
+          if (want) { const k = 0.5 + 0.5 * Math.sin(this.time * 6); z.beam.material.opacity = 0.25 + 0.35 * k; z.beam.scale.set(1 + 0.3 * k, 1, 1 + 0.3 * k); }
+        }
+        if (want && z.mesh && z.mesh.userData.screen && z.mesh.userData.screen.material.uniforms) { const k = 0.6 + 0.4 * Math.sin(this.time * 8); z.mesh.userData.screen.material.uniforms.uEmissive.value.set(1, 0.8 * k, 0.1); }
+      }
       // hail, falling around you
       if (R.ev.includes('hail') && this.mover && Math.random() < 0.9) {
         const p = this.mover.pos;
@@ -465,6 +500,13 @@ export function installRooftopsClient(Game, UI) {
       const left = R.pz.filter((z) => !z.done).length;
       if (R.pz.length) drawSmall(ctx, left ? `HIVE LOCKED: ${R.pz.length - left}/${R.pz.length} PUZZLES FIXED` : 'HIVE UNLOCKED', this.W - 4, y, left ? '#ff4a5a' : '#6aff9a', 'right');
       if (R.ev.includes('hail') && g.mover && !R.shacks.some((s) => Math.hypot(g.mover.pos.x - s.x, g.mover.pos.z - s.z) < ROOFX.hail.shelterR)) drawText(ctx, 'HAIL! GET UNDER A SHACK', this.W / 2, 44, '#c0e8ff', 1, 'center');
+      const last = g.lastPuzzle();
+      if (last && g.mover && !g.dead) {
+        const dx = last.x - g.mover.pos.x, dz = last.z - g.mover.pos.z;
+        const r0 = Math.atan2(dx, dz) - (g.yaw + Math.PI), r = Math.atan2(Math.sin(r0), Math.cos(r0));
+        const arrow = Math.abs(r) < 0.4 ? '^' : Math.abs(r) > 2.6 ? 'V' : r > 0 ? '<' : '>';
+        drawText(ctx, `${arrow} LAST PUZZLE ${Math.round(Math.hypot(dx, dz))}M ${arrow}`, this.W / 2, 56, Math.sin(g.time * 6) > 0 ? '#ffd040' : '#ffffff', 1, 'center');
+      }
       const z = g.locked ? g.nearTerminal() : null;
       if (z) drawText(ctx, `[E] FIX THE WIRES: ${WIRE_VARIANTS[z.v].name}`, this.W / 2, this.H / 2 + 22, '#ffd040', 1, 'center');
     };

@@ -183,6 +183,24 @@ for (let v = 0; v < WIRE_VARIANTS.length; v++) {
   ok(JSON.stringify(a.left) === JSON.stringify(b.left) && JSON.stringify(a.right) === JSON.stringify(b.right), 'the same terminal shows everyone the same board');
 }
 ok(ROOF_EVENTS.length === 5, 'five kinds of rooftop event');
+// ---- the client helpers: the last puzzle is found, and the fake-hive event hides the way ----
+{
+  const { installRooftopsClient } = await import('../src/rooftops.js');
+  class G { onFloor() {} onFeatureEvent() {} updateEntities() {} interact() {} }
+  installRooftopsClient(G, null);
+  const g = new G();
+  g.world = { stage: 'city' }; g.time = 1.3;
+  g.roof = { ev: ['hail'], pz: [{ done: true }, { done: false }, { done: true }], hives: [], shacks: [], beams: [] };
+  ok(g.lastPuzzle() === g.roof.pz[1], 'with one puzzle left, it is the one lit up');
+  g.roof.pz[2].done = false;
+  ok(g.lastPuzzle() === null, 'with two left, neither is');
+  ok(!g.hiveHidden(), 'without fake hives the way to the hive is shown');
+  g.roof.ev = ['fake'];
+  const a = g.scrambledHive(); g.time = 2.9; const b = g.scrambledHive();
+  ok(g.hiveHidden() && a.length === b.length && a !== b, `with fake hives the pointer is scrambled and keeps changing (${a} / ${b})`);
+  g.world.stage = 'hive';
+  ok(!g.hiveHidden(), 'only on the rooftops');
+}
 
 console.log(`${fails ? `\n${fails} FAILURE(S)` : '\nALL ROOFTOP TESTS PASSED'} (${passes} checks)`);
 process.exit(fails ? 1 : 0);
