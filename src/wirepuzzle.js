@@ -136,6 +136,7 @@ export class WirePuzzle {
     if (e.word) { drawSmall(ctx, e.word, x + (x > ctx.canvas.width / 2 ? -2 : 2), y - 2, e.ink, x > ctx.canvas.width / 2 ? 'right' : 'left'); return; }
     if (e.dots) { ctx.fillStyle = e.color; for (let d = 0; d < e.dots; d++) ctx.fillRect(x - 6 + (d % 3) * 4, y - 4 + Math.floor(d / 3) * 4, 3, 3); return; }
     if (e.shape) { this.shape(ctx, e.shape, x, y, e.color); return; }
+    ctx.fillStyle = '#8c88a8'; ctx.fillRect(x - 6, y - 5, 13, 11); // a light rim, so even the BLACK end shows on the dark panel
     ctx.fillStyle = e.color || '#ffffff'; ctx.fillRect(x - 5, y - 4, 11, 9);
     if (done) { ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(x - 5, y - 4, 11, 9); }
     if (e.label) drawSmall(ctx, e.label, x + 1, y - 2, '#14121c', 'center');

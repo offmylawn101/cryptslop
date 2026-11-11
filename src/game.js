@@ -588,7 +588,7 @@ export class Game {
         else if (this.sim) this.sim.handle(from, msg);
         break;
       case 'hello': case 'hit': case 'parry': case 'heal': case 'curse': case 'stun': case 'sunburn': case 'doom': case 'kick': case 'fall': case 'pull':
-      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose':
+      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose': case 'pz': // pz: a rooftop wire puzzle fixed (rooftops.js)
         if (this.sim) this.sim.handle(from, msg);
         break;
       case 'vx': if (from === this.net.hostId) this.onHostMsg(msg); break;

@@ -150,6 +150,8 @@ const transit = (floor, force) => {
   ok(s.countdown < 0 && rfEv('locked').length >= 1, 'the hive will not let you in while a puzzle is left');
   for (const z of rf.pz) { s.handle('a', { t: 'pz', i: z.i }); }
   ok(rf.pz.every((z) => !z.done), 'you have to be at a terminal to fix it');
+  const far = rf.pz[0]; p.x = far.x + 40; p.z = far.z; s.handle('a', { t: 'pz', i: far.i, x: far.x + 1, z: far.z });
+  ok(far.done, 'a fix counts where the player says they stand at the terminal (their last position update can lag)');
   for (const z of rf.pz) { p.x = z.x; p.z = z.z; p.y = z.y; s.handle('a', { t: 'pz', i: z.i }); }
   ok(rf.pz.every((z) => z.done) && rfEv('unlock').length === 1, 'fix them all and the hive opens');
   p.x = s.map.exit.x; p.z = s.map.exit.z; p.y = s.map.exit.y;
@@ -183,6 +185,11 @@ for (let v = 0; v < WIRE_VARIANTS.length; v++) {
   ok(JSON.stringify(a.left) === JSON.stringify(b.left) && JSON.stringify(a.right) === JSON.stringify(b.right), 'the same terminal shows everyone the same board');
 }
 ok(ROOF_EVENTS.length === 5, 'five kinds of rooftop event');
+{ // co-op: the host passes a teammate's puzzle fix on to the sim
+  const { readFileSync } = await import('node:fs');
+  const g = readFileSync(new URL('../src/game.js', import.meta.url), 'utf8');
+  ok(/case 'clashlose': case 'pz':[^\n]*\n\s*if \(this\.sim\) this\.sim\.handle\(from, msg\)/.test(g), "the host forwards a teammate's puzzle fix to the sim");
+}
 // ---- the client helpers: the last puzzle is found, and the fake-hive event hides the way ----
 {
   const { installRooftopsClient } = await import('../src/rooftops.js');

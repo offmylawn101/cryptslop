@@ -123,7 +123,8 @@ export function installRooftops(Sim) {
     handle(from, msg) {
       if (msg && msg.t === 'pz') { // a puzzle fixed
         const rf = this.rf, p = this.players.get(from), z = rf && rf.pz[msg.i | 0];
-        if (!z || z.done || !p || p.dead || this.stage !== 'city' || Math.hypot(p.x - z.x, p.z - z.z) > ROOFX.puzzle.reach) return;
+        const near = (x, zz) => Number.isFinite(x) && Number.isFinite(zz) && Math.hypot(x - z.x, zz - z.z) <= ROOFX.puzzle.reach;
+        if (!z || z.done || !p || p.dead || this.stage !== 'city' || !(near(p.x, p.z) || near(Number(msg.x), Number(msg.z)))) return;
         z.done = true;
         this.ev({ k: 'rf', s: 'pz', i: z.i, by: from });
         if (!this.roofLocked()) this.ev({ k: 'rf', s: 'unlock' });
@@ -394,7 +395,8 @@ export function installRooftopsClient(Game, UI) {
     },
     wiresSolved(wp) {
       const z = wp.terminal;
-      this.toHost({ t: 'pz', i: z.i }, true);
+      const p = this.mover.pos;
+      this.toHost({ t: 'pz', i: z.i, x: Math.round(p.x * 100) / 100, z: Math.round(p.z * 100) / 100 }, true); // where you stand (the last position update may be older)
       this.sound.play('jackpot');
       this.ui.screen = null; this.wirePuzzle = null;
       try { this.lock(); } catch (e) { /* the next click takes the mouse */ }
