@@ -26,11 +26,27 @@ function run(cmd, args) {
   return execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false, timeout: 240000 });
 }
 
+// commit whatever changed and push it to GitHub (github.com/offmylawn101/cryptslop). Never fails the run.
+function syncGit(message) {
+  try {
+    if (!fs.existsSync(path.join(ROOT, '.git'))) return '';
+    if (run('git', ['status', '--porcelain']).trim()) { run('git', ['add', '-A']); run('git', ['commit', '-q', '-m', message]); }
+    const ahead = run('git', ['rev-list', '--count', '@{u}..HEAD']).trim();
+    if (ahead === '0') return '';
+    run('git', ['push', '-q']);
+    return ' Pushed to GitHub.';
+  } catch (e) { return ` (git push failed: ${String(e.stderr || e.message).split('\n').filter(Boolean).slice(-1)[0]})`; }
+}
+
 try {
   const hash = hashTree();
   let last = {};
   try { last = JSON.parse(fs.readFileSync(STATE, 'utf8')); } catch (e) { /* first run */ }
-  if (last.hash === hash) process.exit(0); // nothing changed this turn: stay quiet
+  if (last.hash === hash) { // the game did not change: nothing to upload, but tools and docs still go to GitHub
+    const pushed = syncGit(`Update ${new Date().toISOString().replace('T', ' ').slice(0, 16)}`);
+    if (pushed) say(`nothing to upload.${pushed}`);
+    process.exit(0);
+  }
   if (!fs.existsSync(CLI)) { say(`CLI not found at ${CLI}; skipped upload`); process.exit(0); }
   const node = process.execPath;
   const esbuild = path.join(ROOT, 'node_modules', 'esbuild', 'bin', 'esbuild');
@@ -56,14 +72,9 @@ try {
   const id = (out.match(/\b[a-z0-9]{32}\b/) || [])[0];
   fs.mkdirSync(path.dirname(STATE), { recursive: true });
   fs.writeFileSync(STATE, JSON.stringify({ hash, build: id || null, at: stamp }, null, 2));
-  // keep git in step with what was uploaded (the daily wish build branches from main)
-  try {
-    if (fs.existsSync(path.join(ROOT, '.git')) && run('git', ['status', '--porcelain']).trim()) {
-      run('git', ['add', '-A']);
-      run('git', ['commit', '-q', '-m', `Uploaded build ${id || stamp}`]);
-    }
-  } catch (e) { /* the upload still happened */ }
-  say(`uploaded build ${id || '(see CLI output)'}. Publish it in the Developer Portal.`);
+  // keep git in step with what was uploaded (the daily wish build branches from main), and push it
+  const pushed = syncGit(`Uploaded build ${id || stamp}`);
+  say(`uploaded build ${id || '(see CLI output)'}. Publish it in the Developer Portal.${pushed}`);
 } catch (e) {
   say(`hook error: ${e.message}`);
 }

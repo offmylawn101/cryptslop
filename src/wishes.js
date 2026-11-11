@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import { drawText } from './font.js';
 import { retroMaterial, pixelTexture } from './retro.js';
 import { PROP_BUILDERS, makeGrunt } from './models.js';
-import { wishServer, WISH_HOUR_ET } from './wishConfig.js';
+import { wishServer, WISH_HOUR_ET, REPO_URL } from './wishConfig.js';
 
 export const WISH_MAX = 2000;
 const C = { text: '#f2ead8', dim: '#8c88a8', hot: '#ffd040', red: '#ff4a5a', green: '#6aff9a', blue: '#4ff0ff', pink: '#ff6ad8', bg: '#16121f', panel: '#211b2e', line: '#3a3150' };
@@ -152,6 +152,8 @@ const CSS = `
 .wb-title{font-size:22px;font-weight:900;color:${C.hot};text-shadow:2px 2px 0 #000}
 .wb-sub{font-size:12px;color:${C.dim};margin-top:3px;line-height:1.35}
 .wb-clock{font-size:13px;color:${C.green};margin-top:4px;font-weight:700}
+.wb-src{font-size:11px;color:${C.dim};margin-top:4px}
+.wb-a{color:${C.blue};text-decoration:underline}
 .wb-x{margin-left:auto;background:none;border:2px solid ${C.dim};color:${C.text};font:inherit;font-weight:900;font-size:16px;width:34px;height:34px;cursor:pointer;flex:none}
 .wb-x:hover{border-color:${C.red};color:${C.red}}
 .wb-compose{padding:10px 14px;border-bottom:2px solid ${C.line}}
@@ -224,6 +226,18 @@ export class WishBoard {
     ht.appendChild(el('div', 'wb-title', 'THE PETITION BEE'));
     ht.appendChild(el('div', 'wb-sub', 'WISH FOR ANYTHING. VOTE FOR THE WISHES YOU WANT. EVERY DAY AT 3 PM EASTERN, THE TOP WISHES GET BUILT INTO THE GAME LIVE ON STREAM.'));
     this.clock = el('div', 'wb-clock'); ht.appendChild(this.clock);
+    // the source code: every change chat asks for lands here, in public
+    const src = el('div', 'wb-src'); ht.appendChild(src);
+    src.appendChild(el('span', null, 'SEE EVERY CHANGE IN THE SOURCE: '));
+    const a = el('a', 'wb-a', REPO_URL.replace('https://', '').toUpperCase()); a.href = REPO_URL; a.target = '_blank'; a.rel = 'noopener noreferrer'; src.appendChild(a);
+    const cp = el('button', 'wb-link', ' [COPY LINK]');
+    cp.onclick = async () => {
+      let ok = false;
+      try { if (this.g.WD && this.g.WD.copyLink) { const r = await this.g.WD.copyLink(REPO_URL); ok = r !== false; } } catch (e) { /* fall back */ }
+      if (!ok) { try { await navigator.clipboard.writeText(REPO_URL); ok = true; } catch (e) { /* no clipboard */ } }
+      cp.textContent = ok ? ' [COPIED]' : ' [COPY FAILED]';
+    };
+    src.appendChild(cp);
     const x = el('button', 'wb-x', 'X'); x.title = 'CLOSE (ESC)'; x.onclick = () => this.close(true); head.appendChild(x);
 
     // HOW IT WORKS: shown until you have made your first wish
