@@ -7,7 +7,7 @@ compatibility_date = "2025-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "cryptslop-wishes"
-database_id = "REPLACE_ME"
+database_id = "ade3e8f6-be86-4371-9312-77f9faa9fb30"
 
 # Llama Guard checks each wish as it comes in (Workers AI free tier)
 [ai]
