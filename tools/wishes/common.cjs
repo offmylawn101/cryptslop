@@ -51,10 +51,17 @@ function today(d = new Date()) {
 
 async function api(cfg, method, p, body) {
   if (!cfg.server || !cfg.adminToken) throw new Error(`no server configured: put {"server": "...", "adminToken": "..."} in ${CONFIG_FILE}`);
-  const res = await fetch(`${cfg.server.replace(/\/+$/, '')}${p}`, {
-    method, headers: { Authorization: `Bearer ${cfg.adminToken}`, ...(body ? { 'Content-Type': 'application/json' } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res = null;
+  for (let attempt = 1; ; attempt++) { // networks blink: retry a few times
+    try {
+      res = await fetch(`${cfg.server.replace(/\/+$/, '')}${p}`, {
+        method, headers: { Authorization: `Bearer ${cfg.adminToken}`, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      if (res.status < 500 || attempt >= 4) break;
+    } catch (e) { if (attempt >= 4) throw new Error(`server ${method} ${p}: ${e.message} (${(e.cause && e.cause.code) || 'network'})`); }
+    await new Promise((r) => setTimeout(r, 1500 * attempt));
+  }
   const j = await res.json().catch(() => null);
   if (!res.ok || !j || j.ok === false) throw new Error(`server ${method} ${p}: ${res.status} ${(j && j.error) || ''}`);
   return j;

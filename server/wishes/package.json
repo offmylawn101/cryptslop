@@ -1,0 +1,13 @@
+{
+  "name": "cryptslop-wishes",
+  "private": true,
+  "type": "module",
+  "description": "The Petition Bee: Cryptslop's wish board server (Cloudflare Worker + D1).",
+  "scripts": {
+    "local": "node local.mjs",
+    "deploy": "node ../../tools/wishes/deploy.cjs"
+  },
+  "devDependencies": {
+    "wrangler": "3.114.0"
+  }
+}
