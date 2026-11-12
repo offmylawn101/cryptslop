@@ -42,7 +42,8 @@ for (let s = 1; s <= 400; s++) {
   for (const p of m.props) {
     ok(Math.hypot(p.x - m.spawn.x, p.z - m.spawn.z) > 3, `prop clear of spawn seed ${s}`);
     const k = Math.floor(p.z / T) * W + Math.floor(p.x / T);
-    ok(m.type[k] === FLOOR && m.roomOf[k] === 0, `prop in lounge seed ${s}`);
+    if (p.w4) ok(m.type[k] === FLOOR && m.roomOf[k] > 0 && m.fh[k] === 0 && Math.hypot(p.x - m.exit.x, p.z - m.exit.z) > 5, `floor shop / old bee / hungry bee in its own room, clear of the exit, seed ${s}`); // wishbatch4.js
+    else ok(m.type[k] === FLOOR && m.roomOf[k] === 0, `prop in lounge seed ${s}`);
   }
   ok(propUnder(m, m.spawn.x, m.spawn.z, MV.halfWidth + 1.3) < 0, `spawn (and co-op spread) not inside a prop seed ${s}`);
   for (let vi = 0; vi < m.vaults.length; vi++) openVault(m, vi);

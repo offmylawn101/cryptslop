@@ -372,8 +372,15 @@ export const RANKS = [
   { name: 'S', min: 260, mult: 2.5, color: '#ffd040', title: 'SWARMING' },
   { name: 'SS', min: 380, mult: 3, color: '#ff8a20', title: 'STINGING' },
   { name: 'SSS', min: 520, mult: 4, color: '#ff40c0', title: 'SUPREME SOVEREIGN STINGER' },
+  // way past SSS (a wish, gwen): style decays faster the higher it is, so these take real work to hold
+  { name: 'SSSS', min: 700, mult: 4.5, color: '#ff2020', title: 'STINGER OF STINGERS' },
+  { name: 'ULTRA', min: 900, mult: 5, color: '#ffffff', title: 'ULTRA BEE' },
+  { name: 'HYPER', min: 1150, mult: 5.5, color: '#40ffff', title: 'HYPER HIVE' },
+  { name: 'MEGA', min: 1450, mult: 6, color: '#a040ff', title: 'MEGA MONARCH' },
+  { name: 'GODLIKE', min: 1800, mult: 7, color: '#ffd700', title: 'GOD OF THE HIVE' },
+  { name: 'BEEYOND', min: 2200, mult: 8, color: '#80ff40', title: 'BEEYOND ALL COMPREHENSION' },
 ];
-export const STYLE_CAP = 640;
+export const STYLE_CAP = 2600;
 export function rankFor(style) {
   let r = 0;
   for (let i = 0; i < RANKS.length; i++) if (style >= RANKS[i].min) r = i;

@@ -24,7 +24,19 @@ export const THEMES = [
   { name: 'THE WAX WORKS', wall: [0.95, 0.9, 0.75], floor: [0.8, 0.75, 0.6], ceil: [0.5, 0.45, 0.35], plat: [0.9, 0.85, 0.65], fog: [0.07, 0.065, 0.05], ambient: [0.38, 0.36, 0.3], torch: [1.0, 0.9, 0.6] },
   { name: 'THE POLLEN FIELDS', wall: [0.75, 0.85, 0.35], floor: [0.6, 0.7, 0.3], ceil: [0.3, 0.38, 0.15], plat: [0.95, 0.85, 0.3], fog: [0.05, 0.07, 0.02], ambient: [0.33, 0.4, 0.2], torch: [0.9, 1.0, 0.4] },
   { name: 'THE ROYAL JELLY VAULT', wall: [0.9, 0.55, 0.75], floor: [0.75, 0.5, 0.65], ceil: [0.4, 0.22, 0.35], plat: [1.0, 0.75, 0.85], fog: [0.07, 0.03, 0.06], ambient: [0.4, 0.26, 0.36], torch: [1.0, 0.5, 0.8] },
+  // ten more (a wish, gwen): every floor of a run looks different until floor 15
+  { name: 'THE BEESWAX CATHEDRAL', wall: [1.0, 0.95, 0.75], floor: [0.8, 0.7, 0.45], ceil: [0.55, 0.45, 0.6], plat: [1.0, 0.85, 0.5], fog: [0.06, 0.05, 0.08], ambient: [0.42, 0.38, 0.4], torch: [0.85, 0.6, 1.0] },
+  { name: 'THE NECTAR SWAMP', wall: [0.55, 0.6, 0.3], floor: [0.4, 0.45, 0.22], ceil: [0.25, 0.3, 0.12], plat: [0.7, 0.75, 0.35], fog: [0.04, 0.06, 0.02], ambient: [0.3, 0.36, 0.18], torch: [0.7, 1.0, 0.4] },
+  { name: "THE BEEKEEPER'S SMOKE", wall: [0.62, 0.6, 0.58], floor: [0.5, 0.48, 0.45], ceil: [0.3, 0.29, 0.28], plat: [0.75, 0.7, 0.62], fog: [0.09, 0.085, 0.08], ambient: [0.36, 0.35, 0.34], torch: [1.0, 0.55, 0.2] },
+  { name: 'THE FROSTED COMB', wall: [0.75, 0.9, 1.0], floor: [0.6, 0.75, 0.85], ceil: [0.35, 0.45, 0.55], plat: [0.85, 0.95, 1.0], fog: [0.05, 0.07, 0.09], ambient: [0.34, 0.4, 0.46], torch: [0.6, 0.85, 1.0] },
+  { name: 'THE WILDFLOWER MEADOW', wall: [1.0, 0.65, 0.8], floor: [0.55, 0.75, 0.35], ceil: [0.6, 0.4, 0.55], plat: [1.0, 0.85, 0.4], fog: [0.07, 0.05, 0.06], ambient: [0.42, 0.36, 0.38], torch: [1.0, 0.75, 0.9] },
+  { name: 'THE ROTTEN LOG', wall: [0.45, 0.32, 0.2], floor: [0.35, 0.25, 0.15], ceil: [0.2, 0.15, 0.1], plat: [0.6, 0.45, 0.3], fog: [0.03, 0.04, 0.035], ambient: [0.26, 0.28, 0.26], torch: [0.3, 1.0, 0.8] },
+  { name: 'THE CLOVER CAVES', wall: [0.45, 0.85, 0.45], floor: [0.35, 0.65, 0.35], ceil: [0.2, 0.4, 0.2], plat: [0.6, 0.95, 0.5], fog: [0.03, 0.07, 0.03], ambient: [0.3, 0.42, 0.3], torch: [0.8, 1.0, 0.6] },
+  { name: "THE QUEEN'S BALLROOM", wall: [0.85, 0.25, 0.3], floor: [0.95, 0.75, 0.3], ceil: [0.45, 0.1, 0.15], plat: [1.0, 0.85, 0.45], fog: [0.08, 0.02, 0.03], ambient: [0.45, 0.28, 0.26], torch: [1.0, 0.8, 0.4] },
+  { name: 'THE MIDNIGHT APIARY', wall: [0.35, 0.4, 0.7], floor: [0.25, 0.3, 0.5], ceil: [0.12, 0.14, 0.3], plat: [0.6, 0.65, 0.95], fog: [0.02, 0.025, 0.06], ambient: [0.24, 0.26, 0.4], torch: [0.85, 0.9, 1.0] },
+  { name: 'THE SUGAR REFINERY', wall: [1.0, 0.92, 0.95], floor: [0.95, 0.75, 0.85], ceil: [0.6, 0.5, 0.58], plat: [1.0, 0.6, 0.75], fog: [0.08, 0.07, 0.075], ambient: [0.46, 0.42, 0.44], torch: [1.0, 0.6, 0.8] },
 ];
+export const MAP_HOOKS = []; // functions run on every generated hive floor
 
 // metroidvania gates in front of vault rooms
 export const GATE_KINDS = {
@@ -535,7 +547,9 @@ export function generateFloor(seed, floor) {
 
   // the real room's lamps are cold office light
   for (const rr of realRooms) { const r = rooms[rr.room]; for (const L of lights) if (L.x >= r.x * T && L.x <= (r.x + r.w) * T && L.z >= r.y * T && L.z <= (r.y + r.h) * T) L.real = rr.kind; }
-  return { seed, floor, W, H, type, fh, ch, roomOf, rooms, pads, spawn, exit, lights, props, horse, vaults, gates, pickups, challenges, broken: [], world, theme: themeFor(floor), realOf, realRooms, realMode, blocks };
+  const out = { seed, floor, W, H, type, fh, ch, roomOf, rooms, pads, spawn, exit, lights, props, horse, vaults, gates, pickups, challenges, broken: [], world, theme: themeFor(floor), realOf, realRooms, realMode, blocks };
+  for (const h of MAP_HOOKS) h(out); // extra rooms and props, added after the fact (wishbatch4.js)
+  return out;
 }
 
 // Open a vault's gate (break the wax / unlock the seal). Deterministic, so every peer can apply it.

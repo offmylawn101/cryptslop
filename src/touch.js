@@ -19,6 +19,7 @@ const KIT_BUTTONS = {
   spinner: [],
   pestilent: [],
   fister: [['grab', 'GRAB']],
+  soaker: [['reload', 'SQUEEZE']], // wishbatch3.js
 };
 const HOLD_KEYS = { jump: 'Space', crouch: 'ShiftLeft', dash: 'KeyQ' };
 const DPAD = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' };
@@ -30,6 +31,7 @@ const CSS = `
 #touch .b.on { background: rgba(255, 208, 64, 0.55); color: #201008; }
 #touch .b.sq { border-radius: 14%; }
 #touch .b.hide { display: none; }
+#touch .b { transform: scale(var(--ts, 1)); } /* TOUCH BUTTON SIZE (a setting) */
 #touch .stick { position: absolute; width: 22vmin; height: 22vmin; margin: -11vmin 0 0 -11vmin; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); display: none; pointer-events: none; }
 #touch .knob { position: absolute; left: 50%; top: 50%; width: 9vmin; height: 9vmin; margin: -4.5vmin 0 0 -4.5vmin; border-radius: 50%; background: rgba(255, 208, 64, 0.6); }
 #touch .offer { position: absolute; border-radius: 8px; width: 26vw; height: 15vmin; top: 22vh; font-size: 2.4vmin; white-space: normal; padding: 1vmin; }
@@ -68,7 +70,7 @@ export class TouchControls {
       ['fire', 'FIRE', 3, 6, 21, 'play'], ['jump', 'JUMP', 26, 4, 15, 'play'], ['parry', 'PARRY', 6, 31, 13, 'play'],
       ['crouch', 'SLIDE', 43, 4, 12, 'play'], ['dash', 'DASH', 24, 23, 12, 'play'],
       ['kit0', '', 21, 40, 11, 'play'], ['kit1', '', 34, 36, 11, 'play'], ['kit2', '', 41, 20, 11, 'play'],
-      ['use', 'USE', 50, 18, 10, 'play'], ['active', 'RELIC', 56, 4, 10, 'play'],
+      ['use', 'USE', 50, 18, 10, 'play'], ['active', 'RELIC', 56, 4, 10, 'play'], ['power', 'POW', 62, 18, 10, 'play'], // POW: your POWER (wishbatch2.js)
       ['pause', 'II', 2, 'top:2', 9, 'any', true], ['bag', 'BAG', 13, 'top:2', 9, 'play', true], ['ping', 'PING', 24, 'top:2', 9, 'play', true],
       ['w', 'W', 35, 'top:2', 9, 'play', true], ['build', 'BUILD', 46, 'top:2', 9, 'play', true], ['flip', 'FLIP', 57, 'top:2', 9, 'play', true], ['swap', 'SWAP', 68, 'top:2', 9, 'play', true], ['med', 'MED', 79, 'top:2', 9, 'play', true], ['saber', 'SABR', 90, 'top:2', 9, 'play', true], ['wish', 'WISH', 101, 'top:2', 9, 'play', true],
       ['qte', 'TAP!', 'center', 'center', 22, 'qte'],
@@ -136,9 +138,12 @@ export class TouchControls {
         const el = this.btn[`kit${i}`];
         if (kit[i]) { el.textContent = kit[i][1]; el.dataset.act = kit[i][0]; el.classList.remove('hide'); } else el.classList.add('hide');
       }
-      this.btn.fire.textContent = { hornet: 'FIRE', batter: 'SWING', grenader: 'BOMB', cleaver: 'SLASH', spinner: 'SPIN', pestilent: 'COUGH', fister: 'PUNCH', sieger: 'LOB', koolciller: 'POKE', interceptor: 'LASER', blasphemous: 'RING', parkour: 'RUN' }[g.cls] || 'FIRE';
+      this.btn.fire.textContent = { hornet: 'FIRE', batter: 'SWING', grenader: 'BOMB', cleaver: 'SLASH', spinner: 'SPIN', pestilent: 'COUGH', fister: 'PUNCH', sieger: 'LOB', koolciller: 'POKE', interceptor: 'LASER', blasphemous: 'RING', parkour: 'RUN', soaker: 'SPRAY', glare: 'GLARE' }[g.cls] || 'FIRE' || 'FIRE';
       this.btn.fire.style.borderColor = CLASSES[g.cls].color;
     }
+    // the POW button only when you have a power; the button size setting
+    if (mode === 'play') this.btn.power.classList.toggle('hide', !(g.power && g.wishOn && g.wishOn('powers')));
+    this.root.style.setProperty('--ts', String(g.settings.touchSize || 1));
     // QTE prompt, boon cards, the portrait hint
     const qte = g.qte && g.qte.active;
     this.btn.qte.classList.toggle('hide', !(qte && mode === 'play'));
@@ -253,6 +258,7 @@ export class TouchControls {
       case 'use': g.interact(); break;
       case 'active': g.useActive(); break;
       case 'med': g.useMedkit(); break;
+      case 'power': if (g.usePower) g.usePower(); break;
       case 'saber': g.toggleSaber(); break;
       case 'ping': g.doPing(); break;
       case 'bag': g.casino.openInventory(0); break;

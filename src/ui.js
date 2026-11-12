@@ -16,7 +16,7 @@ const C = {
   text: '#f2ead8', dim: '#8c88a8', hot: '#ffd040', red: '#ff4a5a', green: '#6aff9a', blue: '#4ff0ff', pink: '#ff6ad8',
   panel: 'rgba(14,10,28,0.86)', edge: '#4ff0ff', edgeB: '#ff4fd8', edgeHot: '#ffd040',
 };
-const PROP_NAMES = { slots: 'HONEY SLOTS', wheel: 'THE BUZZ WHEEL', derby: 'BEE-DERBY', booth: 'HIVE HEARTS (DATING)', shop: 'HONEY SHOP', typing: 'TYPING STAND (TYPE FAST, HIT HARD)', petition: 'THE PETITION BEE (MAKE A WISH)' };
+const PROP_NAMES = { slots: 'HONEY SLOTS', wheel: 'THE BUZZ WHEEL', derby: 'BEE-DERBY', booth: 'HIVE HEARTS (DATING)', shop: 'HONEY SHOP', typing: 'TYPING STAND (TYPE FAST, HIT HARD)', petition: 'THE PETITION BEE (MAKE A WISH)', shop2: 'THE HONEY SHOP', fastfood: 'BUZZ BURGER (FAST FOOD)', sacrifice: 'THE SACRIFICE SHOP', storyteller: 'THE OLD BEE (A STORY)', hungrybee: 'A HUNGRY BEE' }; // the last five: wishbatch4.js
 const META_LINES = ['A VIDEO GAME THAT DOES NOT EXIST', 'WHICH MEANS IT DOES', 'IT WAS ALWAYS LIKE THIS', 'PLEASE INSERT MEMORY CARD (FOUND ONE IN THE CLOUD)', 'NOTHING HERE IS REAL EXCEPT THE HORSE', 'THIS DISC IS NOT FOR SALE', 'A HIVE YOU HALF REMEMBER'];
 
 function wrap(text, maxChars) {
@@ -91,6 +91,7 @@ export class UI {
     if (this.screen === 'archive' && archiveKey(this, e)) return; // the archive's list and its entry files (archive.js)
     if (this.screen === 'porridge' && this.g.porridgeKey && this.g.porridgeKey(e)) return; // the PIXEL PORRIDGE shop (porridge.js)
     if (this.screen === 'wires' && this.g.wiresKey && this.g.wiresKey(e)) return; // a rooftop WIRE PUZZLE (rooftops.js)
+    if (this.screen === 'w4' && this.g.w4Key && this.g.w4Key(e)) return; // a floor shop (wishbatch4.js)
     if (e.code === 'Escape' && this.screen === 'wishfx') { this.screen = 'settings'; return; } // the WISH FEATURES switches (wishbatch1.js)
     if (e.code === 'Escape' && (this.screen === 'settings' || this.screen === 'help' || this.screen === 'browser')) this.screen = this.back === 'pause' ? null : 'title';
     else if (e.code === 'Escape' && (this.screen === 'archive' || this.screen === 'beepass')) this.screen = 'title';
@@ -152,6 +153,7 @@ export class UI {
     else if (this.screen === 'porridge' && g.drawPorridgeShop) g.drawPorridgeShop(this);
     else if (this.screen === 'wires' && g.drawWires) g.drawWires(this);
     else if (this.screen === 'wishfx' && g.drawWishFx) g.drawWishFx(this);
+    else if (this.screen === 'w4' && g.drawW4) g.drawW4(this); // a floor shop (wishbatch4.js)
     else if (this.screen === 'beepass') this.drawBeePass();
     else if (this.screen === 'quit') this.drawQuit();
     else if (this.screen === 'title') this.drawTitle();
@@ -337,6 +339,8 @@ export class UI {
       ['PAD LOOK', `${Math.round((s.padSens || 1) * 100)}%`, (d) => { s.padSens = Math.max(0.2, Math.min(4, Math.round(((s.padSens || 1) + d * 0.1) * 10) / 10)); }],
       ['TOUCH CONTROLS', (s.touch || 'auto').toUpperCase(), (d) => { const o = ['auto', 'on', 'off']; s.touch = o[(o.indexOf(s.touch || 'auto') + d + 3) % 3]; }],
       ['TOUCH LOOK', `${Math.round((s.touchSens || 1) * 100)}%`, (d) => { s.touchSens = Math.max(0.2, Math.min(4, Math.round(((s.touchSens || 1) + d * 0.1) * 10) / 10)); }],
+      ['TOUCH BUTTONS', `${Math.round((s.touchSize || 1) * 100)}%`, (d) => { s.touchSize = Math.max(0.7, Math.min(1.4, Math.round(((s.touchSize || 1) + d * 0.1) * 10) / 10)); }], // mobile (a wish, wishbatch4.js)
+      ['TOUCH AIM ASSIST', s.aimAssist === false ? 'OFF' : 'ON', () => { s.aimAssist = s.aimAssist === false; }],
       ['SENSITIVITY', String(Math.round(s.sens * 10000) / 10000), (d) => { s.sens = Math.max(0.05, Math.min(100, Math.round((s.sens + d * 0.05) * 10000) / 10000)); }],
       ['FIELD OF VIEW', String(s.fov), (d) => { s.fov = Math.max(70, Math.min(130, Math.round(s.fov) + d * 5)); }],
       ['RESOLUTION', `${s.res}P`, (d) => { const opts = [144, 180, 240, 300, 360, 480]; const i = Math.max(0, opts.indexOf(s.res)); s.res = opts[Math.max(0, Math.min(opts.length - 1, i + d))]; }],

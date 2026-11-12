@@ -67,6 +67,13 @@ export function drawMap(ctx, g, x0, y0, w, h, { cx = null, cz = null, scale = nu
     if (!g.explored[k] && !eye) continue;
     dot(pk.x, pk.z, pk.kind === 'item' ? '#40ffff' : pk.kind === 'key' ? '#ff40a0' : '#e0c080', pk.kind === 'wafer' ? 0 : 1);
   }
+  if (g.mapIcons) for (const ic of g.mapIcons()) { // special rooms get an icon (wishbatch4.js)
+    const k = Math.floor(ic.z / T) * W + Math.floor(ic.x / T);
+    if (!g.explored[k] && !eye) continue;
+    ctx.fillStyle = ic.c;
+    const bx = Math.round(ox + (ic.x / T) * s) - 1, by = Math.round(oy + (ic.z / T) * s) - 1;
+    for (let q = 0; q < 9; q++) if (ic.g[q]) ctx.fillRect(bx + (q % 3), by + Math.floor(q / 3), 1, 1);
+  }
   const ek = Math.floor(map.exit.z / T) * W + Math.floor(map.exit.x / T);
   if (g.explored[ek] || (g.world.portalOpen && !(g.hiveHidden && g.hiveHidden()))) dot(map.exit.x, map.exit.z, g.world.portalOpen ? '#6aff7a' : '#406040', 1);
   if (g.horse) dot(g.horse.x, g.horse.z, '#c08040', 1);

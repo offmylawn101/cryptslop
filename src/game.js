@@ -16,6 +16,7 @@ import { installRooftopsClient } from './rooftops.js';
 import { installWishBatch1Client } from './wishbatch1.js';
 import { installWishBatch2Client } from './wishbatch2.js';
 import { installWishBatch3Client } from './wishbatch3.js';
+import { installWishBatch4Client } from './wishbatch4.js';
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
@@ -592,7 +593,7 @@ export class Game {
         else if (this.sim) this.sim.handle(from, msg);
         break;
       case 'hello': case 'hit': case 'parry': case 'heal': case 'curse': case 'stun': case 'sunburn': case 'doom': case 'kick': case 'fall': case 'pull':
-      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose': case 'pz': case 'gold': case 'swin': case 'soak': // soak: THE SOAKER (wishbatch3.js) // swin: a cursed player's keys (wishbatch2.js) // gold: THE GOLDEN ONE / THE PEBBLE EDGE (wishbatch1.js) // pz: a rooftop wire puzzle fixed (rooftops.js)
+      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose': case 'pz': case 'gold': case 'swin': case 'soak': case 'sac': // sac: THE SACRIFICE SHOP (wishbatch4.js) // soak: THE SOAKER (wishbatch3.js) // swin: a cursed player's keys (wishbatch2.js) // gold: THE GOLDEN ONE / THE PEBBLE EDGE (wishbatch1.js) // pz: a rooftop wire puzzle fixed (rooftops.js)
         if (this.sim) this.sim.handle(from, msg);
         break;
       case 'vx': if (from === this.net.hostId) this.onHostMsg(msg); break;
@@ -2919,6 +2920,7 @@ installPorridge(Game); // the PIXEL PORRIDGE EXCLUSIVE SHOP and its flair (porri
 installWishBatch1Client(Game, UI); // the first batch of wishes built by hand (wishbatch1.js)
 installWishBatch2Client(Game, UI); // the second batch (wishbatch2.js): after batch 1, it wraps the sidearms
 installWishBatch3Client(Game, UI); // the third batch (wishbatch3.js): THE SOAKER, GLARE, lasers
+installWishBatch4Client(Game, UI); // the fourth batch (wishbatch4.js): floor shops, the old bee, minimap icons, mobile
 installRooftopsClient(Game, UI); // rooftop events, fake hives, shacks, missiles, wire puzzles (rooftops.js)
 installBestiaryClient(Game, UI); // the deep floors' foes: models, looks, warnings, frozen floors (bestiary.js)
 installBugsClient(Game); // the looks of the reworked bugs (bugs.js; the host side installs itself in sim.js)
