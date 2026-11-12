@@ -25,7 +25,7 @@ const r2 = (v) => Math.round(v * 100) / 100;
 export const WORB = { banana: 7, golden: 8, pebble: 9, sword: 10, club: 11 };
 export const WISH_FEATURES = [
   { id: 'deathping', name: 'PING WHERE YOU DIE', by: 'GWEN' },
-  { id: 'spawnfire', name: 'ATTACK FROM THE SPAWN AREA', by: 'OFFMYLAWN' },
+  { id: 'spawnfire', name: 'ATTACK FROM SPAWN', by: 'OFFMYLAWN' },
   { id: 'gnatcap', name: 'SWARM PILE-UP CAP', by: 'ISLANDOFCHICAGOO' },
   { id: 'derpy', name: 'DERPY THE FRUIT FLY', by: 'MICRORAVEN585MOD' },
   { id: 'banana', name: 'BANANAS', by: 'OFFMYLAWN' },
@@ -210,6 +210,7 @@ function sidearmMesh(id) {
   if (id === 'golden') return makeGolden();
   if (id === 'pebble') return makeBlade(0.9, [0.75, 0.9, 1], [0.35, 0.55, 0.8], [0.3, 0.2, 0.4]);
   if (id === 'sword') return makeBlade(0.75, [0.8, 0.8, 0.85], [0.2, 0.2, 0.22], [0.4, 0.25, 0.15]);
+  if (id === 'fists') { const g = new THREE.Group(), skin = mat([1, 0.78, 0.55]); box(g, 0.42, 0.42, 0.5, skin, [0, 0.2, 0]); box(g, 0.44, 0.12, 0.2, mat([0.9, 0.68, 0.48]), [0, 0.44, 0.12]); return g; } // big: sidearms are drawn at 0.38 scale // SIR ECLIPSE has your weapons (wishbatch2.js)
   return makeClub();
 }
 
@@ -316,11 +317,11 @@ export function installWishBatch1Client(Game, UI) {
         if (k === 'pebble') gold.push(e.id);
         else {
           hits.set(e.id, S2.dmg * (1 + S2.perFloor * (floor - 1)) * this.dmgMul());
-          if (k === 'club') { const l = Math.hypot(dx, dz) || 1; this.toHost({ t: 'kick', id: e.id, dx: r2(dx / l), dz: r2(dz / l), f: S2.push }, true); }
+          if (k === 'club' || k === 'fists') { const l = Math.hypot(dx, dz) || 1; this.toHost({ t: 'kick', id: e.id, dx: r2(dx / l), dz: r2(dz / l), f: S2.push }, true); }
         }
       }
       if (gold.length) { this.toHost({ t: 'gold', m: 'pebble', ids: gold }, true); this.hitMarker = 0.25; this.hitstop = 0.06; this.addStyle(12 + gold.length * 6, 'THE PEBBLE EDGE'); this.sound.play('thunk'); }
-      if (hits.size) { this.sendHits(hits, k); this.hitMarker = 0.2; this.addStyle(6 + hits.size * 3, k === 'club' ? 'A WEAPON' : 'A SWORD'); this.sound.play('thunk'); }
+      if (hits.size) { this.sendHits(hits, k); this.hitMarker = 0.2; this.addStyle(6 + hits.size * 3, k === 'club' ? 'A WEAPON' : k === 'fists' ? 'FIST FIGHT' : 'A SWORD'); this.sound.play('thunk'); }
     },
     // THE GOLDEN ONE's reload, step by step (the HUD reads it out)
     goldReloadStep() {
@@ -398,15 +399,16 @@ export function installWishBatch1Client(Game, UI) {
       ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillRect(0, 0, W, H);
       drawText(ctx, 'WISH FEATURES', W / 2, 8, '#ffd040', 2, 'center');
       drawSmall(ctx, 'THINGS PLAYERS WISHED FOR. SWITCH ANY OF THEM OFF.', W / 2, 26, '#8c88a8', 'center');
-      const bw = Math.min(W - 20, 280), bx = Math.round(W / 2 - bw / 2);
-      let y = 34;
-      for (const f of WISH_FEATURES) {
+      // two columns, each wisher's name under their switch, so the list fits however long it gets
+      const cols = WISH_FEATURES.length > 8 ? 2 : 1, rows = Math.ceil(WISH_FEATURES.length / cols);
+      const bw = Math.min(cols === 2 ? Math.floor((W - 30) / 2) : W - 20, 280), step = Math.max(17, Math.min(21, Math.floor((H - 34 - 26) / rows)));
+      WISH_FEATURES.forEach((f, i) => {
+        const c = cols === 2 ? Math.floor(i / rows) : 0, y = 34 + (i % rows) * step;
+        const bx = cols === 2 ? Math.round(W / 2 + (c === 0 ? -bw - 5 : 5)) : Math.round(W / 2 - bw / 2);
         const on = this.wishOn(f.id);
-        ui.button(`${f.name}: ${on ? 'ON' : 'OFF'}`, bx, y, bw, 12, () => { s.wishOff = { ...(s.wishOff || {}), [f.id]: on }; if (!s.wishOff[f.id]) delete s.wishOff[f.id]; this.saveSettings(); }, { color: on ? '#6aff9a' : '#ff4a5a' });
-        drawSmall(ctx, `WISHED BY ${f.by}`, W / 2, y + 14, '#8c88a8', 'center'); // under its switch, so long names never run off the screen
-        y += 21;
-        if (y > H - 40) break;
-      }
+        ui.button(`${f.name}: ${on ? 'ON' : 'OFF'}`, bx, y, bw, 11, () => { s.wishOff = { ...(s.wishOff || {}), [f.id]: on }; if (!s.wishOff[f.id]) delete s.wishOff[f.id]; this.saveSettings(); }, { color: on ? '#6aff9a' : '#ff4a5a' });
+        drawSmall(ctx, `WISHED BY ${f.by}`, bx + bw / 2, y + 12, '#8c88a8', 'center');
+      });
       ui.button('BACK', Math.round(W / 2 - 45), H - 18, 90, 14, () => { ui.screen = 'settings'; });
     },
   }));

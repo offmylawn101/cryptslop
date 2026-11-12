@@ -3,6 +3,7 @@ import { installBugs } from './bugs.js';
 import { installBestiary } from './bestiary.js';
 import { installRooftops } from './rooftops.js';
 import { installWishBatch1 } from './wishbatch1.js';
+import { installWishBatch2 } from './wishbatch2.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -1627,3 +1628,4 @@ installBugs(Sim);
 installBestiary(Sim);
 installRooftops(Sim); // the rooftop events and wire puzzles (rooftops.js)
 installWishBatch1(Sim); // the first batch of wishes (wishbatch1.js)
+installWishBatch2(Sim); // the second batch: four bosses, sword chickens, the swap curse (wishbatch2.js)

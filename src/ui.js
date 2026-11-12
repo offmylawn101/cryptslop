@@ -8,6 +8,7 @@ import { RARITIES, INV_SLOTS } from './weapons.js';
 import { PERKS } from './perks.js';
 import { QUESTS } from './quests.js';
 import { drawArchiveScreen, archiveKey } from './archive.js';
+import { SKINS } from './wishbatch2.js'; // WEAPON SKIN setting (a wish)
 
 // THE LOOK: a bootleg memory card from a console that never existed. Deep violet-black panels with a
 // chromatic split on the edges (cyan up-left, magenta down-right), a dithered title strip, honey gold.
@@ -348,8 +349,9 @@ export class UI {
       ['MICROGAMES', s.microgames !== false ? 'ON' : 'OFF', () => { s.microgames = s.microgames === false; }],
       ['SFX VOLUME', `${Math.round(s.sfx * 100)}%`, (d) => { s.sfx = Math.max(0, Math.min(1, Math.round((s.sfx + d * 0.1) * 10) / 10)); }],
       ['MUSIC VOLUME', `${Math.round(s.music * 100)}%`, (d) => { s.music = Math.max(0, Math.min(1, Math.round((s.music + d * 0.1) * 10) / 10)); }],
-      ['DASH WHERE YOU LOOK', s.dashLook ? 'ON' : 'OFF', () => { s.dashLook = !s.dashLook; }],
-      ['MAKE THE GAME NOT SUCK', s.notSuck ? 'ON' : 'OFF', () => { s.notSuck = !s.notSuck; }],
+      ['DASH TO LOOK', s.dashLook ? 'ON' : 'OFF', () => { s.dashLook = !s.dashLook; }],
+      ['NOT-SUCK MODE', s.notSuck ? 'ON' : 'OFF', () => { s.notSuck = !s.notSuck; }],
+      ['WEAPON SKIN', ((SKINS.find((k) => k.id === s.wskin) || SKINS[0]).name), (d) => { const i = Math.max(0, SKINS.findIndex((k) => k.id === s.wskin)); s.wskin = SKINS[(i + (d || 1) + SKINS.length) % SKINS.length].id; }], // a wish (wishbatch2.js)
       ['WISH FEATURES', 'OPEN >', () => { this.screen = 'wishfx'; }],
     ];
     // one column if it fits, else two side by side
@@ -423,6 +425,7 @@ export class UI {
     else if ((g.meta.porridge || 0) > 0 && g.openPorridgeShop) { this.button(`PORRIDGE SHOP X${g.meta.porridge}`, bx, by, bw, bh, () => { const msg = g.openPorridgeShop(); if (this.screen !== 'porridge') this.toast(msg); }, { color: C.pink }); by += bh + 4; }
     this.button('MAKE A WISH', bx, by, bw, bh, () => g.openWishes(), { color: C.hot }); by += bh + 4;
     this.button(g.settings.clutter === 0 ? 'DECLUTTER: ON' : 'DECLUTTER: OFF', bx, by, bw, bh, () => { const s = g.settings; if (s.clutter === 0) s.clutter = s.clutterWas ?? 2; else { s.clutterWas = s.clutter ?? 2; s.clutter = 0; } g.saveSettings(); }, { color: C.blue }); by += bh + 4;
+    if (g.wishOn && g.wishOn('disguise')) { this.button(g.settings.botLook ? 'LOOK LIKE A BOT: ON' : 'LOOK LIKE A BOT: OFF', bx, by, bw, bh, () => { g.settings.botLook = !g.settings.botLook; g.saveSettings(); }, { color: C.blue }); by += bh + 4; } // a wish (wishbatch2.js)
     this.button('SETTINGS', bx, by, bw, bh, () => { this.screen = 'settings'; this.back = 'pause'; }); by += bh + 4;
     this.button('HOW TO PLAY', bx, by, bw, bh, () => { this.screen = 'help'; this.back = 'pause'; }); by += bh + 4;
     if (g.xr && g.xr.supported && !g.xr.session) { this.button('ENTER VR', bx, by, bw, bh, () => g.xr.enter(), { color: C.green }); by += bh + 4; }

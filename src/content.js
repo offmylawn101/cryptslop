@@ -5,11 +5,11 @@
 export const NEW_ENEMY_TYPES = ['stomper', 'marauder', 'cruiser', 'nyaslop', 'seamstress', 'apiarist', 'combstack', 'lampmother', 'tyrant', 'swarmheart', 'evilhorse', 'civilian',
   // the deep floors (bestiary.js): floor 5 and beyond, then floor 10 and beyond
   'mothman', 'plaguebringer', 'construction', 'antlion', 'honeypot', 'frostboom', 'personifier', 'wanderer', 'necrotick', 'hivemind',
-  // from the wishes (wishbatch1.js)
-  'derpy'];
+  // from the wishes (wishbatch1.js, wishbatch2.js)
+  'derpy', 'beehemoth', 'partybear', 'unitzero', 'eclipse', 'chicken'];
 export const NEW_ENEMY_NAMES = ['STOMPER', 'MARAUDER', 'CRUISER', 'NYASLOP, THE GREMLIN CAT', 'THE SEAMSTRESS', 'THE APIARIST', 'COMBSTACK', 'LAMPMOTHER', 'THE TARANTULA TYRANT', 'SWARMHEART', 'THE EVIL HORSE', 'A PERSON',
   'MOTHMAN', 'PLAGUEBRINGERS', 'CONSTRUCTION', 'ANTLION', 'HONEYPOT ANT', 'FROSTBOOM', 'RANDOMLING PERSONIFIER', 'THE WANDERER', 'NECRO-TICK', 'HIVEMIND',
-  'DERPY THE FRUIT FLY'];
+  'DERPY THE FRUIT FLY', 'QUEEN BEEHEMOTH', 'TEDDY RUCKUS, THE PARTY BEAR', 'UNIT ZERO', 'SIR ECLIPSE, THE MOONLESS KNIGHT', 'SWORD CHICKEN'];
 export const NEW_ENEMIES = {
   // RANDOMLINGS: they only live in the real rooms (an office, a kitchen...) that replace hive rooms after floor 6
   stomper: { // heavy: every step shakes the ground, its attack is a shockwave you have to jump
@@ -63,15 +63,21 @@ export const NEW_ENEMIES = {
   hivemind: { hp: 320, speed: 3.0, radius: 0.8, ranged: { dmg: 10, speed: 12, cooldown: 2.4, range: 22 }, hover: 2.4, hit: [[2.6, 0.85, 1]], height: 3.3, deep: 10 },
   // a wish (MICRORAVEN585MOD): a fruit fly called DERPY. Wobbly loops, little bumps, goofy eyes
   derpy: { hp: 14, speed: 6.2, radius: 0.3, melee: { range: 1.3, dmg: 4, windup: 0.2, cooldown: 0.9 }, hover: 1.5, hit: [[1.55, 0.42, 1]], height: 1.9 },
+  // wishes, batch 2 (wishbatch2.js): four bosses and a chicken
+  beehemoth: { hp: 1250, speed: 4.6, radius: 1.3, melee: { range: 3.0, dmg: 24, windup: 0.5, cooldown: 1.2 }, boss: true, pattern: ['charge', 'sting', 'summon:gnat:3', 'rain', 'sting', 'spread'], hit: [[1.6, 1.3, 1], [1.95, 0.55, 2]], height: 3.2 },
+  partybear: { hp: 1400, speed: 3.6, radius: 1.1, melee: { range: 2.6, dmg: 30, windup: 0.6, cooldown: 1.3 }, boss: true, pattern: ['chomp', 'spread', 'chomp', 'charge', 'summon:roach:3'], hit: [[1.9, 1.1, 1], [3.2, 0.6, 2]], height: 3.9 },
+  unitzero: { hp: 1150, speed: 9.0, radius: 0.8, melee: { range: 2.2, dmg: 20, windup: 0.3, cooldown: 0.8 }, ranged: { dmg: 10, speed: 22, cooldown: 1.2, range: 30 }, boss: true, pattern: ['coin', 'slide', 'spread', 'coin', 'leap', 'coin'], hit: [[1.45, 0.65, 1], [2.05, 0.35, 2]], height: 2.5 },
+  eclipse: { hp: 2200, speed: 5.4, radius: 1.0, melee: { range: 3.4, dmg: 32, windup: 0.4, cooldown: 0.9 }, boss: true, pattern: ['swordrain', 'disarm', 'slashwave', 'charge', 'swordrain', 'slashwave', 'disarm'], hit: [[1.85, 0.9, 1], [2.75, 0.45, 2]], height: 3.3 },
+  chicken: { hp: 30, speed: 7.0, radius: 0.35, melee: { range: 1.4, dmg: 8, windup: 0.25, cooldown: 0.8 }, hit: [[0.65, 0.42, 1]], height: 1.2 },
 };
 export const NEW_SCORE = { stomper: 120, marauder: 80, cruiser: 140, nyaslop: 600, seamstress: 600, apiarist: 550, combstack: 650, lampmother: 550, tyrant: 650, swarmheart: 700, evilhorse: 300, civilian: 5,
-  mothman: 90, plaguebringer: 0, construction: 220, antlion: 70, honeypot: 80, frostboom: 400, personifier: 260, wanderer: 600, necrotick: 15, hivemind: 160, derpy: 9 };
-export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30, 2];
+  mothman: 90, plaguebringer: 0, construction: 220, antlion: 70, honeypot: 80, frostboom: 400, personifier: 260, wanderer: 600, necrotick: 15, hivemind: 160, derpy: 9, beehemoth: 700, partybear: 650, unitzero: 750, eclipse: 900, chicken: 20 };
+export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30, 2, 160, 180, 170, 220, 8];
 export const RANDOMLINGS = ['stomper', 'marauder', 'cruiser'];
 
 // ---------- bosses ----------
 // one boss guards every hive. The order climbs in difficulty and loops.
-export const BOSS_ORDER = ['apiarist', 'combstack', 'warden', 'lampmother', 'seamstress', 'tyrant', 'nyaslop', 'idol', 'swarmheart'];
+export const BOSS_ORDER = ['apiarist', 'combstack', 'warden', 'lampmother', 'seamstress', 'tyrant', 'nyaslop', 'idol', 'swarmheart', 'beehemoth', 'unitzero', 'eclipse']; // the last three were wishes (wishbatch2.js)
 export const bossFor = (floor) => BOSS_ORDER[(Math.max(1, floor) - 1) % BOSS_ORDER.length];
 // every 5th floor is a BOSS RUSH: five different bosses back to back, a GIGA upgrade at the end
 export const RUSH_EVERY = 5;
@@ -184,6 +190,11 @@ export const LORE = {
   wanderer: 'THE BEEKEEPER, WITH ALL THE COLOR DRAINED OUT. HE HAS DIED BEFORE. IT DID NOT TAKE.',
   necrotick: 'A TICK THAT DIED AND KEPT DRINKING. WHAT IT BITES GETS BACK UP.',
   hivemind: 'A BRAIN THE SIZE OF A BEANBAG. IT DOES NOT FIGHT. IT MAKES EVERYTHING AROUND IT AGREE TO SHARE THE PAIN.',
+  beehemoth: 'THE BIGGEST BEE IN THE HIVE, AND SHE KNOWS IT. SHE WEARS A CROWN SHE MADE HERSELF, FIRES STINGERS FIVE AT A TIME, AND CALLS GNATS WHEN SHE IS BORED. A PLAYER WISHED FOR A BEE BOSS. HERE SHE IS.',
+  partybear: 'A PARTY MASCOT FROM A PIZZA PLACE THAT CLOSED DOWN. NOBODY SWITCHED HIM OFF. HE ONLY SHOWS UP IN BOSS RUSH, HE OPENS HIS JAWS BEFORE EVERY BITE, AND THE BITE IS THE END OF YOU. PARRY THE JAWS.',
+  unitzero: 'A CHROME MACHINE THAT RUNS ON BLOOD AND STYLE. IT FLIPS A COIN, THEN SHOOTS THE COIN SO THE SHOT BOUNCES INTO YOU. IT SLIDES FASTER THAN YOU CAN DASH. IT IS VERY PROUD OF ALL OF THIS.',
+  eclipse: 'A KNIGHT WITH NO MOON. HE CARRIES A BLADE LONGER THAN A DOOR, RAINS SWORDS FROM THE CEILING, AND SOMETIMES HE REACHES FOR YOUR WEAPONS. PARRY THE REACH, OR FIGHT HIM WITH YOUR FISTS UNTIL YOU GET THEM BACK.',
+  chicken: 'A CHICKEN WITH A SWORD IN ITS BEAK. IT JUDGES YOUR ATTITUDE. BE POLITE AND IT FIGHTS FOR YOU. CURSE IN CHAT, OR HIT IT THREE TIMES, AND EVERY CHICKEN IN THE HIVE COMES FOR YOU.',
   derpy: 'A FRUIT FLY NAMED DERPY. NOBODY KNOWS WHO NAMED IT. IT FLIES IN LOOPS, BUMPS INTO THINGS, AND IS HAVING A WONDERFUL TIME.',
   civilian: 'A PERSON IN A RED SHIRT. NOBODY KNOWS HOW THEY GOT INTO A BEEHIVE, AND THEY ARE NOT ASKING FOR DIRECTIONS. THEY WANT TO FIGHT. THE ONES IN OTHER COLORS LEFT A LONG TIME AGO.',
 };
