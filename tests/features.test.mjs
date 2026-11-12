@@ -720,7 +720,8 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
   const ENEMY_BUILDERS = readFileSync(new URL('../src/models.js', import.meta.url), 'utf8').match(/ENEMY_BUILDERS = \[([^\]]*)\]/)[1].split(',').map((x) => x.trim())
     .concat(readFileSync(new URL('../src/bestiary.js', import.meta.url), 'utf8').match(/ENEMY_BUILDERS\.push\(([^)]*)\)/)[1].split(',').map((x) => x.trim())) // the deep floors' foes add theirs
     .concat([...readFileSync(new URL('../src/wishbatch1.js', import.meta.url), 'utf8').matchAll(/ENEMY_BUILDERS\[ENEMY_TYPES\.indexOf\('(\w+)'\)\] =/g)].map((m) => m[1])) // and the wished-for ones
-    .concat([...readFileSync(new URL('../src/wishbatch2.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])); // batch 2's bosses and chicken
+    .concat([...readFileSync(new URL('../src/wishbatch2.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 2's bosses and chicken
+    .concat([...readFileSync(new URL('../src/wishbatch3.js', import.meta.url), 'utf8').matchAll(/indexOf\('(\w+)'\); if \(i >= 0\) ENEMY_BUILDERS\[i\]/g)].map((m) => m[1])); // batch 3's OGLER
   ok(ENEMY_TYPES.length >= 37 && ENEMY_NAMES.length === ENEMY_TYPES.length && HONEY_FOR_KILL.length === ENEMY_TYPES.length && ENEMY_BUILDERS.length === ENEMY_TYPES.length, `every enemy type has a name, honey value and model (${ENEMY_TYPES.length}/${ENEMY_NAMES.length}/${HONEY_FOR_KILL.length}/${ENEMY_BUILDERS.length})`);
   for (const t of ENEMY_TYPES) ok(EN[t] && EN[t].hit && (EN[t].hit.length || EN[t].unkillable) && (SC[t] > 0 || EN[t].unkillable), `${t} has stats, hit spheres and a score (the unkillable swarm has neither)`);
   ok(champName(7) === champName(7) && champName(7) !== champName(8), 'champion names are deterministic and varied');
@@ -888,7 +889,7 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
 // ---- classes and ground slams ----
 {
   const { CLASSES, CLASS_IDS, BOMB, bombDamage, rocketPush, SLAMMERS } = await import('../src/data.js');
-  ok(CLASS_IDS.join() === 'hornet,batter,grenader,spinner,cleaver,fister,pestilent,sieger,koolciller,interceptor,blasphemous,parkour' && CLASS_IDS.every((c) => CLASSES[c].name && CLASSES[c].desc && CLASSES[c].kit.length), 'twelve classes with names, descriptions and kits');
+  ok(CLASS_IDS.join() === 'hornet,batter,grenader,spinner,cleaver,fister,pestilent,sieger,koolciller,interceptor,blasphemous,soaker,glare,parkour' && CLASS_IDS.every((c) => CLASSES[c].name && CLASSES[c].desc && CLASSES[c].kit.length), 'fourteen classes with names, descriptions and kits');
   {
     const { CLEAVER_UPGRADES, CLEAVER_KEYS, upgradeFits: fits, UPGRADE_IDS: ids, UPGRADES: ups, ENEMIES: EN3 } = await import('../src/data.js');
     ok(Object.keys(CLEAVER_UPGRADES).length === 10 && Object.keys(CLEAVER_UPGRADES).every((u) => ids.includes(u)), 'ten cleaver upgrades are in the boon pool');

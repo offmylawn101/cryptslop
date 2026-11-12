@@ -7,6 +7,9 @@ export const NEW_CLASSES = {
   koolciller: { name: 'KOOLCILLER', color: '#d01020', kit: ['poke'], desc: 'BLOODY KNIFE: HOLD TO CHARGE A LUNGING POKE. RIGHT CLICK: A SLOW COUNTER THAT ENRAGES YOU.' },
   interceptor: { name: 'INTERCEPTOR', color: '#40ffd0', kit: ['laser'], desc: 'NO WEAPON. 2-SECOND LASERS PIERCE FOES AND ERASE BULLETS. HOLD TO AUTO-FIRE, TURN SLOWER.' },
   blasphemous: { name: 'BLASPHEMOUS', color: '#8020c0', kit: ['javring'], desc: 'EVERY CLICK FIRES A RING OF 16 FALLING JAVELINS ALL AROUND YOU. THEY PIERCE ONCE.' },
+  // two wished-for classes (wishbatch3.js): a sponge (Chokymilkyway) and a big laser (gwen). Free from the start
+  soaker: { name: 'SOAKER', color: '#ffe040', kit: ['soak'], desc: 'A SPONGE. SOAKS UP ENEMY SHOTS THAT COME CLOSE. CLICK: A HIGH-PRESSURE JET. R: SQUEEZE IT ALL OUT IN ONE BIG SPLASH.' },
+  glare: { name: 'GLARE', color: '#ff4060', kit: ['beam'], desc: 'HOLD TO CHARGE, LET GO FOR A HUGE BEAM THAT PIERCES EVERYTHING. THE LONGER THE CHARGE, THE THICKER THE BEAM.' },
   parkour: { name: 'PARKOUR', color: '#ff3030', kit: ['freerun'], desc: 'A RED BAND. +2 HARD DASHES, +3 AIR JUMPS, WALL RUNS, CROUCH IN AIR TO SLAM. MOVING HITS.' },
 };
 
@@ -60,6 +63,16 @@ export const NEW_CLASS_UPGRADES = {
   pk_stomp: { cls: 'parkour', name: 'GOOMBA PROTOCOL', desc: 'STOMPS BOUNCE TWICE AS HIGH AND GIVE A DASH BACK', color: '#ffc040', mods: { pkStomp: 1 } },
   pk_crater: { cls: 'parkour', name: 'CRATER', desc: 'SLAMS HIT 60% WIDER', color: '#ff6040', mods: { pkSlamPct: 60 } },
   pk_flow: { cls: 'parkour', name: 'FLOW STATE', desc: 'WALL RUNNING RECHARGES YOUR DASHES', color: '#ff40a0', mods: { pkFlow: 1 } },
+  // THE SOAKER
+  sk_big: { cls: 'soaker', name: 'BIGGER SPONGE', desc: '+50% WATER', color: '#ffe040', mods: { skTankPct: 50 } },
+  sk_pressure: { cls: 'soaker', name: 'HIGH PRESSURE', desc: '+40% JET DAMAGE', color: '#40c0ff', mods: { skDmgPct: 40 } },
+  sk_thirsty: { cls: 'soaker', name: 'THIRSTY', desc: 'SOAK UP SHOTS FROM 50% FURTHER AWAY', color: '#80e0ff', mods: { skSoakPct: 50 } },
+  sk_wring: { cls: 'soaker', name: 'WRUNG OUT', desc: '+50% SQUEEZE DAMAGE AND SIZE', color: '#ffd080', mods: { skSqueezePct: 50 } },
+  // GLARE
+  gl_focus: { cls: 'glare', name: 'FOCUSED', desc: '+40% BEAM DAMAGE', color: '#ff4060', mods: { glDmgPct: 40 } },
+  gl_wide: { cls: 'glare', name: 'WIDE EYED', desc: '+50% BEAM WIDTH', color: '#ff8080', mods: { glWidePct: 50 } },
+  gl_quick: { cls: 'glare', name: 'QUICK GLANCE', desc: '-30% CHARGE TIME', color: '#ffa040', mods: { glChargePct: 30 } },
+  gl_stare: { cls: 'glare', name: 'LONG STARE', desc: 'BEAMS LAST 60% LONGER', color: '#c04060', mods: { glLongPct: 60 } },
 };
 
 // ULTRA upgrades: one per class, always one of the cards at the end of a boss rush (alongside two GIGAs)
@@ -75,12 +88,15 @@ export const ULTRA_UPGRADES = {
   u_koolciller: { cls: 'koolciller', ultra: true, giga: true, name: 'ULTRA: 33', desc: 'RAGE NEVER CRASHES, AND EVERY KILL WHILE ENRAGED ADDS A SECOND (+1 PER COPY)', color: '#d01020', mods: { kkUltra: 1 } },
   u_interceptor: { cls: 'interceptor', ultra: true, giga: true, name: 'ULTRA: THE LAST LINE', desc: 'LASERS LAST LONGER AND HIT 50% HARDER, ERASED BULLETS HEAL YOU (ALL STACK)', color: '#40ffd0', mods: { icUltra: 1 } },
   u_blasphemous: { cls: 'blasphemous', ultra: true, giga: true, name: 'ULTRA: THE HORSE\'S BLESSING', desc: 'JAVELINS SEEK FOES AND EXPLODE WHERE THEY LAND (BIGGER PER COPY)', color: '#8020c0', mods: { blUltra: 1 } },
+  u_soaker: { cls: 'soaker', ultra: true, giga: true, name: 'ULTRA: DEEP SEA', desc: 'DOUBLE THE WATER, AND EVERY SQUEEZE HEALS YOU 25', color: '#40a0ff', mods: { skUltra: 1 } },
+  u_glare: { cls: 'glare', ultra: true, giga: true, name: 'ULTRA: THE THIRD EYE', desc: 'EVERY BEAM SPLITS INTO THREE', color: '#ff2050', mods: { glUltra: 1 } },
   u_parkour: { cls: 'parkour', ultra: true, giga: true, name: 'ULTRA: TERMINAL VELOCITY', desc: 'MOVING HITS 2X HARDER (+1X PER COPY), KILLS GIVE YOUR DASHES BACK', color: '#ff3030', mods: { pkUltra: 1 } },
 };
 export const ultraFor = (cls) => `u_${cls}`;
 export const NEW_CLASS_MOD_KEYS = ['sgDmgPct', 'sgShards', 'sgCdPct', 'sgBounce', 'sgSplit', 'sgUltra', 'kkDmgPct', 'kkLunge', 'kkKillReset', 'kkRageS', 'kkSoft', 'kkWhirlPct', 'kkUltra',
   'icMax', 'icDmgPct', 'icRegenPct', 'icWide', 'icTurn', 'icRefund', 'icUltra', 'blCount', 'blDmgPct', 'blPierce', 'blCdPct', 'blEcho', 'blUltra',
-  'pkDmgPct', 'pkDashes', 'pkStomp', 'pkSlamPct', 'pkFlow', 'pkUltra', 'fisterUltra'];
+  'pkDmgPct', 'pkDashes', 'pkStomp', 'pkSlamPct', 'pkFlow', 'pkUltra', 'fisterUltra',
+  'skTankPct', 'skDmgPct', 'skSoakPct', 'skSqueezePct', 'skUltra', 'glDmgPct', 'glWidePct', 'glChargePct', 'glLongPct', 'glUltra'];
 
 // the EVIL HORSE now also turns up on its own: 33% a floor, certain after 3 floors without one
 export const WILD_HORSE = { chance: 0.33, pity: 3, delay: 25 };

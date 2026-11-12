@@ -137,7 +137,7 @@ const add = (type, dx, dz) => { const e = s.addEnemy(type, p.x + dx, 0, p.z + dz
   run(0.2);
   const guards = [...s.enemies.values()].filter((e) => e.guardOf === f.id);
   ok(f.armed && guards.length === DEEP.frostboom.guards && guards.every((g) => g.el === EL.frost), `it calls ${DEEP.frostboom.guards} glacier (frost) guards`);
-  for (const g of guards) s.damageEnemy(g, 99999, 'a', 'hit');
+  for (const g of guards) s.killEnemy(g, 'a', 'hit'); // killed outright: a MANTIS guard would block a hit from the front
   run(0.2);
   ok(!f.ice && bug('thaw').length === 1, 'kill them all in time and the ice breaks');
   s.damageEnemy(f, 9999, 'a', 'hit');

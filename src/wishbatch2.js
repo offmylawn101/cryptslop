@@ -408,7 +408,7 @@ function ring(color, r) {
 }
 
 // ================= client =================
-const WEAPON_NAMES = { hornet: 'THE STINGER SHOTGUN', batter: 'THE BAT', grenader: 'HONEY BOMBS', spinner: 'SPIN BALLS', cleaver: 'THE HIVE CLEAVER', fister: 'YOUR FISTS', pestilent: 'THE COUGH', sieger: 'THE SIEGE LAUNCHER', koolciller: 'THE BLOODY KNIFE', interceptor: 'THE LASER', blasphemous: 'THE JAVELIN RING', parkour: 'YOUR OWN TWO FEET' };
+const WEAPON_NAMES = { hornet: 'THE STINGER SHOTGUN', batter: 'THE BAT', grenader: 'HONEY BOMBS', spinner: 'SPIN BALLS', cleaver: 'THE HIVE CLEAVER', fister: 'YOUR FISTS', pestilent: 'THE COUGH', sieger: 'THE SIEGE LAUNCHER', koolciller: 'THE BLOODY KNIFE', interceptor: 'THE LASER', blasphemous: 'THE JAVELIN RING', parkour: 'YOUR OWN TWO FEET', soaker: 'THE SPONGE', glare: 'THE EYE' };
 export const SKINS = [
   { id: 'default', name: 'DEFAULT' },
   { id: 'gold', name: 'GOLD', c: [1, 0.8, 0.25], e: [0.35, 0.25, 0.05] },
