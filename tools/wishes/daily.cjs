@@ -50,6 +50,17 @@ const BUILD_SCHEMA = {
   required: ['status', 'summary', 'notes'],
 };
 
+// a title may only use words from its own (original) spec, plus a few plain words: a franchise name the
+// moderator slipped into the title ("HOLLOW KNIGHT DUELIST") never reaches the builder or the patch notes
+const PLAIN = new Set(['BOSS', 'CLASS', 'ENEMY', 'ENEMIES', 'WEAPON', 'BOON', 'ITEM', 'NEW', 'THE', 'A', 'AN', 'OF', 'AND', 'FIX', 'BUG', 'HAT', 'COSMETIC', 'ROOM', 'FLOOR', 'MODE', 'PET']);
+function cleanTitle(raw, spec, id) {
+  const inSpec = new Set(String(spec).toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean));
+  const words = String(raw || '').toUpperCase().replace(/[^A-Z0-9 ]/g, ' ').split(/\s+/).filter((w) => w && (inSpec.has(w) || PLAIN.has(w)));
+  const named = String(spec).match(/\b(?:called|named|call it)\s+([A-Z][A-Z0-9' -]{2,30})/i);
+  const t = words.length >= 2 ? words.join(' ') : named ? named[1].trim() : `WISH ${id}`;
+  return t.toUpperCase().slice(0, 40);
+}
+
 function moderate(cfg, wishes) {
   const rules = fs.readFileSync(path.join(__dirname, 'moderator.md'), 'utf8');
   const out = new Map();
@@ -181,7 +192,7 @@ async function main() {
     if (v.verdict === 'hide') st.hidden.push(item);
     else if (v.verdict === 'reject') st.rejected.push({ ...item, reason: String(v.reason || 'NOT TODAY').toUpperCase().slice(0, 120) });
     else if (v.verdict === 'build') {
-      const spec = String(v.spec || '').trim().slice(0, 600), title = String(v.title || `WISH ${w.id}`).toUpperCase().replace(/[^A-Z0-9 '!?.,-]/g, '').slice(0, 40);
+      const spec = String(v.spec || '').trim().slice(0, 600), title = cleanTitle(v.title, spec, w.id);
       const red = spec.match(C.SPEC_RED_FLAGS);
       if (!spec || red) st.flagged.push({ ...item, reason: red ? `the spec mentions "${red[0]}"` : 'no spec' });
       else { const raw = w.text.match(C.SPEC_RED_FLAGS); builds.push({ ...item, spec, title, rawFlag: raw ? raw[0] : null }); }
