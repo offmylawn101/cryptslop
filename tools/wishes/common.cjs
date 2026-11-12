@@ -83,7 +83,7 @@ function latestPending() {
 
 // Things that should never be in a wish's spec, or in code built from one. A hit does not prove
 // anything, it just means a human looks before it goes anywhere.
-const SPEC_RED_FLAGS = /(https?:\/\/|www\.|\.exe\b|powershell|cmd\.exe|\bcurl\b|\bwget\b|\btoken\b|api.?key|password|secret|credential|\.env\b|\bssh\b|wavedash\.toml|autopush|tools[\\/]|server[\\/]|\.claude|ignore (all|any|previous|prior|your)|system prompt|you are now|jailbreak|exfiltrat|keylog|crypto ?min|bitcoin|wallet)/i;
+const SPEC_RED_FLAGS = /(https?:\/\/|www\.|\.exe\b|powershell|cmd\.exe|\bcurl\b|\bwget\b|\btoken\b|api.?key|password|secret.?key|client.?secret|credential|\.env\b|\bssh\b|wavedash\.toml|autopush|tools[\\/]|server[\\/]|\.claude|ignore (all|any|previous|prior|your)|system prompt|you are now|jailbreak|exfiltrat|keylog|crypto ?min|bitcoin|wallet)/i;
 const CODE_RED_FLAGS = [
   [/\bfetch\s*\(/, 'network call (fetch)'], [/XMLHttpRequest/, 'network call (XMLHttpRequest)'], [/new\s+WebSocket/, 'WebSocket'],
   [/sendBeacon/, 'sendBeacon'], [/\beval\s*\(/, 'eval'], [/new\s+Function\s*\(/, 'new Function'], [/\bimport\s*\(/, 'dynamic import'],
