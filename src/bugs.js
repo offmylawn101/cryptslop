@@ -200,6 +200,7 @@ export function installBugs(Sim) {
     },
     hurtPlayer(p, dmg, fx, fz) {
       const e = this._thinking, before = p.hp;
+      if (e && !this._bugInner && this.swarmAllow && !this.swarmAllow(p, e)) return; // the SWARM PILE-UP CAP (wishbatch1.js)
       o.hurtPlayer.call(this, p, dmg, fx, fz);
       if (!e || this._bugInner || p.hp >= before) return;
       // a bite from a bug that does something extra
@@ -292,7 +293,7 @@ export function installBugs(Sim) {
       if (M.t > 0) return;
       const p = this.players.get(M.pid);
       M.n--; M.t = BUGS.gnatGap;
-      if (p && !p.dead && Math.hypot(p.x - e.x, p.z - e.z) < ENEMIES.gnat.melee.range + 0.9) {
+      if (p && !p.dead && Math.hypot(p.x - e.x, p.z - e.z) < ENEMIES.gnat.melee.range + 0.9 && (!this.swarmAllow || this.swarmAllow(p, e))) {
         if (p.parryUntil > this.time) { e.multi = null; this.stunByParry(e, p); this.parried(p, 1); return; }
         this._bugInner = true;
         try { o.hurtPlayer.call(this, p, M.dmg, e.x, e.z); } finally { this._bugInner = false; }

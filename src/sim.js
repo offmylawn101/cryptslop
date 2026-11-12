@@ -2,6 +2,7 @@
 import { installBugs } from './bugs.js';
 import { installBestiary } from './bestiary.js';
 import { installRooftops } from './rooftops.js';
+import { installWishBatch1 } from './wishbatch1.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -347,7 +348,7 @@ export class Sim {
       case 'hit': {
         const p = this.ensurePlayer(from);
         if (p.dead || !Array.isArray(msg.h)) break;
-        if (this.map && inLounge(this.map, p.x, p.z)) break; // no shooting out of the safe zone
+        if (this.map && inLounge(this.map, p.x, p.z) && !this.loungeFight) break; // no shooting out of the safe zone (unless SPAWN FIRE is on)
         let budget = 2000; // sanity cap per shot
         for (const h of msg.h) {
           const e = this.enemies.get(h[0]);
@@ -374,7 +375,7 @@ export class Sim {
         const p = this.ensurePlayer(from);
         if (p.dead || ![msg.x, msg.y, msg.z].every(Number.isFinite)) break;
         if (Math.hypot(msg.x - p.x, msg.z - p.z) > 45) break;
-        if (this.map && (inLounge(this.map, p.x, p.z) || inLounge(this.map, msg.x, msg.z))) break;
+        if (this.map && !this.loungeFight && (inLounge(this.map, p.x, p.z) || inLounge(this.map, msg.x, msg.z))) break;
         let n = 0;
         for (const e of this.enemies.values()) {
           const dx = msg.x - e.x, dz = msg.z - e.z, d = Math.hypot(dx, dz);
@@ -402,7 +403,7 @@ export class Sim {
         if (p.dead || this.runOverTimer >= 0) break; // no safe zone from your own head: it kills you even in the lounge
         const dmg = Math.max(1, Math.ceil(p.hp)); // it KILLS you (a cheat-death boon can still save you)
         this.ev({ k: 'boom', x: r2(p.x), y: r2(p.y + 0.5), z: r2(p.z) });
-        if (!(this.map && inLounge(this.map, p.x, p.z))) for (const e of [...this.enemies.values()]) if (Math.hypot(e.x - p.x, e.z - p.z) < 4 && Math.abs(e.y - p.y) < 2.5) this.damageEnemy(e, 60 + 6 * this.floor, p.id);
+        if (!(this.map && inLounge(this.map, p.x, p.z) && !this.loungeFight)) for (const e of [...this.enemies.values()]) if (Math.hypot(e.x - p.x, e.z - p.z) < 4 && Math.abs(e.y - p.y) < 2.5) this.damageEnemy(e, 60 + 6 * this.floor, p.id);
         p.hp = 0;
         this.ev({ k: 'hurt', id: p.id, dmg, x: r2(p.x), z: r2(p.z), s: 1 });
         this.downPlayer(p);
@@ -410,7 +411,7 @@ export class Sim {
       }
       case 'clashlose': { // lost a JOHN FISTER kick clash
         const p = this.ensurePlayer(from);
-        if (p.dead || this.runOverTimer >= 0 || (this.map && inLounge(this.map, p.x, p.z))) break;
+        if (p.dead || this.runOverTimer >= 0 || (this.map && inLounge(this.map, p.x, p.z) && !this.loungeFight)) break;
         p.hp -= 25;
         this.ev({ k: 'hurt', id: p.id, dmg: 25, x: r2(p.x), z: r2(p.z), s: 1 });
         if (p.hp <= 0) this.downPlayer(p);
@@ -462,7 +463,7 @@ export class Sim {
         const e = this.enemies.get(msg.id);
         const l = Math.hypot(msg.dx, msg.dz);
         if (!e || p.dead || !(l > 0.01) || Math.hypot(e.x - p.x, e.z - p.z) > 9) break; // dropkicks and cleaver slashes
-        if (this.map && inLounge(this.map, p.x, p.z)) break;
+        if (this.map && inLounge(this.map, p.x, p.z) && !this.loungeFight) break;
         const f = (e.isBoss ? 2 : e.type === 'brute' ? 5 : 10) * Math.max(1, Math.min(2.5, Number(msg.f) || 1));
         e.kb = { x: (msg.dx / l) * f, z: (msg.dz / l) * f, t: 0.3 };
         e.stun = Math.max(e.stun || 0, e.isBoss ? 0.3 : 0.8); e.state = 3;
@@ -471,7 +472,7 @@ export class Sim {
       }
       case 'fall': { // fell into the honey goo
         const p = this.ensurePlayer(from);
-        if (p.dead || this.runOverTimer >= 0 || (this.map && inLounge(this.map, p.x, p.z))) break;
+        if (p.dead || this.runOverTimer >= 0 || (this.map && inLounge(this.map, p.x, p.z) && !this.loungeFight)) break;
         p.hp -= 8;
         this.ev({ k: 'hurt', id: p.id, dmg: 8, x: r2(p.x), z: r2(p.z), s: 1 });
         if (p.hp <= 0) this.downPlayer(p);
@@ -1625,3 +1626,4 @@ export class Sim {
 installBugs(Sim);
 installBestiary(Sim);
 installRooftops(Sim); // the rooftop events and wire puzzles (rooftops.js)
+installWishBatch1(Sim); // the first batch of wishes (wishbatch1.js)

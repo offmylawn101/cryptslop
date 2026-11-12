@@ -212,7 +212,7 @@ export class Mover {
     this.dashHeldLast = !!input.dash;
     if (dashPressed && this.dashes > 0) {
       let dx = wx, dz = wz;
-      if (wl <= 0.0001) { dx = fx; dz = fz; }
+      if (wl <= 0.0001 || this.dashLook) { dx = fx; dz = fz; } // DASH WHERE YOU LOOK (a setting, wishbatch1.js)
       const hs = Math.hypot(this.vel.x, this.vel.z);
       const sp = Math.min(MV.maxVelocity, Math.max(hs + 2, MV.dashSpeed));
       this.vel.x = dx * sp; this.vel.z = dz * sp;

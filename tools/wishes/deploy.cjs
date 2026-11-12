@@ -58,7 +58,7 @@ if (!cfg.adminToken || cfg.adminToken.startsWith('local-')) cfg.adminToken = cry
 const sec = wrangler(['secret', 'put', 'ADMIN_TOKEN'], `${cfg.adminToken}\n`);
 if (!sec.ok) die(`could not set the admin token:\n${sec.out}`);
 cfg.server = url;
-C.saveConfig(cfg);
+C.saveConfig({ server: url, adminToken: cfg.adminToken }); // only these: the defaults in common.cjs stay the defaults
 
 const conf = path.join(C.ROOT, 'src', 'wishConfig.js');
 const src = fs.readFileSync(conf, 'utf8').replace(/export const WISH_SERVER = '[^']*';/, `export const WISH_SERVER = '${url}';`);

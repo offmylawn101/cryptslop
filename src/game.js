@@ -13,6 +13,7 @@ import { installChangelog } from './changelogUI.js';
 import { installBugsClient } from './bugs.js';
 import { installBestiaryClient } from './bestiary.js';
 import { installRooftopsClient } from './rooftops.js';
+import { installWishBatch1Client } from './wishbatch1.js';
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
@@ -588,7 +589,7 @@ export class Game {
         else if (this.sim) this.sim.handle(from, msg);
         break;
       case 'hello': case 'hit': case 'parry': case 'heal': case 'curse': case 'stun': case 'sunburn': case 'doom': case 'kick': case 'fall': case 'pull':
-      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose': case 'pz': // pz: a rooftop wire puzzle fixed (rooftops.js)
+      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose': case 'pz': case 'gold': // gold: THE GOLDEN ONE / THE PEBBLE EDGE (wishbatch1.js) // pz: a rooftop wire puzzle fixed (rooftops.js)
         if (this.sim) this.sim.handle(from, msg);
         break;
       case 'vx': if (from === this.net.hostId) this.onHostMsg(msg); break;
@@ -916,7 +917,7 @@ export class Game {
       os.add(id);
       let o = this.orbs.get(id);
       if (!o) {
-        const mesh = kind === 1 ? makeHoneyDrop() : kind === 2 ? makeWafer() : kind === 5 ? makeMedkit() : kind === 6 ? makeSaber('#40c0ff', 0.9) : makeOrb();
+        const mesh = (this.orbMesh && this.orbMesh(kind)) || (kind === 1 ? makeHoneyDrop() : kind === 2 ? makeWafer() : kind === 5 ? makeMedkit() : kind === 6 ? makeSaber('#40c0ff', 0.9) : makeOrb());
         mesh.position.set(x, y, z); this.entityRoot.add(mesh);
         o = { mesh, x, y, z }; this.orbs.set(id, o);
       }
@@ -1088,6 +1089,7 @@ export class Game {
           else if (m.kind === 3) { const d = unpackDrop(Number(m.v) || 0); this.addWeapon(rollWeapon(d.seed, (this.world && this.world.floor) || 1, this.cls, d.minRarity)); }
           else if (m.kind === 5) this.addMedkit();
           else if (m.kind === 6) this.giveSaber();
+          else if (this.onWishOrb && this.onWishOrb(m.kind)) { /* a banana or a wished-for weapon (wishbatch1.js) */ }
           else { this.sound.play('orb'); this.hurtFlash = 0; this.stats.add('heals'); }
         }
         break;
@@ -1618,6 +1620,7 @@ export class Game {
       if (wantFire && w.cool <= 0 && this.quiver > 0) this.throwJavelin();
       return;
     }
+    if (this.sidearm && this.cls !== 'fister' && this.updateSidearm) { this.updateSidearm(dt, wantFire); if (this.cls !== 'hornet') this.updateClass(dt, false); return; } // a wished-for sidearm (wishbatch1.js)
     if (this.saberOut && this.hasSaber && this.cls !== 'fister') { this.updateSaber(dt, wantFire); if (this.cls !== 'hornet') this.updateClass(dt, false); return; } // the LIGHT SABER replaces the trigger
     if (this.cls !== 'hornet') { this.updateClass(dt, wantFire); return; }
     // no automatic reload: every press of R loads one shell (see loadShell)
@@ -2910,6 +2913,7 @@ installFister(Game); // JOHN FISTER (fisterPort.js + src/fister/)
 installClasses2(Game, Sim); // SIEGER, KOOLCILLER, INTERCEPTOR, BLASPHEMOUS, PARKOUR, the ULTRAs, the wild EVIL HORSE (classes2.js)
 installEconomy(Game); // the post-boss shop, the rooftop clock, starting deeper, newer wafer upgrades (economy.js)
 installPorridge(Game); // the PIXEL PORRIDGE EXCLUSIVE SHOP and its flair (porridge.js)
+installWishBatch1Client(Game, UI); // the first batch of wishes built by hand (wishbatch1.js)
 installRooftopsClient(Game, UI); // rooftop events, fake hives, shacks, missiles, wire puzzles (rooftops.js)
 installBestiaryClient(Game, UI); // the deep floors' foes: models, looks, warnings, frozen floors (bestiary.js)
 installBugsClient(Game); // the looks of the reworked bugs (bugs.js; the host side installs itself in sim.js)

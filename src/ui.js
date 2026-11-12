@@ -90,6 +90,7 @@ export class UI {
     if (this.screen === 'archive' && archiveKey(this, e)) return; // the archive's list and its entry files (archive.js)
     if (this.screen === 'porridge' && this.g.porridgeKey && this.g.porridgeKey(e)) return; // the PIXEL PORRIDGE shop (porridge.js)
     if (this.screen === 'wires' && this.g.wiresKey && this.g.wiresKey(e)) return; // a rooftop WIRE PUZZLE (rooftops.js)
+    if (e.code === 'Escape' && this.screen === 'wishfx') { this.screen = 'settings'; return; } // the WISH FEATURES switches (wishbatch1.js)
     if (e.code === 'Escape' && (this.screen === 'settings' || this.screen === 'help' || this.screen === 'browser')) this.screen = this.back === 'pause' ? null : 'title';
     else if (e.code === 'Escape' && (this.screen === 'archive' || this.screen === 'beepass')) this.screen = 'title';
     else if (e.code === 'Escape' && this.screen === 'quit') this.screen = null;
@@ -149,6 +150,7 @@ export class UI {
     else if (this.screen === 'archive') this.drawArchive();
     else if (this.screen === 'porridge' && g.drawPorridgeShop) g.drawPorridgeShop(this);
     else if (this.screen === 'wires' && g.drawWires) g.drawWires(this);
+    else if (this.screen === 'wishfx' && g.drawWishFx) g.drawWishFx(this);
     else if (this.screen === 'beepass') this.drawBeePass();
     else if (this.screen === 'quit') this.drawQuit();
     else if (this.screen === 'title') this.drawTitle();
@@ -346,6 +348,9 @@ export class UI {
       ['MICROGAMES', s.microgames !== false ? 'ON' : 'OFF', () => { s.microgames = s.microgames === false; }],
       ['SFX VOLUME', `${Math.round(s.sfx * 100)}%`, (d) => { s.sfx = Math.max(0, Math.min(1, Math.round((s.sfx + d * 0.1) * 10) / 10)); }],
       ['MUSIC VOLUME', `${Math.round(s.music * 100)}%`, (d) => { s.music = Math.max(0, Math.min(1, Math.round((s.music + d * 0.1) * 10) / 10)); }],
+      ['DASH WHERE YOU LOOK', s.dashLook ? 'ON' : 'OFF', () => { s.dashLook = !s.dashLook; }],
+      ['MAKE THE GAME NOT SUCK', s.notSuck ? 'ON' : 'OFF', () => { s.notSuck = !s.notSuck; }],
+      ['WISH FEATURES', 'OPEN >', () => { this.screen = 'wishfx'; }],
     ];
     // one column if it fits, else two side by side
     const cols = 30 + rows.length * 14 > H - 34 ? 2 : 1;
@@ -417,6 +422,7 @@ export class UI {
     if (g.porridgeShopActive && g.porridgeShopActive()) { this.button(`EXCLUSIVE SHOP ${Math.ceil(g.porridgeShopLeft())}S`, bx, by, bw, bh, () => g.showPorridgeShop(), { color: C.pink }); by += bh + 4; }
     else if ((g.meta.porridge || 0) > 0 && g.openPorridgeShop) { this.button(`PORRIDGE SHOP X${g.meta.porridge}`, bx, by, bw, bh, () => { const msg = g.openPorridgeShop(); if (this.screen !== 'porridge') this.toast(msg); }, { color: C.pink }); by += bh + 4; }
     this.button('MAKE A WISH', bx, by, bw, bh, () => g.openWishes(), { color: C.hot }); by += bh + 4;
+    this.button(g.settings.clutter === 0 ? 'DECLUTTER: ON' : 'DECLUTTER: OFF', bx, by, bw, bh, () => { const s = g.settings; if (s.clutter === 0) s.clutter = s.clutterWas ?? 2; else { s.clutterWas = s.clutter ?? 2; s.clutter = 0; } g.saveSettings(); }, { color: C.blue }); by += bh + 4;
     this.button('SETTINGS', bx, by, bw, bh, () => { this.screen = 'settings'; this.back = 'pause'; }); by += bh + 4;
     this.button('HOW TO PLAY', bx, by, bw, bh, () => { this.screen = 'help'; this.back = 'pause'; }); by += bh + 4;
     if (g.xr && g.xr.supported && !g.xr.session) { this.button('ENTER VR', bx, by, bw, bh, () => g.xr.enter(), { color: C.green }); by += bh + 4; }

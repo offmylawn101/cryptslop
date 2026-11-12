@@ -4,9 +4,12 @@
 // ---------- enemies ----------
 export const NEW_ENEMY_TYPES = ['stomper', 'marauder', 'cruiser', 'nyaslop', 'seamstress', 'apiarist', 'combstack', 'lampmother', 'tyrant', 'swarmheart', 'evilhorse', 'civilian',
   // the deep floors (bestiary.js): floor 5 and beyond, then floor 10 and beyond
-  'mothman', 'plaguebringer', 'construction', 'antlion', 'honeypot', 'frostboom', 'personifier', 'wanderer', 'necrotick', 'hivemind'];
+  'mothman', 'plaguebringer', 'construction', 'antlion', 'honeypot', 'frostboom', 'personifier', 'wanderer', 'necrotick', 'hivemind',
+  // from the wishes (wishbatch1.js)
+  'derpy'];
 export const NEW_ENEMY_NAMES = ['STOMPER', 'MARAUDER', 'CRUISER', 'NYASLOP, THE GREMLIN CAT', 'THE SEAMSTRESS', 'THE APIARIST', 'COMBSTACK', 'LAMPMOTHER', 'THE TARANTULA TYRANT', 'SWARMHEART', 'THE EVIL HORSE', 'A PERSON',
-  'MOTHMAN', 'PLAGUEBRINGERS', 'CONSTRUCTION', 'ANTLION', 'HONEYPOT ANT', 'FROSTBOOM', 'RANDOMLING PERSONIFIER', 'THE WANDERER', 'NECRO-TICK', 'HIVEMIND'];
+  'MOTHMAN', 'PLAGUEBRINGERS', 'CONSTRUCTION', 'ANTLION', 'HONEYPOT ANT', 'FROSTBOOM', 'RANDOMLING PERSONIFIER', 'THE WANDERER', 'NECRO-TICK', 'HIVEMIND',
+  'DERPY THE FRUIT FLY'];
 export const NEW_ENEMIES = {
   // RANDOMLINGS: they only live in the real rooms (an office, a kitchen...) that replace hive rooms after floor 6
   stomper: { // heavy: every step shakes the ground, its attack is a shockwave you have to jump
@@ -58,10 +61,12 @@ export const NEW_ENEMIES = {
   necrotick: { hp: 30, speed: 6.4, radius: 0.35, melee: { range: 1.4, dmg: 8, windup: 0.2, cooldown: 0.8 }, hit: [[0.3, 0.45, 1]], height: 0.6, deep: 10 },
   // a floating brain that links the foes around it: hit one and every linked foe shares the damage
   hivemind: { hp: 320, speed: 3.0, radius: 0.8, ranged: { dmg: 10, speed: 12, cooldown: 2.4, range: 22 }, hover: 2.4, hit: [[2.6, 0.85, 1]], height: 3.3, deep: 10 },
+  // a wish (MICRORAVEN585MOD): a fruit fly called DERPY. Wobbly loops, little bumps, goofy eyes
+  derpy: { hp: 14, speed: 6.2, radius: 0.3, melee: { range: 1.3, dmg: 4, windup: 0.2, cooldown: 0.9 }, hover: 1.5, hit: [[1.55, 0.42, 1]], height: 1.9 },
 };
 export const NEW_SCORE = { stomper: 120, marauder: 80, cruiser: 140, nyaslop: 600, seamstress: 600, apiarist: 550, combstack: 650, lampmother: 550, tyrant: 650, swarmheart: 700, evilhorse: 300, civilian: 5,
-  mothman: 90, plaguebringer: 0, construction: 220, antlion: 70, honeypot: 80, frostboom: 400, personifier: 260, wanderer: 600, necrotick: 15, hivemind: 160 };
-export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30];
+  mothman: 90, plaguebringer: 0, construction: 220, antlion: 70, honeypot: 80, frostboom: 400, personifier: 260, wanderer: 600, necrotick: 15, hivemind: 160, derpy: 9 };
+export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30, 2];
 export const RANDOMLINGS = ['stomper', 'marauder', 'cruiser'];
 
 // ---------- bosses ----------
@@ -179,6 +184,7 @@ export const LORE = {
   wanderer: 'THE BEEKEEPER, WITH ALL THE COLOR DRAINED OUT. HE HAS DIED BEFORE. IT DID NOT TAKE.',
   necrotick: 'A TICK THAT DIED AND KEPT DRINKING. WHAT IT BITES GETS BACK UP.',
   hivemind: 'A BRAIN THE SIZE OF A BEANBAG. IT DOES NOT FIGHT. IT MAKES EVERYTHING AROUND IT AGREE TO SHARE THE PAIN.',
+  derpy: 'A FRUIT FLY NAMED DERPY. NOBODY KNOWS WHO NAMED IT. IT FLIES IN LOOPS, BUMPS INTO THINGS, AND IS HAVING A WONDERFUL TIME.',
   civilian: 'A PERSON IN A RED SHIRT. NOBODY KNOWS HOW THEY GOT INTO A BEEHIVE, AND THEY ARE NOT ASKING FOR DIRECTIONS. THEY WANT TO FIGHT. THE ONES IN OTHER COLORS LEFT A LONG TIME AGO.',
 };
 
