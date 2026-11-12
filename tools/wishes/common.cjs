@@ -25,9 +25,10 @@ const CHECK = path.join(__dirname, 'check.cjs').replace(/\\/g, '/');
 const DEFAULTS = {
   server: '',               // the Petition Bee server, e.g. https://cryptslop-wishes.<you>.workers.dev
   adminToken: '',
-  consider: 40,             // how many of the top open wishes the moderator reads each day
-  build: 5,                 // how many get built (by votes)
-  wildcard: 1,              // plus this many picked at random from the rest that passed
+  consider: 200,            // how many open wishes the moderator reads each day (most-voted first)
+  build: 0,                 // how many get built: 0 = EVERY wish that passes, most-voted first
+  wildcard: 0,              // with a cap above: this many more picked at random from the rest
+  stopAt: '14:40',          // Eastern: no new wish is started after this (the stream is at 3). Left over: first tomorrow
   moderatorModel: 'sonnet',
   builderModel: 'fable',
   builderMinutes: 25,       // per wish

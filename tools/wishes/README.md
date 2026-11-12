@@ -1,6 +1,6 @@
 # The Petition Bee: chat builds the game
 
-Players make wishes in the game. Each day the top wishes get built, and you ship them on stream.
+Players make wishes in the game. Each day every good wish gets built, most voted first, and you ship them on stream. Built wishes move to the COMPLETE tab.
 
 ## How players take part
 
@@ -22,7 +22,7 @@ Players make wishes in the game. Each day the top wishes get built, and you ship
 
 | When | What | Command |
 |---|---|---|
-| 1 PM (automatic) | Reads the top 40 wishes. Moderates them. Builds the top 5 by votes plus 1 random wildcard. Opens a report. | `node tools/wishes/daily.cjs` |
+| 11 AM (automatic) | Reads every open wish. Moderates them: big wishes get their core built, clear bug reports get fixed, other people's characters become original takes. Builds every one that passes, most voted first, until 2:40 PM; any left over go first the next day. Opens a report. | `node tools/wishes/daily.cjs` |
 | Before 3 PM | Read `wishes/<date>/REPORT.md`, then play the build. | `node tools/wishes/preview.cjs`, then open http://localhost:8081 |
 | On stream | Ship it. Add `--drop 12` to leave out wish #12. | `node tools/wishes/approve.cjs` |
 | | Make it live | Press Publish in the Wavedash Developer Portal |
@@ -59,14 +59,15 @@ Wishes that failed to build go back on the board with their votes.
 
 1. `cd server/wishes && npx wrangler login`: log in to Cloudflare (a free account is enough).
 2. `node tools/wishes/deploy.cjs`: creates the database, deploys the server, saves the admin token and points the game at it. Upload a build afterwards.
-3. `node tools/wishes/schedule.cjs 13:00`: adds the daily scheduled task.
+3. `node tools/wishes/schedule.cjs 11:00`: adds the daily scheduled task.
 
 Settings live in `%USERPROFILE%\.cryptslop\wishes.json`:
 
 | Setting | Meaning | Default |
 |---|---|---|
-| `build` | Wishes built per day | 5 |
-| `wildcard` | Random picks added on top | 1 |
+| `build` | Wishes built per day (0 = every one that passes) | 0 |
+| `stopAt` | Eastern time after which no new wish is started | 14:40 |
+| `wildcard` | With a `build` cap: random picks added on top | 0 |
 | `consider` | Top wishes the moderator reads | 40 |
 | `builderModel` | Model that builds the wishes | |
 | `moderatorModel` | Model that moderates | |

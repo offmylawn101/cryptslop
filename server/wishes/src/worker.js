@@ -8,7 +8,7 @@
 // player's id. In DEV mode (local testing only) a token "dev:<id>" is accepted too.
 //
 // Public routes (CORS open, since the game runs on *.builds.wavedashcdn.com):
-//   GET  /api/wishes?sort=top|new|mine&limit=&offset=   the open wishes
+//   GET  /api/wishes?sort=top|new|mine|done&limit=&offset=   the open wishes (done: the COMPLETE board)
 //   POST /api/wishes   {text, name}                     make a wish (player token)
 //   POST /api/vote     {id, on}                         vote / unvote (player token)
 //   POST /api/report   {id}                             report a wish (player token)
@@ -168,6 +168,11 @@ async function listWishes(req, env, url) {
   const limit = Math.max(1, Math.min(LIMITS.pageMax, Number(url.searchParams.get('limit')) || 50));
   const offset = Math.max(0, Number(url.searchParams.get('offset')) || 0);
   let rows;
+  if (sort === 'done') { // the COMPLETE board: every wish that was built, newest first
+    rows = (await env.DB.prepare(`SELECT ${PUBLIC_COLS}, uid, note, batch FROM wishes WHERE status = 'built' ORDER BY batch DESC, id DESC LIMIT ? OFFSET ?`).bind(limit, offset).all()).results;
+    const done = (await env.DB.prepare("SELECT COUNT(*) AS n FROM wishes WHERE status = 'built'").first()).n;
+    return json({ ok: true, wishes: rows.map((r) => ({ ...shape(r, me && me.uid, false), note: r.note, batch: r.batch })), total: done });
+  }
   if (sort === 'mine') {
     if (!me) return json({ ok: true, wishes: [], total: 0 });
     rows = (await env.DB.prepare(`SELECT ${PUBLIC_COLS}, uid FROM wishes WHERE uid = ? AND status != 'hidden' ORDER BY created DESC, id DESC LIMIT ? OFFSET ?`).bind(me.uid, limit, offset).all()).results;
@@ -246,8 +251,8 @@ async function notes(req, env) {
 
 // ---------------- admin ----------------
 async function adminOpen(env, url) {
-  const limit = Math.max(1, Math.min(500, Number(url.searchParams.get('limit')) || 40));
-  const rows = (await env.DB.prepare("SELECT id, uid, name, text, votes, reports, created, status FROM wishes WHERE status = 'open' ORDER BY votes DESC, created ASC LIMIT ?").bind(limit).all()).results;
+  const limit = Math.max(1, Math.min(500, Number(url.searchParams.get('limit')) || 200));
+  const rows = (await env.DB.prepare("SELECT id, uid, name, text, votes, reports, created, status FROM wishes WHERE status = 'open' ORDER BY votes DESC, created ASC LIMIT ?").bind(limit).all()).results; // most-voted first
   const total = (await env.DB.prepare("SELECT COUNT(*) AS n FROM wishes WHERE status = 'open'").first()).n;
   return json({ ok: true, wishes: rows, total });
 }

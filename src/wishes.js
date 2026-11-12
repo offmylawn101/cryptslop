@@ -1,5 +1,5 @@
 // THE PETITION BEE: players wish for what chat should build next, and vote on each other's wishes.
-// Every day at 3 PM Eastern the stream builds the top wishes into the game (tools/wishes/), and the
+// Every day the pipeline builds every good wish, most voted first (tools/wishes/), they ship on the 3 PM stream, and the
 // patch notes come back here with the names of the players whose wishes were built.
 //
 // Where you find it: Y opens it any time in a run. The PETITION BEE stands in every Honey Lounge
@@ -224,7 +224,7 @@ export class WishBoard {
     const head = el('div', 'wb-head'); box.appendChild(head);
     const ht = el('div'); head.appendChild(ht);
     ht.appendChild(el('div', 'wb-title', 'THE PETITION BEE'));
-    ht.appendChild(el('div', 'wb-sub', 'WISH FOR ANYTHING. VOTE FOR THE WISHES YOU WANT. EVERY DAY AT 3 PM EASTERN, THE TOP WISHES GET BUILT INTO THE GAME LIVE ON STREAM.'));
+    ht.appendChild(el('div', 'wb-sub', 'WISH FOR ANYTHING. EVERY GOOD WISH GETS BUILT INTO THE GAME, ONE DAY AT A TIME, AND SHIPS LIVE ON STREAM AT 3 PM EASTERN. VOTES DECIDE WHICH GO FIRST.'));
     this.clock = el('div', 'wb-clock'); ht.appendChild(this.clock);
     // the source code: every change chat asks for lands here, in public
     const src = el('div', 'wb-src'); ht.appendChild(src);
@@ -247,7 +247,7 @@ export class WishBoard {
     for (const line of [
       'WISH FOR ANYTHING: AN ENEMY, A WEAPON, A HAT, A DUMB JOKE. TYPE IT BELOW.',
       'VOTE FOR THE OTHER WISHES YOU WANT TO SEE.',
-      'EVERY DAY AT 3 PM EASTERN THE TOP WISHES GET BUILT INTO THE GAME, LIVE ON STREAM. YOUR NAME GOES IN THE PATCH NOTES.',
+      'EVERY GOOD WISH GETS BUILT, MOST VOTED FIRST, AND SHIPS ON THE 3 PM EASTERN STREAM. IT MOVES TO THE COMPLETE TAB, WITH YOUR NAME IN THE PATCH NOTES.',
     ]) steps.appendChild(el('li', null, line));
     this.intro.appendChild(el('div', 'wb-intro-r', 'YOUR FIRST WISH EARNS 2 WAFERS. COME BACK ANY TIME: PRESS Y IN A RUN, OR FIND THE PETITION BEE IN THE LOUNGE.'));
     const comp = el('div', 'wb-compose'); box.appendChild(comp);
@@ -262,7 +262,7 @@ export class WishBoard {
 
     const tabs = el('div', 'wb-tabs'); box.appendChild(tabs);
     this.tabBtns = {};
-    for (const [k, label] of [['top', 'TOP'], ['new', 'NEW'], ['mine', 'MINE'], ['notes', 'PATCH NOTES']]) {
+    for (const [k, label] of [['top', 'TOP'], ['new', 'NEW'], ['mine', 'MINE'], ['done', 'COMPLETE'], ['notes', 'PATCH NOTES']]) {
       const b = el('button', 'wb-tab', label); b.onclick = () => this.show(k); tabs.appendChild(b); this.tabBtns[k] = b;
     }
     this.list = el('div', 'wb-list'); box.appendChild(this.list);
@@ -376,10 +376,10 @@ export class WishBoard {
     const L = this.list;
     L.replaceChildren();
     if (!this.items.length) {
-      L.appendChild(el('div', 'wb-empty', this.tab === 'mine' ? 'YOU HAVE NOT WISHED FOR ANYTHING YET. TYPE ONE ABOVE.' : 'NO WISHES YET. BE THE FIRST.'));
+      L.appendChild(el('div', 'wb-empty', this.tab === 'mine' ? 'YOU HAVE NOT WISHED FOR ANYTHING YET. TYPE ONE ABOVE.' : this.tab === 'done' ? 'NOTHING IS COMPLETE YET. EVERY GOOD WISH GETS BUILT, DAY BY DAY.' : 'NO WISHES YET. BE THE FIRST.'));
       return;
     }
-    if (this.tab !== 'mine') L.appendChild(el('div', 'wb-meta', `  ${total} WISH${total === 1 ? '' : 'ES'} WAITING`)).style.padding = '4px 10px';
+    if (this.tab !== 'mine') L.appendChild(el('div', 'wb-meta', this.tab === 'done' ? `  ${total} WISH${total === 1 ? '' : 'ES'} BUILT INTO THE GAME` : `  ${total} WISH${total === 1 ? '' : 'ES'} WAITING. EVERY GOOD ONE GETS BUILT, MOST VOTED FIRST`)).style.padding = '4px 10px';
     for (const w of this.items) L.appendChild(this.wishRow(w));
   }
 
@@ -403,7 +403,8 @@ export class WishBoard {
     tx.textContent = short; b.appendChild(tx);
     const meta = el('div', 'wb-meta'); b.appendChild(meta);
     meta.appendChild(el('span', null, ago(w.created)));
-    const chip = { building: ['BUILDING TODAY', C.green], built: ['BUILT', C.green], rejected: ['NOT BUILT', C.red] }[w.status];
+    const chip = { building: ['BUILDING TODAY', C.green], built: [w.batch ? `BUILT ${w.batch}` : 'BUILT', C.green], rejected: ['NOT BUILT', C.red] }[w.status];
+    if (w.status === 'built' && w.note) { const n = el('div', 'wb-text', w.note); n.style.color = C.green; n.style.fontSize = '12px'; b.insertBefore(n, meta); }
     if (chip) { const c = el('span', 'wb-chip', chip[0]); c.style.color = chip[1]; meta.appendChild(c); }
     if (short !== full) { const m = el('button', 'wb-link', 'SHOW ALL'); m.onclick = () => { tx.textContent = full; m.remove(); }; meta.appendChild(m); }
     if (!w.mine && live) {

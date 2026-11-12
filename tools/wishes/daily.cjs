@@ -61,6 +61,13 @@ function cleanTitle(raw, spec, id) {
   return t.toUpperCase().slice(0, 40);
 }
 
+// is it past HH:MM in New York?
+function pastStop(hhmm) {
+  const [h, m] = String(hhmm || '14:40').split(':').map(Number);
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour12: false, hour: '2-digit', minute: '2-digit' }).formatToParts(new Date()).map((x) => [x.type, x.value]));
+  return (Number(p.hour) % 24) * 60 + Number(p.minute) >= h * 60 + m;
+}
+
 function moderate(cfg, wishes) {
   const rules = fs.readFileSync(path.join(__dirname, 'moderator.md'), 'utf8');
   const out = new Map();
@@ -128,7 +135,7 @@ function report(st) {
   const L = [];
   const n = st.results.filter((r) => r.status === 'built').length;
   L.push(`# Wishes for ${st.date}`, '');
-  L.push(`**${n} of ${st.results.length} picked wishes built.** ${st.considered} open wishes read, ${st.total} waiting in all.`, '');
+  L.push(`**${n} of ${st.results.length} wishes built.** Every wish that passed moderation is attempted, most-voted first, until ${C.config().stopAt} ET. ${st.considered} open wishes read, ${st.total} waiting in all.`, '');
   L.push('Next steps:', '', '- Try it: `node tools/wishes/preview.cjs` opens this build at http://localhost:8081', '- Ship it: `node tools/wishes/approve.cjs` (drop one with `--drop <wish id>`)', '- Throw it all away: `node tools/wishes/discard.cjs`', '');
   if (st.final) L.push(`Final check of the whole day: **${st.final.check}**. ${st.final.stat || ''}`, '');
   const warn = [];
@@ -155,6 +162,7 @@ function report(st) {
     L.push('');
   }
   const section = (title, list, f) => { if (!list.length) return; L.push(`## ${title}`, ''); for (const w of list) L.push(`- #${w.id} (${w.votes} votes) ${w.name}: "${w.text.replace(/\n+/g, ' ').slice(0, 140)}" - ${f(w)}`); L.push(''); };
+  if (st.notReached && st.notReached.length) section('Not reached before the stream (first in line tomorrow)', st.notReached, () => 'ran out of time');
   section('Rejected (shown in the patch notes)', st.rejected, (w) => w.reason);
   section('Hidden from the board', st.hidden, (w) => w.reason);
   section('Flagged for you (not built, still on the board)', st.flagged, (w) => w.reason);
@@ -201,7 +209,7 @@ async function main() {
   if (st.hidden.length && !DRY) await C.api(cfg, 'POST', '/api/admin/hide', { ids: st.hidden.map((w) => w.id), reason: 'moderation' });
   log(`moderated: ${builds.length} buildable, ${st.skipped.length} skipped, ${st.rejected.length} rejected, ${st.hidden.length} hidden, ${st.flagged.length} flagged`);
 
-  const n = ONLY || cfg.build;
+  const n = ONLY || (cfg.build > 0 ? cfg.build : builds.length); // 0: build them all
   st.picked = builds.slice(0, n);
   const rest = builds.slice(n);
   for (let k = 0; k < (ONLY ? 0 : cfg.wildcard) && rest.length; k++) st.picked.push({ ...rest.splice(Math.floor(Math.random() * rest.length), 1)[0], wildcard: true });
@@ -220,6 +228,13 @@ async function main() {
   st.phase = 'building'; C.saveState(st);
 
   for (const w of st.picked) {
+    if (!ONLY && pastStop(cfg.stopAt)) { // out of time before the stream: the rest go first tomorrow
+      st.notReached = st.picked.filter((p) => !st.results.some((r) => r.id === p.id));
+      log(`it is past ${cfg.stopAt} ET: ${st.notReached.length} wish(es) wait for tomorrow`);
+      await C.api(cfg, 'POST', '/api/admin/resolve', { batch: date, publish: false, results: st.notReached.map((p) => ({ id: p.id, status: 'open' })) }).catch(() => {});
+      st.picked = st.picked.filter((p) => st.results.some((r) => r.id === p.id));
+      break;
+    }
     log(`building #${w.id} ${w.title}`);
     const r = buildOne(cfg, st.wt, w);
     st.results.push({ id: w.id, ...r });

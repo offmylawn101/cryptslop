@@ -293,7 +293,7 @@ export class UI {
     if (g.wishes && g.wishes.api.ready) { // the wish ticker
       const n = g.wishWaiting, l = g.wishLatest;
       const news = l && l.built.length && Date.now() / 1000 - l.created < 3 * 86400 ? `CHAT JUST BUILT ${l.built.length} WISH${l.built.length === 1 ? '' : 'ES'}. ` : '';
-      drawSmall(ctx, `${news}${n ? `${n} WISHES WAITING. ` : ''}THE TOP ONES GET BUILT LIVE AT 3 PM EASTERN`, W / 2, H - 31, C.hot, 'center');
+      drawSmall(ctx, `${news}${n ? `${n} WISHES WAITING. ` : ''}EVERY GOOD ONE GETS BUILT, MOST VOTED FIRST`, W / 2, H - 31, C.hot, 'center');
     }
     const streak = g.meta.streak && g.meta.streak.n > 1 ? `   DAY ${g.meta.streak.n} STREAK` : '';
     drawText(ctx, g.bestFloor ? `DEEPEST FLOOR: ${g.bestFloor}   WAFERS: ${g.meta.wafers}${streak}` : 'BHOP. STRAFE. DESCEND.', W / 2, H - 22, C.dim, 1, 'center');
@@ -373,7 +373,7 @@ export class UI {
       ['WASD / MOUSE', 'MOVE / LOOK'], ['LMB', 'FIRE (JAVELIN ON HORSEBACK)'], ['SPACE / WHEEL', 'JUMP, WALL-KICK IN AIR'],
       ['SHIFT / C', 'CROUCH, SLIDE AT SPEED'], ['Q / MOUSE 4-5', 'DASH (BREAKS WAX WALLS)'], ['RMB', 'PARRY + STING'], ['V (HOLD)', 'HIVE CLEAVER SLASH (CHARGE FOR MASSIVE)'],
       ['G', 'THROW SPIN BALL'], ['F', 'PRESIDENTIAL ACTIVE'], ['E', 'MACHINES, SEALS, DISMOUNT'], ['R', 'RELOAD'],
-      ['1-3 / 4 / 5', 'BOON / DOUBLE-OR-NOTHING / REROLL'], ['I / M', 'INVENTORY / MAP'], ['T', 'CHAT (SPAM W FOR BUFFS)'], ['TAB', 'SCOREBOARD'], ['` / F1', 'DEVELOPER CONSOLE'], ['Z / MMB', 'PING'], ['X', 'DROPKICK'], ['K / H', 'THROWING KNIFE / MOLOTOV'], ['B', 'HONEY SHOP (IN THE LOUNGE)'], ['Y', 'MAKE A WISH: CHAT BUILDS THE TOP WISHES DAILY'],
+      ['1-3 / 4 / 5', 'BOON / DOUBLE-OR-NOTHING / REROLL'], ['I / M', 'INVENTORY / MAP'], ['T', 'CHAT (SPAM W FOR BUFFS)'], ['TAB', 'SCOREBOARD'], ['` / F1', 'DEVELOPER CONSOLE'], ['Z / MMB', 'PING'], ['X', 'DROPKICK'], ['K / H', 'THROWING KNIFE / MOLOTOV'], ['B', 'HONEY SHOP (IN THE LOUNGE)'], ['Y', 'MAKE A WISH: EVERY GOOD ONE GETS BUILT'],
     ];
     let y = 24;
     const cx = Math.round(W / 2);
