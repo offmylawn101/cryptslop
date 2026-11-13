@@ -43,6 +43,7 @@ for (let s = 1; s <= 400; s++) {
     ok(Math.hypot(p.x - m.spawn.x, p.z - m.spawn.z) > 3, `prop clear of spawn seed ${s}`);
     const k = Math.floor(p.z / T) * W + Math.floor(p.x / T);
     if (p.w4) ok(m.type[k] === FLOOR && m.roomOf[k] > 0 && m.fh[k] === 0 && Math.hypot(p.x - m.exit.x, p.z - m.exit.z) > 5, `floor shop / old bee / hungry bee in its own room, clear of the exit, seed ${s}`); // wishbatch4.js
+    else if (p.w5) ok(m.type[k] === FLOOR && m.roomOf[k] > 0, `special room in its own room, seed ${s}`); // wishbatch5.js
     else ok(m.type[k] === FLOOR && m.roomOf[k] === 0, `prop in lounge seed ${s}`);
   }
   ok(propUnder(m, m.spawn.x, m.spawn.z, MV.halfWidth + 1.3) < 0, `spawn (and co-op spread) not inside a prop seed ${s}`);
@@ -722,7 +723,8 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
     .concat(readFileSync(new URL('../src/bestiary.js', import.meta.url), 'utf8').match(/ENEMY_BUILDERS\.push\(([^)]*)\)/)[1].split(',').map((x) => x.trim())) // the deep floors' foes add theirs
     .concat([...readFileSync(new URL('../src/wishbatch1.js', import.meta.url), 'utf8').matchAll(/ENEMY_BUILDERS\[ENEMY_TYPES\.indexOf\('(\w+)'\)\] =/g)].map((m) => m[1])) // and the wished-for ones
     .concat([...readFileSync(new URL('../src/wishbatch2.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 2's bosses and chicken
-    .concat([...readFileSync(new URL('../src/wishbatch3.js', import.meta.url), 'utf8').matchAll(/indexOf\('(\w+)'\); if \(i >= 0\) ENEMY_BUILDERS\[i\]/g)].map((m) => m[1])); // batch 3's OGLER
+    .concat([...readFileSync(new URL('../src/wishbatch3.js', import.meta.url), 'utf8').matchAll(/indexOf\('(\w+)'\); if \(i >= 0\) ENEMY_BUILDERS\[i\]/g)].map((m) => m[1])) // batch 3's OGLER
+    .concat([...readFileSync(new URL('../src/wishbatch5.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])); // batch 5's randomlings, the hype bee and NOCTRESS
   ok(ENEMY_TYPES.length >= 37 && ENEMY_NAMES.length === ENEMY_TYPES.length && HONEY_FOR_KILL.length === ENEMY_TYPES.length && ENEMY_BUILDERS.length === ENEMY_TYPES.length, `every enemy type has a name, honey value and model (${ENEMY_TYPES.length}/${ENEMY_NAMES.length}/${HONEY_FOR_KILL.length}/${ENEMY_BUILDERS.length})`);
   for (const t of ENEMY_TYPES) ok(EN[t] && EN[t].hit && (EN[t].hit.length || EN[t].unkillable) && (SC[t] > 0 || EN[t].unkillable), `${t} has stats, hit spheres and a score (the unkillable swarm has neither)`);
   ok(champName(7) === champName(7) && champName(7) !== champName(8), 'champion names are deterministic and varied');

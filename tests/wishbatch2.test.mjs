@@ -47,9 +47,9 @@ const keepMap = s.map;
   ok(BOSS_ORDER.includes('beehemoth') && BOSS_ORDER.includes('unitzero') && BOSS_ORDER.includes('eclipse'), 'the wished-for bosses are in the rotation');
   const fl = (t) => { for (let f = 1; f < 200; f++) if (bossFor(f) === t && f % RUSH_EVERY !== 0) return f; return -1; };
   for (const t of ['beehemoth', 'unitzero', 'eclipse']) {
-    s.floor = fl(t); s.loadBossRoom();
+    s.wishOff = { phases: true }; s.floor = fl(t); s.loadBossRoom(); // BOSS PHASES (wishbatch5.js) can swap in a big boss on later floors
     ok(s.bossQueue[0] === t, `${t} waits behind the boss door on floor ${s.floor}`);
-    s.wishOff = { [t]: true }; s.loadBossRoom();
+    s.wishOff = { [t]: true, phases: true }; s.loadBossRoom();
     ok(s.bossQueue[0] === W2.stand_in, `switched off, ${t} steps aside`);
     s.wishOff = {};
   }

@@ -348,20 +348,20 @@ export function installFister(Game) {
       const dashing = sim.IsAirKickDashing(), railing = sim.IsOverchargeDashing(), rocket = sim.IsRocketPunchAscending();
       if (dashing) { // home in on the nearest foe in front
         const { fwd } = this.aim();
-        const t = this.fTargets(40, 0.85, fwd)[0];
+        const t = this.fTargets(55, 0.78, fwd)[0]; // AIR KICK BUFF (offmylawn's wish): locks on from farther and wider
         sim.SetAirKickLockCandidate(!!t);
         if (t) { const p = t.e.model.position; sim.SetAirKickHomingTarget(true, toSim(p.x, p.y + 1, p.z)); } else sim.SetAirKickHomingTarget(false, new Vec3());
       }
       if (!dashing && !railing && !rocket) return;
-      const r = (railing ? K.RAILING_PLAYER_HIT_RADIUS : dashing ? 2.25 : 1.5) * FS + 0.4;
+      const r = (railing ? K.RAILING_PLAYER_HIT_RADIUS : dashing ? 3.0 : 1.5) * FS + 0.4; // the air kick's reach was 2.25 before its buff
       const v = this.mover.vel, sp = Math.hypot(v.x, v.y, v.z) || 1;
       for (const h of this.fTargets(r, -2, null)) {
         if (this.fHits.has(h.e.id)) continue;
         this.fHits.add(h.e.id);
-        const dmg = railing ? 40 + Math.min(130, sim.OverchargeDashSpeed()) : dashing ? 70 * (sim.AirKickImpactScale ? sim.AirKickImpactScale() : 1) : 35;
+        const dmg = railing ? 40 + Math.min(130, sim.OverchargeDashSpeed()) : dashing ? 120 * (sim.AirKickImpactScale ? sim.AirKickImpactScale() : 1) : 35; // the air kick did 70 before its buff
         this.fHit([[h.e, this.fDmg(dmg), { x: v.x / sp, z: v.z / sp }, 2.5]], 'fist');
         this.fSnd(railing || dashing ? 'criticalhit' : 'crack', 1);
-        if (dashing) { sim.OnAirKickHit(); this.fStopLoop(); this.addStyle(25, 'AIR KICK'); }
+        if (dashing) { sim.OnAirKickHit(); this.fStopLoop(); this.addStyle(40, 'AIR KICK'); this.fKickBlast && this.fKickBlast(h.e); }
         if (railing) { sim.OnRailingHit(false); sim.GrantInstantPunchCharge(); this.addStyle(30, 'RAILED'); }
       }
     },

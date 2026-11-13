@@ -32,7 +32,6 @@ export const WISH2_FEATURES = [
   { id: 'disguise', name: 'LOOK LIKE A BOT', by: 'DAETAINXWIZARD' },
   { id: 'splinter', name: 'SPLINTER KICKER', by: 'DAETAINXWIZARD' },
   { id: 'walktest', name: 'THE WALKING TEST', by: 'DAETAINXWIZARD' },
-  { id: 'swapcurse', name: 'THE SWAP CURSE', by: 'RYANFITZPATRICKD' },
   { id: 'skins', name: 'WEAPON NAMES + SKINS', by: 'OBEASEPICKLE' },
   { id: 'powers', name: 'POWERS', by: 'CALNEIA666' },
 ];
@@ -45,7 +44,7 @@ export const W2 = {
   chomp: { windup: 0.85, lunge: 20, lungeT: 0.42, reach: 1.4 },
   coin: { delay: 0.65, speed: 38, dmg: 22 },
   disarm: { chance: 0.5, windup: 0.9, range: 14, time: 12 },
-  swap: { chance: 0.35, minDelay: 25, maxDelay: 65, life: 90, meet: 3 },
+  swap: { chance: 0, /* REMOVED by offmylawn's wish (it was 0.35) */ minDelay: 25, maxDelay: 65, life: 90, meet: 3 },
   splinter: { kicks: 10, r: 5, dmg: 30, perFloor: 0.12 },
   powerCd: 16,
 };

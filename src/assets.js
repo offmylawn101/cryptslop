@@ -119,7 +119,9 @@ export async function loadAssets(base = './models/', onProgress) {
 
 // A fresh copy of an asset, ready to drop in the world. Returns null if it never loaded.
 // userData: { mats, mixer, actions, kind: 'gltf', play(name) }
+export const ASSET_OFF = new Set(); // OLD BEE MODELS (a wish, wishbatch5.js): these fall back to the original procedural models
 export function makeAsset(id, { center = false } = {}) {
+  if (ASSET_OFF.has(id)) return null;
   const L = loaded[id];
   if (!L) return null;
   const inner = L.skinned ? skeletonClone(L.scene) : L.scene.clone(true);

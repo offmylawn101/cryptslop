@@ -17,6 +17,7 @@ import { installWishBatch1Client } from './wishbatch1.js';
 import { installWishBatch2Client } from './wishbatch2.js';
 import { installWishBatch3Client } from './wishbatch3.js';
 import { installWishBatch4Client } from './wishbatch4.js';
+import { installWishBatch5Client } from './wishbatch5.js';
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
@@ -593,7 +594,7 @@ export class Game {
         else if (this.sim) this.sim.handle(from, msg);
         break;
       case 'hello': case 'hit': case 'parry': case 'heal': case 'curse': case 'stun': case 'sunburn': case 'doom': case 'kick': case 'fall': case 'pull':
-      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose': case 'pz': case 'gold': case 'swin': case 'soak': case 'sac': // sac: THE SACRIFICE SHOP (wishbatch4.js) // soak: THE SOAKER (wishbatch3.js) // swin: a cursed player's keys (wishbatch2.js) // gold: THE GOLDEN ONE / THE PEBBLE EDGE (wishbatch1.js) // pz: a rooftop wire puzzle fixed (rooftops.js)
+      case 'vxr': case 'hex': case 'nuke': case 'flop': case 'clashlose': case 'pz': case 'gold': case 'swin': case 'soak': case 'sac': case 'w5': // w5: the special rooms (wishbatch5.js) // sac: THE SACRIFICE SHOP (wishbatch4.js) // soak: THE SOAKER (wishbatch3.js) // swin: a cursed player's keys (wishbatch2.js) // gold: THE GOLDEN ONE / THE PEBBLE EDGE (wishbatch1.js) // pz: a rooftop wire puzzle fixed (rooftops.js)
         if (this.sim) this.sim.handle(from, msg);
         break;
       case 'vx': if (from === this.net.hostId) this.onHostMsg(msg); break;
@@ -2063,7 +2064,7 @@ export class Game {
     const n = 1 + (this.others ? this.others.size : 0);
     this.sendTimer = n <= 4 ? 1 / 30 : n <= 8 ? 1 / 20 : 1 / 15;
     const m = this.mover;
-    const msg = { t: 'p', x: r2(m.pos.x), y: r2(m.pos.y), z: r2(m.pos.z), yw: r2(this.yaw), pt: r2(this.pitch), d: m.ducked ? 1 : 0, sp: r2(m.horizontalSpeed()), dead: this.dead ? 1 : 0, rd: this.riding ? 1 : 0, h: this.hat, fl: this.flairOn, dg: this.botLookOn ? 1 : 0 }; // dg: LOOK LIKE A BOT (wishbatch2.js)
+    const msg = { t: 'p', x: r2(m.pos.x), y: r2(m.pos.y), z: r2(m.pos.z), yw: r2(this.yaw), pt: r2(this.pitch), d: m.ducked ? 1 : 0, sp: r2(m.horizontalSpeed()), dead: this.dead ? 1 : 0, rd: this.riding ? 1 : 0, h: this.hat, fl: this.flairOn, dg: this.botLookOn ? 1 : 0, cl: this.cls, bk: this.biking ? 1 : 0 }; // dg: LOOK LIKE A BOT (wishbatch2.js)
     if (/^#[0-9a-f]{6}$/i.test(this.settings.color || '')) msg.c = this.settings.color;
     if (this.cls === 'fister' && this.fModel && !this.dead) { msg.fp = this.fisterPacket(); if (this.fSim && this.fSim.IsAirKickDashing()) msg.ak = 1; } // John's posed body, so everyone sees him
     if (this.saberOut && this.hasSaber && this.cls !== 'fister') msg.sb = 1;
@@ -2925,6 +2926,7 @@ installRooftopsClient(Game, UI); // rooftop events, fake hives, shacks, missiles
 installBestiaryClient(Game, UI); // the deep floors' foes: models, looks, warnings, frozen floors (bestiary.js)
 installBugsClient(Game); // the looks of the reworked bugs (bugs.js; the host side installs itself in sim.js)
 installChangelog(UI); // the CHANGELOG in the title screen's left column (changelog.js, changelogUI.js)
+installWishBatch5Client(Game, UI); // the fifth batch (wishbatch5.js): randomlings, boss phases, special rooms, statuses, keybinds, dirtbikes. After the changelog: it wraps its mouse wheel
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)

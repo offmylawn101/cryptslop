@@ -271,6 +271,7 @@ export class Casino {
       { name: 'BOON TICKET', desc: g.shopBoonsLeft() > 0 ? 'PICK A NEW BOON (ONE PER SHOP)' : 'SOLD OUT UNTIL THE NEXT BOSS', cost: 80 + 20 * f, ok: () => g.shopBoonsLeft() > 0, buy: () => g.buyShopBoon() },
       { name: 'MYSTERY RELIC', desc: 'A RANDOM PRESIDENTIAL RELIC', cost: 220 + 30 * f, buy: () => g.takeItem(ITEM_IDS[Math.floor(Math.random() * ITEM_IDS.length)]) },
       { name: 'HORSE RENTAL', desc: 'ONE HORSE, DELIVERED', cost: 180, ok: () => !g.riding, buy: () => g.spawnHorseNear() },
+      { name: 'DIRTBIKE RENTAL', desc: 'VERY FAST. E TO RIDE (A WISH)', cost: 220, ok: () => !g.biking && !g.riding && g.cls !== 'fister', buy: () => g.spawnBikeNear() },
       { name: 'WAFER EXCHANGE', desc: '+1 WAFER FOR PERMANENT UPGRADES', cost: 150, buy: () => g.addWafers(1) },
       { name: 'TIP BUZZBY', desc: 'HE IS VERY GRATEFUL', cost: 5, buy: () => g.buddy.pet() },
       { name: 'PIXEL PORRIDGE EXCLUSIVE SHOP', desc: `${g.meta.porridge || 0} TOKENS. 30 SECONDS. 5,000 HONEY AND UP.`, cost: 1, token: true, buy: () => g.openPorridgeShop() },

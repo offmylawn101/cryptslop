@@ -199,10 +199,10 @@ const add = (type, dx, dz) => { const e = s.addEnemy(type, p.x + dx, 0, p.z + dz
   const full = g.hp;
   run(1.5);
   ok(!s.enemies.has(n.id) && g.necro && Math.abs(g.hp - (full - g.maxHp * DEEP.necro.cut)) < 1 && bug('infect').length === 1, 'it latches on: a quarter of its health, and it is inside');
-  s.damageEnemy(g, 99999, 'a', 'hit');
+  s.damageEnemy(g, 99999, 'a', 'boom'); // a blast: the mantis cannot guard it (a gunshot from the front depends on which way it faces)
   ok(s.enemies.has(g.id) && g.necroRisen && Math.abs(g.hp - g.maxHp * DEEP.necro.risePct) < 1, 'killed, the host rises once');
   ok(!s.canInfect(g), 'a risen foe can never be ridden again');
-  s.damageEnemy(g, 99999, 'a', 'hit');
+  s.damageEnemy(g, 99999, 'a', 'boom');
   ok(!s.enemies.has(g.id), 'and the second time it stays dead');
   const big = add('brute', 10, 10); big.maxHp = 900; big.hp = 900;
   ok(!s.canInfect(big) && !s.canInfect(add('wanderer', 12, 12)), 'big foes and the deep foes cannot be ridden');

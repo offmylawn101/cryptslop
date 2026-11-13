@@ -16,7 +16,7 @@ const C = {
   text: '#f2ead8', dim: '#8c88a8', hot: '#ffd040', red: '#ff4a5a', green: '#6aff9a', blue: '#4ff0ff', pink: '#ff6ad8',
   panel: 'rgba(14,10,28,0.86)', edge: '#4ff0ff', edgeB: '#ff4fd8', edgeHot: '#ffd040',
 };
-const PROP_NAMES = { slots: 'HONEY SLOTS', wheel: 'THE BUZZ WHEEL', derby: 'BEE-DERBY', booth: 'HIVE HEARTS (DATING)', shop: 'HONEY SHOP', typing: 'TYPING STAND (TYPE FAST, HIT HARD)', petition: 'THE PETITION BEE (MAKE A WISH)', shop2: 'THE HONEY SHOP', fastfood: 'BUZZ BURGER (FAST FOOD)', sacrifice: 'THE SACRIFICE SHOP', storyteller: 'THE OLD BEE (A STORY)', hungrybee: 'A HUNGRY BEE' }; // the last five: wishbatch4.js
+const PROP_NAMES = { slots: 'HONEY SLOTS', wheel: 'THE BUZZ WHEEL', derby: 'BEE-DERBY', booth: 'HIVE HEARTS (DATING)', shop: 'HONEY SHOP', typing: 'TYPING STAND (TYPE FAST, HIT HARD)', petition: 'THE PETITION BEE (MAKE A WISH)', shop2: 'THE HONEY SHOP', fastfood: 'BUZZ BURGER (FAST FOOD)', sacrifice: 'THE SACRIFICE SHOP', storyteller: 'THE OLD BEE (A STORY)', hungrybee: 'A HUNGRY BEE', chalsigil: 'THE CHALLENGE SIGIL (WAVES OF ELITES, BIG LOOT)', doomshrine: 'THE DOOMSDAY SHRINE (DOOM THE NEXT FLOOR)', capsule: 'THE TIME CAPSULE (BURY HONEY)', moonshrine: 'THE MOON SHRINE (LOW GRAVITY)' }; // the last five: wishbatch4.js
 const META_LINES = ['A VIDEO GAME THAT DOES NOT EXIST', 'WHICH MEANS IT DOES', 'IT WAS ALWAYS LIKE THIS', 'PLEASE INSERT MEMORY CARD (FOUND ONE IN THE CLOUD)', 'NOTHING HERE IS REAL EXCEPT THE HORSE', 'THIS DISC IS NOT FOR SALE', 'A HIVE YOU HALF REMEMBER'];
 
 function wrap(text, maxChars) {
@@ -92,7 +92,7 @@ export class UI {
     if (this.screen === 'porridge' && this.g.porridgeKey && this.g.porridgeKey(e)) return; // the PIXEL PORRIDGE shop (porridge.js)
     if (this.screen === 'wires' && this.g.wiresKey && this.g.wiresKey(e)) return; // a rooftop WIRE PUZZLE (rooftops.js)
     if (this.screen === 'w4' && this.g.w4Key && this.g.w4Key(e)) return; // a floor shop (wishbatch4.js)
-    if (e.code === 'Escape' && this.screen === 'wishfx') { this.screen = 'settings'; return; } // the WISH FEATURES switches (wishbatch1.js)
+    if (e.code === 'Escape' && (this.screen === 'wishfx' || this.screen === 'keys')) { this.screen = 'settings'; return; } // the WISH FEATURES switches (wishbatch1.js)
     if (e.code === 'Escape' && (this.screen === 'settings' || this.screen === 'help' || this.screen === 'browser')) this.screen = this.back === 'pause' ? null : 'title';
     else if (e.code === 'Escape' && (this.screen === 'archive' || this.screen === 'beepass')) this.screen = 'title';
     else if (e.code === 'Escape' && this.screen === 'quit') this.screen = null;
@@ -154,6 +154,7 @@ export class UI {
     else if (this.screen === 'wires' && g.drawWires) g.drawWires(this);
     else if (this.screen === 'wishfx' && g.drawWishFx) g.drawWishFx(this);
     else if (this.screen === 'w4' && g.drawW4) g.drawW4(this); // a floor shop (wishbatch4.js)
+    else if (this.screen === 'keys' && g.drawKeys) g.drawKeys(this); // SETTINGS > KEYBINDS (wishbatch5.js)
     else if (this.screen === 'beepass') this.drawBeePass();
     else if (this.screen === 'quit') this.drawQuit();
     else if (this.screen === 'title') this.drawTitle();
@@ -356,6 +357,8 @@ export class UI {
       ['DASH TO LOOK', s.dashLook ? 'ON' : 'OFF', () => { s.dashLook = !s.dashLook; }],
       ['NOT-SUCK MODE', s.notSuck ? 'ON' : 'OFF', () => { s.notSuck = !s.notSuck; }],
       ['WEAPON SKIN', ((SKINS.find((k) => k.id === s.wskin) || SKINS[0]).name), (d) => { const i = Math.max(0, SKINS.findIndex((k) => k.id === s.wskin)); s.wskin = SKINS[(i + (d || 1) + SKINS.length) % SKINS.length].id; }], // a wish (wishbatch2.js)
+      ['KEYBINDS', 'OPEN >', () => { this.screen = 'keys'; }], // a wish (wishbatch5.js)
+      ['OLD BEE MODELS', s.oldBees ? 'ON' : 'OFF', () => { s.oldBees = !s.oldBees; g.ui.toast('NEW MODELS SHOW UP ON THE NEXT FLOOR'); }], // a wish (wishbatch5.js)
       ['WISH FEATURES', 'OPEN >', () => { this.screen = 'wishfx'; }],
     ];
     // one column if it fits, else two side by side
