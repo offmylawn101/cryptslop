@@ -249,7 +249,7 @@ export class UI {
     // VHS tracking noise: a few bright bars drifting down the screen
     const t = g.time + (g.demoT || 0);
     for (let k = 0; k < 3; k++) { const yy = Math.floor(((t * 37 + k * 83) % (H + 20)) - 10); ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.fillRect(0, yy, W, 1 + k); }
-    const title = 'CRYPTSLOP';
+    const title = g.settings && g.settings.classic ? 'CRYPTHOP' : 'CRYPTSLOP'; // CRYPTHOP CLASSIC (wishbatch6.js)
     const scale = W > 360 ? 5 : 4;
     const tw = textWidth(title, scale);
     const x = W / 2 - tw / 2;
@@ -359,6 +359,7 @@ export class UI {
       ['WEAPON SKIN', ((SKINS.find((k) => k.id === s.wskin) || SKINS[0]).name), (d) => { const i = Math.max(0, SKINS.findIndex((k) => k.id === s.wskin)); s.wskin = SKINS[(i + (d || 1) + SKINS.length) % SKINS.length].id; }], // a wish (wishbatch2.js)
       ['KEYBINDS', 'OPEN >', () => { this.screen = 'keys'; }], // a wish (wishbatch5.js)
       ['OLD BEE MODELS', s.oldBees ? 'ON' : 'OFF', () => { s.oldBees = !s.oldBees; g.ui.toast('NEW MODELS SHOW UP ON THE NEXT FLOOR'); }], // a wish (wishbatch5.js)
+      ['CRYPTHOP CLASSIC', s.classic ? 'ON' : 'OFF', () => { s.classic = !s.classic; g.ui.toast(s.classic ? 'WELCOME BACK TO THE CRYPT. THE OLD STONE SHOWS UP ON THE NEXT FLOOR' : 'THE BEES ARE BACK. NEXT FLOOR'); }], // a wish (wishbatch6.js)
       ['WISH FEATURES', 'OPEN >', () => { this.screen = 'wishfx'; }],
     ];
     // one column if it fits, else two side by side

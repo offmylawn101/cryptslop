@@ -14,7 +14,7 @@ import { UPGRADES, UPGRADE_IDS, upgradeFits, ENEMIES, ENEMY_TYPES } from './data
 import { PROP_BUILDERS, part } from './models.js';
 import { MAP_HOOKS, T, W as MW, FLOOR, isPit } from './mapgen.js';
 import { drawText, drawSmall } from './font.js';
-import { WISH_FEATURES } from './wishbatch1.js';
+import { WISH_FEATURES, WISH_OFF } from './wishbatch1.js';
 
 const r2 = (v) => Math.round(v * 100) / 100;
 export const WISH4_FEATURES = [
@@ -84,7 +84,7 @@ export function placeFloorProps(map) {
   });
   for (let i = spots.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [spots[i], spots[j]] = [spots[j], spots[i]]; }
   const roll = R(), shop = roll < 0.55 ? 'shop2' : roll < 0.8 ? 'fastfood' : 'sacrifice';
-  const kinds = [shop, 'storyteller', 'hungrybee', 'hungrybee'];
+  const kinds = [...(WISH_OFF.has('floorshop') ? [] : [shop]), ...(WISH_OFF.has('story') ? [] : ['storyteller']), ...(WISH_OFF.has('floorshop') ? [] : ['hungrybee', 'hungrybee'])]; // switched off: not on the map at all
   const used = new Set();
   for (const kind of kinds) {
     const s = spots.find((q) => !used.has(q.n));

@@ -7,6 +7,7 @@ import { installWishBatch2 } from './wishbatch2.js';
 import { installWishBatch3 } from './wishbatch3.js';
 import { installWishBatch4 } from './wishbatch4.js';
 import { installWishBatch5 } from './wishbatch5.js';
+import { installWishBatch6 } from './wishbatch6.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -1635,3 +1636,4 @@ installWishBatch2(Sim); // the second batch: four bosses, sword chickens, the sw
 installWishBatch3(Sim); // the third batch: lasers, rainbow elites, roaming bosses (wishbatch3.js)
 installWishBatch4(Sim); // the fourth batch: the sacrifice shop (wishbatch4.js)
 installWishBatch5(Sim); // the fifth batch: new randomlings, boss phases, special rooms, statuses (wishbatch5.js)
+installWishBatch6(Sim); // the sixth batch: the wish switches for real, the sabrematon, the grindhouse (wishbatch6.js)

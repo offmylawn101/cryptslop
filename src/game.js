@@ -18,6 +18,7 @@ import { installWishBatch2Client } from './wishbatch2.js';
 import { installWishBatch3Client } from './wishbatch3.js';
 import { installWishBatch4Client } from './wishbatch4.js';
 import { installWishBatch5Client } from './wishbatch5.js';
+import { installWishBatch6Client } from './wishbatch6.js';
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
@@ -2927,6 +2928,7 @@ installBestiaryClient(Game, UI); // the deep floors' foes: models, looks, warnin
 installBugsClient(Game); // the looks of the reworked bugs (bugs.js; the host side installs itself in sim.js)
 installChangelog(UI); // the CHANGELOG in the title screen's left column (changelog.js, changelogUI.js)
 installWishBatch5Client(Game, UI); // the fifth batch (wishbatch5.js): randomlings, boss phases, special rooms, statuses, keybinds, dirtbikes. After the changelog: it wraps its mouse wheel
+installWishBatch6Client(Game, UI); // the sixth batch (wishbatch6.js): after the fifth, because it wraps the fifth's wish screen
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)

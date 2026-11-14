@@ -28,7 +28,7 @@ import { MV } from './movement.js';
 import { ASSET_OFF } from './assets.js';
 import { sharedUniforms } from './retro.js';
 import { packDrop } from './weapons.js';
-import { WISH_FEATURES } from './wishbatch1.js';
+import { WISH_FEATURES, WISH_OFF } from './wishbatch1.js';
 import { W3 } from './wishbatch3.js';
 import { W2 } from './wishbatch2.js';
 
@@ -77,7 +77,7 @@ export const W5S = { doomFloor: false }; // the next map is a doomsday floor: no
 function rng(seed) { let s = (seed ^ 0x2545f491) >>> 0; return () => { s = (s + 0x6d2b79f5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 export const ROOM_KINDS = ['chalsigil', 'doomshrine', 'capsule', 'moonshrine'];
 export function placeSpecialRooms(map) {
-  if (!map || !map.rooms || map.floor < 1) return;
+  if (!map || !map.rooms || map.floor < 1 || WISH_OFF.has('rooms5')) return; // switched off: no special rooms at all
   const R = rng((map.seed >>> 0) ^ 0x0dd5eed5);
   const vaultRooms = new Set((map.vaults || []).map((v) => v.room));
   const taken = new Set((map.props || []).map((p) => map.roomOf[Math.floor(p.z / T) * MW + Math.floor(p.x / T)]));

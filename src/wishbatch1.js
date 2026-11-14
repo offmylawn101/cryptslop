@@ -23,6 +23,10 @@ import { raycastLevel } from './mapgen.js';
 
 const r2 = (v) => Math.round(v * 100) / 100;
 export const WORB = { banana: 7, golden: 8, pebble: 9, sword: 10, club: 11 };
+// The switches the HOST of this floor has off. Maps are built on every machine from the seed, so the map hooks
+// (shops, the old bee, special rooms, the grindhouse) read this set, never the local settings. The host fills
+// it before it builds a floor and sends it with the floor (wishbatch6.js), so everyone builds the same map.
+export const WISH_OFF = new Set();
 export const WISH_FEATURES = [
   { id: 'deathping', name: 'PING WHERE YOU DIE', by: 'GWEN' },
   { id: 'spawnfire', name: 'ATTACK FROM SPAWN', by: 'OFFMYLAWN' },

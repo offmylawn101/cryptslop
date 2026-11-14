@@ -10,6 +10,8 @@ export const NEW_CLASSES = {
   // two wished-for classes (wishbatch3.js): a sponge (Chokymilkyway) and a big laser (gwen). Free from the start
   soaker: { name: 'SOAKER', color: '#ffe040', kit: ['soak'], desc: 'A SPONGE. SOAKS UP ENEMY SHOTS THAT COME CLOSE. CLICK: A HIGH-PRESSURE JET. R: SQUEEZE IT ALL OUT IN ONE BIG SPLASH.' },
   glare: { name: 'GLARE', color: '#ff4060', kit: ['beam'], desc: 'HOLD TO CHARGE, LET GO FOR A HUGE BEAM THAT PIERCES EVERYTHING. THE LONGER THE CHARGE, THE THICKER THE BEAM.' },
+  // a wished-for class (wishbatch6.js, Chokymilkyway): a plumber who moves like a 3D platformer hero. Free from the start
+  pipefitter: { name: 'PIPEFITTER', color: '#20b0a0', kit: ['wrench'], desc: 'A PLUMBER. JUMP AGAIN AS YOU LAND FOR A DOUBLE AND A TRIPLE JUMP. SLIDE AND JUMP FOR A LONG JUMP. CROUCH IN THE AIR TO GROUND POUND. KICK OFF WALLS FOREVER. STOMP HEADS. CLICK: A BIG WRENCH.' },
   parkour: { name: 'PARKOUR', color: '#ff3030', kit: ['freerun'], desc: 'A RED BAND. +2 HARD DASHES, +3 AIR JUMPS, WALL RUNS, CROUCH IN AIR TO SLAM. MOVING HITS.' },
 };
 
@@ -63,6 +65,11 @@ export const NEW_CLASS_UPGRADES = {
   pk_stomp: { cls: 'parkour', name: 'GOOMBA PROTOCOL', desc: 'STOMPS BOUNCE TWICE AS HIGH AND GIVE A DASH BACK', color: '#ffc040', mods: { pkStomp: 1 } },
   pk_crater: { cls: 'parkour', name: 'CRATER', desc: 'SLAMS HIT 60% WIDER', color: '#ff6040', mods: { pkSlamPct: 60 } },
   pk_flow: { cls: 'parkour', name: 'FLOW STATE', desc: 'WALL RUNNING RECHARGES YOUR DASHES', color: '#ff40a0', mods: { pkFlow: 1 } },
+  // THE PIPEFITTER
+  pf_wrench: { cls: 'pipefitter', name: 'TORQUE', desc: '+50% WRENCH DAMAGE', color: '#20b0a0', mods: { pfDmgPct: 50 } },
+  pf_pound: { cls: 'pipefitter', name: 'HEAVY BOOTS', desc: 'GROUND POUNDS HIT 60% WIDER AND HARDER', color: '#ff8040', mods: { pfPoundPct: 60 } },
+  pf_spring: { cls: 'pipefitter', name: 'SPRING IN YOUR STEP', desc: 'THE TRIPLE JUMP GOES 30% HIGHER, STOMPS BOUNCE HIGHER', color: '#ffe040', mods: { pfSpringPct: 30 } },
+  pf_long: { cls: 'pipefitter', name: 'LONG HAUL', desc: 'LONG JUMPS GO 30% FURTHER', color: '#40c0ff', mods: { pfLongPct: 30 } },
   // THE SOAKER
   sk_big: { cls: 'soaker', name: 'BIGGER SPONGE', desc: '+50% WATER', color: '#ffe040', mods: { skTankPct: 50 } },
   sk_pressure: { cls: 'soaker', name: 'HIGH PRESSURE', desc: '+40% JET DAMAGE', color: '#40c0ff', mods: { skDmgPct: 40 } },
@@ -90,13 +97,14 @@ export const ULTRA_UPGRADES = {
   u_blasphemous: { cls: 'blasphemous', ultra: true, giga: true, name: 'ULTRA: THE HORSE\'S BLESSING', desc: 'JAVELINS SEEK FOES AND EXPLODE WHERE THEY LAND (BIGGER PER COPY)', color: '#8020c0', mods: { blUltra: 1 } },
   u_soaker: { cls: 'soaker', ultra: true, giga: true, name: 'ULTRA: DEEP SEA', desc: 'DOUBLE THE WATER, AND EVERY SQUEEZE HEALS YOU 25', color: '#40a0ff', mods: { skUltra: 1 } },
   u_glare: { cls: 'glare', ultra: true, giga: true, name: 'ULTRA: THE THIRD EYE', desc: 'EVERY BEAM SPLITS INTO THREE', color: '#ff2050', mods: { glUltra: 1 } },
+  u_pipefitter: { cls: 'pipefitter', ultra: true, giga: true, name: 'ULTRA: FULL PRESSURE', desc: 'EVERY JUMP ON A TRIPLE CHAIN AND EVERY STOMP SENDS A SHOCKWAVE. GROUND POUNDS 2X', color: '#20d0c0', mods: { pfUltra: 1 } },
   u_parkour: { cls: 'parkour', ultra: true, giga: true, name: 'ULTRA: TERMINAL VELOCITY', desc: 'MOVING HITS 2X HARDER (+1X PER COPY), KILLS GIVE YOUR DASHES BACK', color: '#ff3030', mods: { pkUltra: 1 } },
 };
 export const ultraFor = (cls) => `u_${cls}`;
 export const NEW_CLASS_MOD_KEYS = ['sgDmgPct', 'sgShards', 'sgCdPct', 'sgBounce', 'sgSplit', 'sgUltra', 'kkDmgPct', 'kkLunge', 'kkKillReset', 'kkRageS', 'kkSoft', 'kkWhirlPct', 'kkUltra',
   'icMax', 'icDmgPct', 'icRegenPct', 'icWide', 'icTurn', 'icRefund', 'icUltra', 'blCount', 'blDmgPct', 'blPierce', 'blCdPct', 'blEcho', 'blUltra',
   'pkDmgPct', 'pkDashes', 'pkStomp', 'pkSlamPct', 'pkFlow', 'pkUltra', 'fisterUltra',
-  'skTankPct', 'skDmgPct', 'skSoakPct', 'skSqueezePct', 'skUltra', 'glDmgPct', 'glWidePct', 'glChargePct', 'glLongPct', 'glUltra'];
+  'skTankPct', 'skDmgPct', 'skSoakPct', 'skSqueezePct', 'skUltra', 'glDmgPct', 'glWidePct', 'glChargePct', 'glLongPct', 'glUltra', 'pfDmgPct', 'pfPoundPct', 'pfSpringPct', 'pfLongPct', 'pfUltra'];
 
 // the EVIL HORSE now also turns up on its own: 33% a floor, certain after 3 floors without one
 export const WILD_HORSE = { chance: 0.33, pity: 3, delay: 25 };
