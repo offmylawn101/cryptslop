@@ -225,12 +225,16 @@ if (baseTyping && !baseTyping.w6) {
 }
 
 // CRYPTHOP CLASSIC: the crypt's old names for its first four foes
-const CLASSIC_NAMES = ['GRUNT', 'SPITTER', 'BRUTE', 'THE WARDEN'];
+// the old names, and (a wish, batch 8: "make the game not so related to bees") every other bee gets a bee-free name too
+export const CLASSIC_RENAME = { grunt: 'GRUNT', spitter: 'SPITTER', brute: 'BRUTE', warden: 'THE WARDEN', idol: 'VOX POPULI, THE IDOL', yellowjacket: 'STRIPER',
+  beehemoth: 'THE BEHEMOTH', hypebee: 'THE HYPE MAN', honeypot: 'POT ANT' };
 let savedNames = null;
 export function applyClassic(on) {
   CLASSIC.on = !!on;
-  if (on && !savedNames) { savedNames = ENEMY_NAMES.slice(0, 4); CLASSIC_NAMES.forEach((n, i) => { ENEMY_NAMES[i] = n; }); }
-  else if (!on && savedNames) { savedNames.forEach((n, i) => { ENEMY_NAMES[i] = n; }); savedNames = null; }
+  if (on && !savedNames) {
+    savedNames = {};
+    for (const [t, n] of Object.entries(CLASSIC_RENAME)) { const i = ENEMY_TYPES.indexOf(t); if (i >= 0) { savedNames[i] = ENEMY_NAMES[i]; ENEMY_NAMES[i] = n; } }
+  } else if (!on && savedNames) { for (const [i, n] of Object.entries(savedNames)) ENEMY_NAMES[i] = n; savedNames = null; }
 }
 
 function animateSabre(e, t, dt) {

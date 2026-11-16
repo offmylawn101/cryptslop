@@ -154,7 +154,7 @@ export function installWishBatch5(Sim) {
       if (this.floor >= W5.rand.from && on(this, 'newrandomlings')) { // past floor 9: some randomlings are the new ones
         const pick = () => NEW_RANDOMLINGS[Math.floor(Math.random() * NEW_RANDOMLINGS.length)];
         for (const e of [...this.enemies.values()]) {
-          if (!['stomper', 'marauder', 'cruiser'].includes(e.type) || Math.random() >= W5.rand.swap) continue;
+          if (!['stomper', 'marauder', 'cruiser'].includes(e.type) || e.tier || Math.random() >= W5.rand.swap) continue; // never swap away an elite or a rainbow champion
           this.enemies.delete(e.id);
           this.addEnemy(pick(), e.x, e.y, e.z, hpScale);
         }

@@ -20,6 +20,7 @@ import { installWishBatch4Client } from './wishbatch4.js';
 import { installWishBatch5Client } from './wishbatch5.js';
 import { installWishBatch6Client } from './wishbatch6.js';
 import { installWishBatch7Client } from './wishbatch7.js';
+import { installWishBatch8Client } from './wishbatch8.js';
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
@@ -920,11 +921,11 @@ export class Game {
     }
     for (const [id, p] of this.projs) if (!ps.has(id)) { this.entityRoot.remove(p.mesh); this.projs.delete(id); }
     const os = new Set();
-    for (const [id, x, y, z, kind] of msg.o) {
+    for (const [id, x, y, z, kind, ov] of msg.o) {
       os.add(id);
       let o = this.orbs.get(id);
       if (!o) {
-        const mesh = (this.orbMesh && this.orbMesh(kind)) || (kind === 1 ? makeHoneyDrop() : kind === 2 ? makeWafer() : kind === 5 ? makeMedkit() : kind === 6 ? makeSaber('#40c0ff', 0.9) : makeOrb());
+        const mesh = (this.orbMesh && this.orbMesh(kind, ov)) || (kind === 1 ? makeHoneyDrop() : kind === 2 ? makeWafer() : kind === 5 ? makeMedkit() : kind === 6 ? makeSaber('#40c0ff', 0.9) : makeOrb());
         mesh.position.set(x, y, z); this.entityRoot.add(mesh);
         o = { mesh, x, y, z }; this.orbs.set(id, o);
       }
@@ -2931,6 +2932,7 @@ installChangelog(UI); // the CHANGELOG in the title screen's left column (change
 installWishBatch5Client(Game, UI); // the fifth batch (wishbatch5.js): randomlings, boss phases, special rooms, statuses, keybinds, dirtbikes. After the changelog: it wraps its mouse wheel
 installWishBatch6Client(Game, UI); // the sixth batch (wishbatch6.js): after the fifth, because it wraps the fifth's wish screen
 installWishBatch7Client(Game); // the seventh batch: a tiny bit faster (wishbatch7.js)
+installWishBatch8Client(Game); // the eighth batch: weapon drops that look like themselves, the stickman, knives, finishes, inspects (wishbatch8.js)
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)

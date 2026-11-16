@@ -9,6 +9,7 @@ import { installWishBatch4 } from './wishbatch4.js';
 import { installWishBatch5 } from './wishbatch5.js';
 import { installWishBatch6 } from './wishbatch6.js';
 import { installWishBatch7 } from './wishbatch7.js';
+import { installWishBatch8 } from './wishbatch8.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -1621,7 +1622,7 @@ export class Sim {
     const pr = [];
     for (const p of this.projs.values()) pr.push([p.id, r2(p.x), r2(p.y), r2(p.z), p.own ? 1 : 0]);
     const o = [];
-    for (const ob of this.orbs.values()) o.push([ob.id, r2(ob.x), r2(ob.y), r2(ob.z), ob.kind || 0]);
+    for (const ob of this.orbs.values()) o.push(ob.kind === 3 && Number.isFinite(ob.v) ? [ob.id, r2(ob.x), r2(ob.y), r2(ob.z), 3, ob.v] : [ob.id, r2(ob.x), r2(ob.y), r2(ob.z), ob.kind || 0]); // a weapon drop sends its roll, so it can look like itself (wishbatch8.js)
     const pl = {};
     for (const p of this.players.values()) pl[p.id] = [Math.ceil(p.hp), p.maxHp, p.dead ? 1 : 0, p.kills, p.score, p.dead ? r2(Math.min(1, (p.rev || 0) / REVIVE.time)) : 0, p.downAt ? r2(p.downAt.x) : 0, p.downAt ? r2(p.downAt.z) : 0, p.downAt ? r2(p.downAt.y) : 0];
     this.out.broadcast({ t: 's', n: this.seq, run: this.run, floor: this.floor, st: this.stage, e, pr, o, pl, cd: r2(this.countdown), po: this.portalOpen ? 1 : 0, ro: this.runOverTimer >= 0 ? r2(this.runOverTimer) : -1, ls: this.lastStand || '', bq: this.stage === 'boss' ? this.bossQueue.length : 0, th: threatLevel(this.runTime), rn: Math.round(this.runTime || 0), rt: this.stage === 'city' && this.roofT != null ? r2(this.roofT) : null }, false);
@@ -1639,3 +1640,4 @@ installWishBatch4(Sim); // the fourth batch: the sacrifice shop (wishbatch4.js)
 installWishBatch5(Sim); // the fifth batch: new randomlings, boss phases, special rooms, statuses (wishbatch5.js)
 installWishBatch6(Sim); // the sixth batch: the wish switches for real, the sabrematon, the grindhouse (wishbatch6.js)
 installWishBatch7(Sim); // the seventh batch: a tiny bit faster (wishbatch7.js)
+installWishBatch8(Sim); // the eighth batch: the stickman (wishbatch8.js)

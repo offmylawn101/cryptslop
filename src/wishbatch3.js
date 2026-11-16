@@ -128,7 +128,7 @@ export function installWishBatch3(Sim) {
           if (n >= W3.rainbow.max || e.tier === 2 || Math.random() >= W3.rainbow.chance) continue;
           n++;
           if (!e.tier) this.makeTier(e, 2, AFFIX_IDS.slice()); // every affix
-          else { e.affixes = [...new Set([...(e.affixes || []), ...AFFIX_IDS])]; }
+          else { e.affixes = [...new Set([...(e.affixes || []), ...AFFIX_IDS])]; e.tier = 2; } // an elite becomes a champion too (it stayed an elite before)
           if (!e.el) makeElemental(e, 1 + Math.floor(Math.random() * (ELEMENTS.length - 1)));
           e.rainbow = true; e.rainbowT = W3.rainbow.every;
         }

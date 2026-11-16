@@ -281,6 +281,7 @@ export class Casino {
       const owned = hats.includes(h), on = g.hat === h;
       items.push({ name: HATS[h].name, hat: h, owned, on, desc: owned ? (on ? 'WEARING IT. SPACE: TAKE IT OFF' : 'OWNED. SPACE: PUT IT ON') : 'COSMETIC HAT, YOURS FOREVER', cost: owned ? 0 : HATS[h].cost });
     }
+    if (g.cosmeticItems) items.push(...g.cosmeticItems()); // knives and gun finishes (wishbatch8.js)
     const disc = Math.min(0.6, g.mod('shopDiscountPct') / 100);
     if (disc > 0) for (const it of items) if (it.cost) it.cost = Math.max(1, Math.ceil(it.cost * (1 - disc)));
     return items;
@@ -293,6 +294,7 @@ export class Casino {
     if (c === 'KeyS' || c === 'ArrowDown') o.sel = (o.sel + 1) % items.length;
     if (c !== 'Space' && c !== 'Enter') return;
     const it = items[o.sel];
+    if (it.w8 && it.owned) { o.msg = it.equip(); g.sound.play('ui'); return; } // a knife or a finish you own: equip it (wishbatch8.js)
     if (it.hat && it.owned) { g.setHat(it.on ? 'none' : it.hat); g.sound.play('ui'); o.msg = it.on ? 'HAT OFF' : `WEARING THE ${it.name}`; return; }
     if (it.ok && !it.ok()) { g.sound.play('deny'); o.msg = 'NOT RIGHT NOW'; return; }
     if (it.token) { // paid in PIXEL PORRIDGE TOKENS, not honey
@@ -319,10 +321,10 @@ export class Casino {
       const i = start + n, y = top + n * rowH, sel = i === o.sel;
       ui.panel(px, y, pw, rowH - 2);
       if (sel) { ctx.fillStyle = 'rgba(255,208,64,0.14)'; ctx.fillRect(px + 1, y + 1, pw - 2, rowH - 4); }
-      drawText(ctx, it.name, px + 5, y + 3, sel ? C.hot : it.hat ? C.pink : C.text);
+      drawText(ctx, it.name, px + 5, y + 3, sel ? C.hot : it.hat || it.w8 ? C.pink : C.text);
       drawSmall(ctx, it.desc, px + pw - 52, y + 4, C.dim, 'right');
-      const price = it.hat && it.owned ? (it.on ? 'ON' : 'OWNED') : it.token ? `${it.cost} TOKEN` : `${it.cost}`;
-      drawText(ctx, price, px + pw - 5, y + 3, it.hat && it.owned ? C.green : it.token ? ((g.meta.porridge || 0) >= it.cost ? C.pink : C.red) : g.honey >= it.cost ? C.hot : C.red, 1, 'right');
+      const price = (it.hat || it.w8) && it.owned ? (it.on ? 'ON' : 'OWNED') : it.token ? `${it.cost} TOKEN` : `${it.cost}`;
+      drawText(ctx, price, px + pw - 5, y + 3, (it.hat || it.w8) && it.owned ? C.green : it.token ? ((g.meta.porridge || 0) >= it.cost ? C.pink : C.red) : g.honey >= it.cost ? C.hot : C.red, 1, 'right');
     });
     if (o.msg) drawText(ctx, o.msg, w / 2, h - 30, C.green, 1, 'center');
     drawSmall(ctx, 'W/S CHOOSE   SPACE BUY   E/ESC LEAVE', w / 2, h - 14, C.dim, 'center');

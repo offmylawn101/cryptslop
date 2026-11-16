@@ -1,6 +1,6 @@
 // The sixth batch of wishes (src/wishbatch6.js and friends). Run with `node tests/wishbatch6.test.mjs`
 import './_seed.mjs';
-import { generateFloor } from '../src/mapgen.js';
+import { generateFloor, inLounge } from '../src/mapgen.js';
 import { Sim } from '../src/sim.js';
 import { ENEMIES, ENEMY_TYPES, ENEMY_NAMES, HONEY_FOR_KILL, CLASSES, CLASS_IDS, UPGRADES, ultraFor, upgradeFits } from '../src/data.js';
 import { W6, PIPE, WISH6_FEATURES, WISH_CLASSES, isGrind, applyClassic, CLASSIC, installWishBatch6Client } from '../src/wishbatch6.js';
@@ -71,15 +71,17 @@ ok(ENEMY_TYPES.length === ENEMY_NAMES.length && ENEMY_TYPES.length === HONEY_FOR
 // ---- THE SABREMATON ----
 {
   const s = sim(); s.floor = 9; s.loadFloor(); s.grace = 0; s.enemies.clear(); s.projs && s.projs.clear && s.projs.clear();
-  const p = s.players.get('a'); p.x = 30; p.z = 30; p.y = 0; p.hp = 200; p.maxHp = 200;
+  let X = 30, Z = 30; // a spot outside the lounge (the lounge is a safe zone: no damage there)
+  for (let k = 0; k < 200 && (inLounge(s.map, X, Z) || inLounge(s.map, X, Z + 15)); k++) { X = 10 + (k * 37) % 80; Z = 10 + (k * 53) % 80; }
+  const p = s.players.get('a'); p.x = X; p.z = Z; p.y = 0; p.hp = 200; p.maxHp = 200;
   s.moveEnemy = (q, dx, dz) => { q.x += dx; q.z += dz; }; // the AI, not the walls
-  const e = s.addEnemy('sabrematon', 30, 0, 38, 1); e.awake = true; e.sbLungeCd = 0; e.sbThrowCd = 99;
+  const e = s.addEnemy('sabrematon', X, 0, Z + 8, 1); e.awake = true; e.sbLungeCd = 0; e.sbThrowCd = 99;
   let windup = false, lunged = false;
   for (let k = 0; k < 90; k++) { s.think(e, [p], 1 / 60, false); if (e.sbWind > 0) windup = true; if (e.sbLunge > 0) lunged = true; }
   ok(windup && lunged, 'it winds up, then lunges');
   ok(p.hp < 200, `the lunge hurts (${p.hp})`);
   const before = s.projs ? s.projs.size : 0;
-  const e2 = s.addEnemy('sabrematon', 30, 0, 45, 1); e2.awake = true; e2.sbLungeCd = 99; e2.sbThrowCd = 0;
+  const e2 = s.addEnemy('sabrematon', X, 0, Z + 15, 1); e2.awake = true; e2.sbLungeCd = 99; e2.sbThrowCd = 0;
   s.think(e2, [p], 1 / 60, false);
   ok(s.projs && s.projs.size === before + 1, 'from far away, it throws its sword');
   e2.hp = e2.maxHp * 0.4; const sp = e2.speedMul || 1;
