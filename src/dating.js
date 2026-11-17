@@ -174,9 +174,12 @@ export function drawPortrait(ctx, ch, x, y, s, t = 0, mood = 0) {
   P(0, 0, 32, 32, '#140e08');
   // wings
   const flap = Math.sin(t * 30) > 0 ? 1 : 0;
-  P(2, 6 - flap, 8, 10, 'rgba(200,230,255,0.45)'); P(22, 6 - flap, 8, 10, 'rgba(200,230,255,0.45)');
-  const body = ch.id === 'hornetta' ? '#d03020' : ch.id === 'waxworth' ? '#e8d8a0' : ch.id === 'utabee' ? '#d8b0ff' : '#ffc020';
-  const stripe = ch.id === 'hornetta' ? '#1a0a0a' : '#201408';
+  if (ch.id === 'lune') { // big pale-green moth wings with eye spots and long tails
+    P(0, 4 - flap, 10, 14, '#a8ffb0'); P(22, 4 - flap, 10, 14, '#a8ffb0'); P(2, 18 - flap, 4, 10, '#90e8a0'); P(26, 18 - flap, 4, 10, '#90e8a0');
+    P(3, 9 - flap, 3, 3, '#ffd060'); P(26, 9 - flap, 3, 3, '#ffd060'); P(4, 10 - flap, 1, 1, '#603010'); P(27, 10 - flap, 1, 1, '#603010');
+  } else { P(2, 6 - flap, 8, 10, 'rgba(200,230,255,0.45)'); P(22, 6 - flap, 8, 10, 'rgba(200,230,255,0.45)'); }
+  const body = ch.id === 'hornetta' ? '#d03020' : ch.id === 'waxworth' ? '#e8d8a0' : ch.id === 'utabee' ? '#d8b0ff' : ch.id === 'emberly' ? '#ff8a20' : ch.id === 'lune' ? '#f0f8e8' : '#ffc020';
+  const stripe = ch.id === 'hornetta' ? '#1a0a0a' : ch.id === 'emberly' ? '#c02008' : ch.id === 'lune' ? '#d8f0d0' : '#201408';
   // body + stripes
   P(9, 18 + bob, 14, 14, body);
   P(9, 21 + bob, 14, 2, stripe); P(9, 26 + bob, 14, 2, stripe);
@@ -201,5 +204,10 @@ export function drawPortrait(ctx, ch, x, y, s, t = 0, mood = 0) {
   if (ch.id === 'chadley') { P(10, 9 + bob, 12, 4, '#101010'); P(11, 10 + bob, 4, 2, '#4ac8ff'); P(17, 10 + bob, 4, 2, '#4ac8ff'); P(10, 7 + bob, 12, 1, '#ff3030'); P(6, 20 + bob, 4, 6, body); P(22, 20 + bob, 4, 6, body); }
   if (ch.id === 'waxworth') { P(11, 9 + bob, 5, 5, '#808080'); P(16, 9 + bob, 5, 5, '#808080'); P(12, 10 + bob, 3, 3, '#d0e8ff'); P(17, 10 + bob, 3, 3, '#d0e8ff'); P(13, 11 + bob, 1, 1, '#101010'); P(18, 11 + bob, 1, 1, '#101010'); }
   if (ch.id === 'utabee') { P(6, 4 + bob, 4, 10, '#8040c0'); P(22, 4 + bob, 4, 10, '#8040c0'); P(9, 13 + bob, 2, 4, '#303030'); P(8, 12 + bob, 3, 2, '#606060'); P(14, 5 + bob, 4, 1, '#ff60c0'); }
+  if (ch.id === 'emberly') { // a flickering flame for hair, and a little smoke
+    const fl = Math.sin(t * 12) > 0 ? 1 : 0;
+    P(11, 2 + bob - fl, 10, 4, '#ff5010'); P(13, 0 + bob - fl, 6, 3, '#ffa020'); P(15, -1 + bob, 2, 2, '#fff080'); P(24, 2 + bob, 2, 2, 'rgba(120,120,120,0.6)'); P(26, 0 + bob, 2, 2, 'rgba(120,120,120,0.35)');
+  }
+  if (ch.id === 'lune') { P(11, 1 + bob, 1, 5, '#c0a070'); P(20, 1 + bob, 1, 5, '#c0a070'); P(9, 1 + bob, 2, 1, '#c0a070'); P(21, 1 + bob, 2, 1, '#c0a070'); P(9, 3 + bob, 2, 1, '#c0a070'); P(21, 3 + bob, 2, 1, '#c0a070'); P(11, 17 + bob, 10, 2, '#ffffff'); }
   if (ch.id === 'hornetta') { P(9, 8 + bob, 4, 1, '#1a0a0a'); P(19, 8 + bob, 4, 1, '#1a0a0a'); P(15, 30 + bob, 2, 2, '#e0e0e0'); }
 }

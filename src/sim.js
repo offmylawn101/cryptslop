@@ -10,6 +10,7 @@ import { installWishBatch5 } from './wishbatch5.js';
 import { installWishBatch6 } from './wishbatch6.js';
 import { installWishBatch7 } from './wishbatch7.js';
 import { installWishBatch8 } from './wishbatch8.js';
+import { installWishBatch9 } from './wishbatch9.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -942,7 +943,7 @@ export class Sim {
     if (!e.awake) {
       // nobody stands around: once the floor's grace is over, sleeping foes PROWL toward the nearest bee
       // along the paths (slower, not attacking) until they see or hear you and wake up properly
-      if (this.grace > 0 || def.boss || e.type === 'fingler' || (def.npc && e.shirt !== 0)) { e.yaw += Math.sin(this.time * 0.5 + e.id) * dt * 0.5; return; }
+      if (this.grace > 0 || def.boss || e.type === 'fingler' || (def.npc && e.shirt !== 0) || (this.prowlHold && this.prowlHold(e, p))) { e.yaw += Math.sin(this.time * 0.5 + e.id) * dt * 0.5; return; }
       const [px, pz] = this.flowDir(e, p, false);
       const sp = def.speed * (e.speedMul || 1) * 0.55;
       const bx = e.x, bz = e.z;
@@ -1641,3 +1642,4 @@ installWishBatch5(Sim); // the fifth batch: new randomlings, boss phases, specia
 installWishBatch6(Sim); // the sixth batch: the wish switches for real, the sabrematon, the grindhouse (wishbatch6.js)
 installWishBatch7(Sim); // the seventh batch: a tiny bit faster (wishbatch7.js)
 installWishBatch8(Sim); // the eighth batch: the stickman (wishbatch8.js)
+installWishBatch9(Sim); // the ninth batch: foes stop crowding the spawn room (wishbatch9.js)

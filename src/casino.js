@@ -5,6 +5,7 @@ import {
   BETS, betLabel, betAmount, spinSlots, SLOT_SYMBOLS, WHEEL, wheelCost, spinWheel, DERBY, derbyPayout, runDerby, derbyTimes, derbyProgress,
 } from './gamble.js';
 import { CHARACTERS, FLIRT_WIN, FLIRT_LOSE, GIFTS, GIFT_COST, BLESS_AT, MAX_HEARTS, drawPortrait } from './dating.js';
+import { boonRows } from './wishbatch9.js';
 import { ITEMS, ITEM_IDS, WAFER_UPGRADES, WAFER_IDS, UPGRADES, countUp, weaponStats, HATS, HAT_IDS, MEDKIT, SABER } from './data.js';
 import { W, H, T, WALL, GATE_KINDS, isPit } from './mapgen.js';
 import { Stats } from './stats.js';
@@ -376,7 +377,7 @@ export class Casino {
     if (o.page === 'pick') {
       if (c === 'KeyW' || c === 'ArrowUp') o.sel = (o.sel + CHARACTERS.length - 1) % CHARACTERS.length;
       if (c === 'KeyS' || c === 'ArrowDown') o.sel = (o.sel + 1) % CHARACTERS.length;
-      const dn = /^Digit[1-5]$/.test(c) ? Number(c.slice(5)) - 1 : -1;
+      const dn = /^Digit[1-9]$/.test(c) ? Number(c.slice(5)) - 1 : -1;
       if (dn >= 0 && dn < CHARACTERS.length) o.sel = dn;
       if (c === 'KeyG') return this.gift(CHARACTERS[o.sel]);
       if (c === 'Space' || c === 'Enter' || dn >= 0) {
@@ -436,6 +437,7 @@ export class Casino {
     if (fx === 'grind') { g.applyUp('dash', true); g.applyUp('speed', true); }
     if (fx === 'mag') g.applyUp('mag', true);
     if (fx === 'guard') g.applyUp('guard', true);
+    for (const u of ch.blessing.ups || []) g.applyUp(u, true); // wishbatch9's dates
     g.sound.play('jackpot');
     g.ui.banner(`${ch.name}: ${ch.blessing.name}! ${ch.blessing.desc}`, 4);
   }
@@ -443,10 +445,10 @@ export class Casino {
   // ---------------- inventory ----------------
   invKey(c) {
     const o = this.o, g = this.g;
-    const TABS = 5;
+    const TABS = 6;
     if (c === 'KeyA' || c === 'ArrowLeft' || c === 'KeyQ') { o.tab = (o.tab + TABS - 1) % TABS; o.sel = 0; o.scroll = 0; }
     if (c === 'KeyD' || c === 'ArrowRight' || c === 'KeyR') { o.tab = (o.tab + 1) % TABS; o.sel = 0; o.scroll = 0; }
-    if (/^Digit[1-5]$/.test(c)) { o.tab = Number(c.slice(5)) - 1; o.sel = 0; o.scroll = 0; }
+    if (/^Digit[1-6]$/.test(c)) { o.tab = Number(c.slice(5)) - 1; o.sel = 0; o.scroll = 0; }
     if (c === 'KeyW' || c === 'ArrowUp') { o.sel = Math.max(0, o.sel - 1); o.scroll = Math.max(0, o.scroll - 3); }
     if (c === 'KeyS' || c === 'ArrowDown') { o.sel++; o.scroll += 3; }
     if (o.tab === 1 && (c === 'Space' || c === 'Enter')) {
@@ -625,7 +627,7 @@ export class Casino {
 
   drawInv(ui) {
     const ctx = ui.ctx, w = ui.W, h = ui.H, o = this.o, g = this.g;
-    const TABS = ['ITEMS', 'WAFERS', 'STATS', 'MAP', 'HEARTS'];
+    const TABS = ['ITEMS', 'WAFERS', 'STATS', 'MAP', 'HEARTS', 'BOONS'];
     let tx = 6;
     TABS.forEach((t, i) => {
       const tw = textWidth(t) + 8;
@@ -654,7 +656,7 @@ export class Casino {
         drawSmall(ctx, `${it.g >= 1000 ? (it.g / 1000).toFixed(1) + 'KG' : it.g + 'G'}`, x + cw - 3, y + 3, C.dim, 'right');
       });
       const boons = g.myUps;
-      drawSmall(ctx, `BOONS (${boons.length}): ${[...new Set(boons)].map((u) => `${UPGRADES[u] ? UPGRADES[u].name : u} X${countUp(boons, u)}`).join(', ')}`.slice(0, Math.floor(w / 4) - 2), 6, h - 22, C.dim);
+      drawSmall(ctx, `BOONS: ${boons.length} (${new Set(boons).size} KINDS). SEE THE BOONS TAB (6)`, 6, h - 22, C.dim);
       drawSmall(ctx, `ROYAL KEYS: ${g.floorKey || 0}   HONEY ${Math.floor(g.honey)}   WAFERS ${g.meta.wafers}`, 6, h - 14, C.text);
     } else if (o.tab === 1) {
       drawText(ctx, `WAFERS: ${g.meta.wafers}   PERMANENT UPGRADES - SPACE TO BUY`, 6, y0, C.hot);
@@ -700,13 +702,30 @@ export class Casino {
       }
       if (!g.metaLvl('eye')) drawSmall(ctx, "BEE'S-EYE MAP (3 WAFERS) REVEALS VAULTS", lx, y + 4, C.dim);
     } else if (o.tab === 4) {
+      const rh = Math.min(30, Math.floor((h - y0 - 4) / CHARACTERS.length));
       CHARACTERS.forEach((ch, i) => {
-        const y = y0 + i * 30;
-        drawPortrait(ctx, ch, 6, y, 26, g.time + i, 0);
+        const y = y0 + i * rh;
+        drawPortrait(ctx, ch, 6, y, rh - 4, g.time + i, 0);
         drawText(ctx, ch.name, 36, y + 2, ch.color);
         const aff = g.dates.aff[ch.id] || 0;
         drawSmall(ctx, `${aff}/${MAX_HEARTS} HEARTS  DATES ${g.dates.step[ch.id] || 0}/3  BEST EVER ${g.meta.bestHearts[ch.id] || 0}  ${g.dates.blessed.includes(ch.id) ? 'BLESSED: ' + ch.blessing.desc : ''}`, 36, y + 12, C.dim);
       });
+    } else if (o.tab === 5) { // BOONS (wishbatch9): every boon you hold, how many, what it does
+      const rows = boonRows(g.myUps);
+      drawText(ctx, `BOONS: ${g.myUps.length}   KINDS: ${rows.length}`, 6, y0, C.hot);
+      if (!rows.length) drawText(ctx, 'NO BOONS YET. CLEAR ROOMS AND PICK A CARD.', 6, y0 + 16, C.dim);
+      const cols = 2, cw = Math.floor((w - 18) / cols), rh = 19;
+      const per = Math.max(cols, Math.floor((h - y0 - 24) / (rh + 2)) * cols);
+      const start = Math.min(Math.max(0, Math.ceil((rows.length - per) / cols) * cols), Math.floor(o.scroll / 3) * cols);
+      rows.slice(start, start + per).forEach((r, n) => {
+        const x = 6 + (n % cols) * (cw + 6), y = y0 + 12 + Math.floor(n / cols) * (rh + 2);
+        ui.panel(x, y, cw, rh);
+        ctx.fillStyle = r.color; ctx.fillRect(x + 3, y + 3, 5, 5);
+        drawText(ctx, r.name.slice(0, Math.floor((cw - 40) / 6)), x + 11, y + 2, r.giga ? C.hot : C.text);
+        drawText(ctx, `X${r.n}`, x + cw - 4, y + 2, r.n > 1 ? C.green : C.dim, 1, 'right');
+        drawSmall(ctx, r.desc.slice(0, Math.floor((cw - 8) / 4)), x + 4, y + 11, C.dim);
+      });
+      if (rows.length > per) drawSmall(ctx, `${start + 1}-${Math.min(rows.length, start + per)} OF ${rows.length}  W/S SCROLL`, w - 6, h - 8, C.dim, 'right');
     }
   }
 }

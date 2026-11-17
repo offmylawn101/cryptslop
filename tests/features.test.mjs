@@ -322,7 +322,7 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
 
 // ---- content integrity ----
 {
-  ok(CHARACTERS.length === 5, 'five dateable characters');
+  ok(CHARACTERS.length >= 5 && CHARACTERS.slice(0, 5).map((c) => c.id).join() === 'beatrix,chadley,waxworth,hornetta,utabee', 'the five original dates (wish batches add more)');
   for (const c of CHARACTERS) {
     ok(c.dates.length === 3 && c.dates.every((d) => d.lines.length && d.choices.length === 3), `${c.id} has three full dates`);
     const best = c.dates.reduce((a, d) => a + Math.max(...d.choices.map((q) => q[1])), 0);

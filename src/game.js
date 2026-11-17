@@ -21,6 +21,7 @@ import { installWishBatch5Client } from './wishbatch5.js';
 import { installWishBatch6Client } from './wishbatch6.js';
 import { installWishBatch7Client } from './wishbatch7.js';
 import { installWishBatch8Client } from './wishbatch8.js';
+import './wishbatch9.js'; // the ninth batch: two new dates for HIVE HEARTS (the BOONS tab is in casino.js)
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
