@@ -12,13 +12,16 @@ export const NEW_ENEMY_TYPES = ['stomper', 'marauder', 'cruiser', 'nyaslop', 'se
   // wishes, batch 6 (wishbatch6.js): a sword machine
   'sabrematon',
   // wishes, batch 8 (wishbatch8.js): a stickman with a gun
-  'stickman'];
+  'stickman',
+  // wishes, batch 10 (wishbatch10.js): a tiny grub in a cowboy hat with a rainbow pistol
+  'deputy'];
 export const NEW_ENEMY_NAMES = ['STOMPER', 'MARAUDER', 'CRUISER', 'NYASLOP, THE GREMLIN CAT', 'THE SEAMSTRESS', 'THE APIARIST', 'COMBSTACK', 'LAMPMOTHER', 'THE TARANTULA TYRANT', 'SWARMHEART', 'THE EVIL HORSE', 'A PERSON',
   'MOTHMAN', 'PLAGUEBRINGERS', 'CONSTRUCTION', 'ANTLION', 'HONEYPOT ANT', 'FROSTBOOM', 'RANDOMLING PERSONIFIER', 'THE WANDERER', 'NECRO-TICK', 'HIVEMIND',
   'DERPY THE FRUIT FLY', 'QUEEN BEEHEMOTH', 'TEDDY RUCKUS, THE PARTY BEAR', 'UNIT ZERO', 'SIR ECLIPSE, THE MOONLESS KNIGHT', 'SWORD CHICKEN', 'OGLER, THE BEAM WARDEN',
   'THE SHAPESHIFTER', 'THE THUMPER', 'THE FLICKER', 'THE HYPE BEE', 'NOCTRESS, THE MOTH OF LAST LIGHT',
   'THE SABREMATON',
-  'THE STICKMAN'];
+  'THE STICKMAN',
+  "LIL' DEPUTY GRUB"];
 export const NEW_ENEMIES = {
   // RANDOMLINGS: they only live in the real rooms (an office, a kitchen...) that replace hive rooms after floor 6
   stomper: { // heavy: every step shakes the ground, its attack is a shockwave you have to jump
@@ -87,14 +90,16 @@ export const NEW_ENEMIES = {
   hypebee: { hp: 120, speed: 3.4, radius: 0.5, ranged: { dmg: 8, speed: 12, cooldown: 2.6, range: 18 }, hit: [[1.0, 0.55, 1], [1.35, 0.25, 2]], height: 1.8 },
   // wishes, batch 6 (wishbatch6.js): a lanky sword machine. It lunges, throws its blade and gets angrier at half health
   // wishes, batch 8 (wishbatch8.js): a stick figure with a pistol. Fragile, quick, keeps its distance and shoots
+  // wishes, batch 10 (wishbatch10.js): knee-high, rides in posses, shoots rainbows
+  deputy: { hp: 45, speed: 5.0, radius: 0.36, ranged: { dmg: 6, speed: 18, cooldown: 1.1, range: 22 }, hit: [[0.45, 0.42, 1], [0.92, 0.26, 2]], height: 1.15 },
   stickman: { hp: 70, speed: 4.8, radius: 0.32, ranged: { dmg: 9, speed: 24, cooldown: 1.5, range: 28 }, hit: [[1.0, 0.35, 1], [1.75, 0.25, 2]], height: 2.0 },
   sabrematon: { hp: 520, speed: 4.6, radius: 0.6, melee: { range: 2.4, dmg: 20, windup: 0.4, cooldown: 0.8 }, hit: [[1.3, 0.7, 1], [2.3, 0.35, 2]], height: 2.6 },
   noctress: { hp: 1600, speed: 4.0, radius: 1.4, hover: 0.4, boss: true, pattern: ['spread', 'summon:moth:3', 'rain', 'ring', 'spiral'], hit: [[3.0, 1.4, 1], [3.2, 0.55, 2]], height: 4.2 },
 };
 export const NEW_SCORE = { stomper: 120, marauder: 80, cruiser: 140, nyaslop: 600, seamstress: 600, apiarist: 550, combstack: 650, lampmother: 550, tyrant: 650, swarmheart: 700, evilhorse: 300, civilian: 5,
   mothman: 90, plaguebringer: 0, construction: 220, antlion: 70, honeypot: 80, frostboom: 400, personifier: 260, wanderer: 600, necrotick: 15, hivemind: 160, derpy: 9, beehemoth: 700, partybear: 650, unitzero: 750, eclipse: 900, chicken: 20, ogler: 1200,
-  shifter: 140, thumper: 160, flicker: 110, hypebee: 45, noctress: 1300, sabrematon: 300, stickman: 60 };
-export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30, 2, 160, 180, 170, 220, 8, 300, 22, 24, 18, 8, 320, 40, 10];
+  shifter: 140, thumper: 160, flicker: 110, hypebee: 45, noctress: 1300, sabrematon: 300, stickman: 60, deputy: 35 };
+export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30, 2, 160, 180, 170, 220, 8, 300, 22, 24, 18, 8, 320, 40, 10, 6];
 export const RANDOMLINGS = ['stomper', 'marauder', 'cruiser'];
 
 // ---------- bosses ----------
@@ -221,6 +226,7 @@ export const LORE = {
   thumper: 'A RANDOMLING SPIDER THAT WALKS ON THE CEILING AND KEEPS A PISTON UNDER ITS BELLY. WHEN IT STOPS ABOVE YOU, MOVE. THE CRUSHER COMES DOWN, THE BULLETS GO OUT, AND THE FLOOR SHAKES.',
   flicker: 'A RANDOMLING THAT LOOKS LIKE A BAD SIGNAL. IT DOES NOT WALK TO YOU. IT IS JUST BEHIND YOU NOW. TURN AROUND.',
   stickman: 'A STICK FIGURE THAT ESCAPED FROM THE MARGIN OF A MATH NOTEBOOK. IT FOUND A PISTOL. IT IS ONE LINE THICK, SO IT IS VERY HARD TO HIT, AND ONE GOOD HIT IS ALL IT TAKES. IT KEEPS ITS DISTANCE AND IT DOES NOT MISS MUCH.',
+  deputy: 'A GRUB THAT FELL OUT OF ITS CELL TOO EARLY AND WAS RAISED BY A WESTERN ON A TV IN THE BREAK ROOM. IT FOUND A HAT, A BANDANA AND A PISTOL THAT ONLY SHOOTS RAINBOWS. THEY RIDE IN POSSES. THEY ARE KNEE HIGH, SO AIM DOWN.',
   sabrematon: 'A LANKY BRASS MACHINE BUILT TO DUEL, WITH A SWORD WHERE ITS MANNERS SHOULD BE. IT LUNGES ACROSS THE ROOM, THROWS ITS BLADE WHEN YOU KEEP YOUR DISTANCE, AND AT HALF HEALTH ITS VISOR TURNS RED AND IT STOPS BEING POLITE. PARRY THE THROWN SWORD. IT HATES THAT.',
   hypebee: 'A BEE WITH A MEGAPHONE AND A FOAM FINGER. IT DOES NOT FIGHT. IT CHEERS, AND EVERYTHING IT CHEERS FOR GETS ANGRY AND HARD TO HURT. SHOOT THE HYPE FIRST.',
   noctress: 'THE LAST MOTH. SHE ATE EVERY LIGHT IN THE DEEP HIVE AND NOW SHE IS COMING FOR THE STARS. THREE PHASES. THE THIRD ONE BRINGS THE SKY DOWN.',

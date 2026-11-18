@@ -634,7 +634,7 @@ export function keymapFor(binds) { // binds: action's default key -> the key you
   for (const [d, n] of Object.entries(binds || {})) if (n && n !== d && map[d] === undefined) map[d] = '';
   return map;
 }
-export const keyName = (code) => String(code || '').replace(/^Key/, '').replace(/^Digit/, '').replace(/Left$/, ' L').replace(/Right$/, ' R').toUpperCase();
+export const keyName = (code) => /^Mouse\d$/.test(code) ? ['MOUSE L', 'MOUSE MID', 'MOUSE R', 'MOUSE 4', 'MOUSE 5'][Number(code.slice(5))] : String(code || '').replace(/^Key/, '').replace(/^Digit/, '').replace(/Left$/, ' L').replace(/Right$/, ' R').toUpperCase();
 
 // ---------- status icons ----------
 const GLYPH = {

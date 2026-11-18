@@ -434,6 +434,7 @@ export const HATS = {
   cowboy: { name: 'COWBOY HAT', cost: 250 },
   crown: { name: 'TINY CROWN', cost: 400 },
   halo: { name: 'HALO', cost: 600 },
+  verity: { name: 'THE VERITY', cost: 300 }, // wish batch 10 (Luxadactale): a tall violet hat with an eye that tells the truth
 };
 export const HAT_IDS = Object.keys(HATS);
 

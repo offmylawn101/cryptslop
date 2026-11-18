@@ -11,6 +11,7 @@ import { installWishBatch6 } from './wishbatch6.js';
 import { installWishBatch7 } from './wishbatch7.js';
 import { installWishBatch8 } from './wishbatch8.js';
 import { installWishBatch9 } from './wishbatch9.js';
+import { installWishBatch10 } from './wishbatch10.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -1621,7 +1622,7 @@ export class Sim {
       e.push(row);
     }
     const pr = [];
-    for (const p of this.projs.values()) pr.push([p.id, r2(p.x), r2(p.y), r2(p.z), p.own ? 1 : 0]);
+    for (const p of this.projs.values()) pr.push([p.id, r2(p.x), r2(p.y), r2(p.z), p.own ? 1 : p.rb ? 2 : 0]); // 2: a rainbow shot (wishbatch10.js)
     const o = [];
     for (const ob of this.orbs.values()) o.push(ob.kind === 3 && Number.isFinite(ob.v) ? [ob.id, r2(ob.x), r2(ob.y), r2(ob.z), 3, ob.v] : [ob.id, r2(ob.x), r2(ob.y), r2(ob.z), ob.kind || 0]); // a weapon drop sends its roll, so it can look like itself (wishbatch8.js)
     const pl = {};
@@ -1643,3 +1644,4 @@ installWishBatch6(Sim); // the sixth batch: the wish switches for real, the sabr
 installWishBatch7(Sim); // the seventh batch: a tiny bit faster (wishbatch7.js)
 installWishBatch8(Sim); // the eighth batch: the stickman (wishbatch8.js)
 installWishBatch9(Sim); // the ninth batch: foes stop crowding the spawn room (wishbatch9.js)
+installWishBatch10(Sim); // the tenth batch: deputy grubs, rainbow shots, the fart relay (wishbatch10.js)

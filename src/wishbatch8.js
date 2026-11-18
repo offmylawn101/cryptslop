@@ -143,7 +143,7 @@ export function installWishBatch8(Sim) {
       const n = Math.min(C.max, (Math.random() < C.chance ? 1 : 0) + Math.floor(this.floor / C.perFloors));
       const hpScale = 1 + 0.2 * (this.floor - 1);
       for (let k = 0; k < n; k++) {
-        const pool = [...this.enemies.values()].filter((e) => !e.def.boss && !e.def.npc && !e.def.hunter && !e.def.unkillable && !['fingler', 'chicken', 'sabrematon', 'stickman'].includes(e.type) && !e.tier);
+        const pool = [...this.enemies.values()].filter((e) => !e.def.boss && !e.def.npc && !e.def.hunter && !e.def.unkillable && !e.def.randomling && !['fingler', 'chicken', 'sabrematon', 'stickman'].includes(e.type) && !e.tier);
         if (!pool.length) break;
         const e = pool[Math.floor(Math.random() * pool.length)];
         this.enemies.delete(e.id);

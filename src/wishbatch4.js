@@ -198,7 +198,7 @@ export function installWishBatch4Client(Game, UI) {
     w4Key(e) {
       if (e.code === 'Escape') { this.ui.screen = null; this.w4Open = null; return true; }
       const n = Number(e.key);
-      if (n >= 1 && n <= 5) { if (this.w4Open === 'fastfood') this.buyFood(n - 1); else this.sacrifice(n - 1); }
+      if (n >= 1 && n <= 9) { if (this.w4Open === 'fastfood') this.buyFood(n - 1); else this.sacrifice(n - 1); }
       return true;
     },
     foodCost(f) { return Math.round(f.cost * (1 + 0.25 * ((this.world && this.world.floor) || 1))); },
@@ -291,7 +291,7 @@ export function installWishBatch4Client(Game, UI) {
         drawText(ctx, 'BUZZ BURGER', Wd / 2, 10, '#ffe040', 2, 'center');
         drawSmall(ctx, `HONEY ${Math.floor(this.honey)}. FOOD IN YOUR BAG: ${this.food.length}. FEED IT TO A HUNGRY BEE.`, Wd / 2, 30, '#c8c4e0', 'center');
         FOODS.forEach((f, i) => ui.button(`${i + 1}. ${f.name}: ${this.foodCost(f)} HONEY`, bx, 44 + i * 20, bw, 15, () => this.buyFood(i), { color: '#ffd040' }));
-        if (this.ffEvents.length) drawSmall(ctx, `FAST FOOD EVENTS THIS RUN: ${this.ffEvents.map((id) => FAST_FOOD_EVENTS.find((e) => e.id === id).name).join(', ')}`, Wd / 2, 152, '#6aff9a', 'center');
+        if (this.ffEvents.length) drawSmall(ctx, `FAST FOOD EVENTS THIS RUN: ${this.ffEvents.map((id) => FAST_FOOD_EVENTS.find((e) => e.id === id).name).join(', ')}`, Wd / 2, 50 + FOODS.length * 20, '#6aff9a', 'center');
       } else {
         drawText(ctx, 'THE SACRIFICE SHOP', Wd / 2, 10, '#ff4040', 2, 'center');
         drawSmall(ctx, 'THE ALTAR WANTS HEALTH. IT NEVER TAKES YOUR LAST DROP.', Wd / 2, 30, '#c8c4e0', 'center');

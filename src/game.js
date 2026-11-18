@@ -22,6 +22,7 @@ import { installWishBatch6Client } from './wishbatch6.js';
 import { installWishBatch7Client } from './wishbatch7.js';
 import { installWishBatch8Client } from './wishbatch8.js';
 import './wishbatch9.js'; // the ninth batch: two new dates for HIVE HEARTS (the BOONS tab is in casino.js)
+import { installWishBatch10Client } from './wishbatch10.js';
 import { installElites } from './elites.js';
 import { installSaber, makeSaber } from './saber.js';
 import { installPerks } from './perks.js';
@@ -908,12 +909,12 @@ export class Game {
     for (const [id, x, y, z, rf] of msg.pr) {
       ps.add(id);
       let p = this.projs.get(id);
-      if (p && !!p.rf !== !!rf) { this.entityRoot.remove(p.mesh); this.projs.delete(id); p = null; }
+      if (p && (p.rf | 0) !== (rf | 0)) { this.entityRoot.remove(p.mesh); this.projs.delete(id); p = null; }
       if (!p) {
-        const mesh = makeProjectile(this.world.boss != null, !!rf);
+        const mesh = rf === 2 && this.rainbowShot ? this.rainbowShot() : makeProjectile(this.world.boss != null, rf === 1); // 2: a deputy's rainbow (wishbatch10.js)
         mesh.position.set(x, y, z);
         this.entityRoot.add(mesh);
-        p = { mesh, x, y, z, vx: 0, vy: 0, vz: 0, rf: !!rf };
+        p = { mesh, x, y, z, vx: 0, vy: 0, vz: 0, rf: rf | 0 };
         this.projs.set(id, p);
       } else {
         p.vx = (x - p.x) * 20; p.vy = (y - p.y) * 20; p.vz = (z - p.z) * 20;
@@ -2215,7 +2216,7 @@ export class Game {
       pr.mesh.position.y += (pr.y + pr.vy * 0.03 - pr.mesh.position.y) * k;
       pr.mesh.position.z += (pr.z + pr.vz * 0.03 - pr.mesh.position.z) * k;
       pr.mesh.rotation.y += dt * 8; pr.mesh.rotation.x += dt * 5;
-      if (Math.random() < 0.5) this.particles.emit(pr.mesh.position.x, pr.mesh.position.y, pr.mesh.position.z, 0, 0, 0, pr.rf ? 1 : 0.6, pr.rf ? 0.85 : 0.9, 0.2, 0.06, 0.25, 0);
+      if (Math.random() < 0.5) this.particles.emit(pr.mesh.position.x, pr.mesh.position.y, pr.mesh.position.z, 0, 0, 0, pr.rf === 1 ? 1 : 0.6, pr.rf === 1 ? 0.85 : 0.9, 0.2, 0.06, 0.25, 0);
     }
     for (const o of this.orbs.values()) {
       o.mesh.position.x += (o.x - o.mesh.position.x) * k; o.mesh.position.z += (o.z - o.mesh.position.z) * k;
@@ -2934,6 +2935,7 @@ installWishBatch5Client(Game, UI); // the fifth batch (wishbatch5.js): randomlin
 installWishBatch6Client(Game, UI); // the sixth batch (wishbatch6.js): after the fifth, because it wraps the fifth's wish screen
 installWishBatch7Client(Game); // the seventh batch: a tiny bit faster (wishbatch7.js)
 installWishBatch8Client(Game); // the eighth batch: weapon drops that look like themselves, the stickman, knives, finishes, inspects (wishbatch8.js)
+installWishBatch10Client(Game); // the tenth batch: mouse keybinds, the fart button, the nuggert, deputy grubs (wishbatch10.js)
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)

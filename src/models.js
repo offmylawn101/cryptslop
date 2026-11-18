@@ -758,6 +758,12 @@ export function addHat(head, hat, mats) {
     case 'cowboy': part(h, new THREE.CylinderGeometry(0.33, 0.33, 0.03, 8), [0.55, 0.35, 0.18], { pos: [0, 0.01, 0], mats }); part(h, new THREE.BoxGeometry(0.24, 0.16, 0.22), [0.55, 0.35, 0.18], { pos: [0, 0.09, 0], mats }); break;
     case 'crown': part(h, new THREE.CylinderGeometry(0.15, 0.15, 0.1, 6, 1, true), [1, 0.8, 0.2], { emissive: [0.5, 0.35, 0.05], pos: [0, 0.05, 0], mats });
       for (let k = 0; k < 5; k++) { const a = (k / 5) * Math.PI * 2; part(h, new THREE.ConeGeometry(0.035, 0.1, 4), [1, 0.8, 0.2], { emissive: [0.5, 0.35, 0.05], pos: [Math.cos(a) * 0.13, 0.14, Math.sin(a) * 0.13], mats }); } break;
+    case 'verity': // a tall violet hat with a gold band and one open eye on the front (wish batch 10)
+      part(h, new THREE.CylinderGeometry(0.26, 0.26, 0.03, 8), [0.3, 0.12, 0.45], { pos: [0, 0.01, 0], mats });
+      part(h, new THREE.CylinderGeometry(0.11, 0.16, 0.42, 8), [0.3, 0.12, 0.45], { pos: [0, 0.23, 0], rot: [0, 0, 0.12], mats });
+      part(h, new THREE.CylinderGeometry(0.165, 0.165, 0.05, 8), [1, 0.8, 0.2], { emissive: [0.5, 0.35, 0.05], pos: [0, 0.06, 0], mats });
+      part(h, new THREE.SphereGeometry(0.06, 8, 6), [1, 1, 1], { emissive: [0.8, 0.8, 0.8], pos: [0, 0.22, 0.13], mats });
+      part(h, new THREE.SphereGeometry(0.03, 6, 4), [0, 0, 0], { emissive: [0.3, 0.1, 0.6], pos: [0, 0.22, 0.18], mats }); break;
     case 'halo': part(h, new THREE.TorusGeometry(0.17, 0.025, 4, 10), [0, 0, 0], { emissive: [1, 0.95, 0.5], pos: [0, 0.22, 0], rot: [Math.PI / 2, 0, 0], mats }); break;
   }
   return h;

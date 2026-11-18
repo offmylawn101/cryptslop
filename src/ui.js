@@ -359,7 +359,7 @@ export class UI {
       ['WEAPON SKIN', ((SKINS.find((k) => k.id === s.wskin) || SKINS[0]).name), (d) => { const i = Math.max(0, SKINS.findIndex((k) => k.id === s.wskin)); s.wskin = SKINS[(i + (d || 1) + SKINS.length) % SKINS.length].id; }], // a wish (wishbatch2.js)
       ['KEYBINDS', 'OPEN >', () => { this.screen = 'keys'; }], // a wish (wishbatch5.js)
       ['OLD BEE MODELS', s.oldBees ? 'ON' : 'OFF', () => { s.oldBees = !s.oldBees; g.ui.toast('NEW MODELS SHOW UP ON THE NEXT FLOOR'); }], // a wish (wishbatch5.js)
-      ['CRYPTHOP CLASSIC (FEWER BEES)', s.classic ? 'ON' : 'OFF', () => { s.classic = !s.classic; g.ui.toast(s.classic ? 'WELCOME BACK TO THE CRYPT. FEWER BEES. THE OLD STONE SHOWS UP ON THE NEXT FLOOR' : 'THE BEES ARE BACK. NEXT FLOOR'); }], // a wish (wishbatch6.js)
+      ['CLASSIC (FEWER BEES)', s.classic ? 'ON' : 'OFF', () => { s.classic = !s.classic; g.ui.toast(s.classic ? 'WELCOME BACK TO THE CRYPT. FEWER BEES. THE OLD STONE SHOWS UP ON THE NEXT FLOOR' : 'THE BEES ARE BACK. NEXT FLOOR'); }], // a wish (wishbatch6.js)
       ['WISH FEATURES', 'OPEN >', () => { this.screen = 'wishfx'; }],
     ];
     // one column if it fits, else two side by side

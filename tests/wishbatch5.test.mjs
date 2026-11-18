@@ -157,7 +157,7 @@ ok(ENEMIES.noctress.boss && PHASES.noctress && PHASES.ogler && PHASES.eclipse, '
     ok(!s.map.props.some((q) => q.kind === 'doomshrine'), 'with no doomsday shrine on it');
     s.grace = 0; p.hp = 1000; p.maxHp = 1000; p.x = 30; p.z = 30;
     let fell = 0;
-    for (let k = 0; k < 60 * 8; k++) { s.step(1 / 60); fell = Math.max(fell, s.w5met.length); }
+    for (let k = 0; k < 60 * 8; k++) { p.hp = p.maxHp; p.dead = false; s.step(1 / 60); fell = Math.max(fell, s.w5met.length); }
     ok(fell > 0 && s.doomNow, 'meteors fall');
     s.enemies.clear(); s.onCleared();
     ok([...s.orbs.values()].some((ob) => ob.kind === 4), 'clearing it pays a chest');
