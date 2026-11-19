@@ -24,7 +24,8 @@ import { installWishBatch8Client } from './wishbatch8.js';
 import './wishbatch9.js'; // the ninth batch: two new dates for HIVE HEARTS (the BOONS tab is in casino.js)
 import { installWishBatch10Client } from './wishbatch10.js';
 import { installElites } from './elites.js';
-import { installSaber, makeSaber } from './saber.js';
+import { installSaber, installSaberToggle, makeSaber } from './saber.js';
+import { installWishBatch11Client } from './wishbatch11.js';
 import { installPerks } from './perks.js';
 import { installQuests } from './quests.js';
 import { installParryFx } from './parryfx.js';
@@ -2923,6 +2924,7 @@ installFister(Game); // JOHN FISTER (fisterPort.js + src/fister/)
 installClasses2(Game, Sim); // SIEGER, KOOLCILLER, INTERCEPTOR, BLASPHEMOUS, PARKOUR, the ULTRAs, the wild EVIL HORSE (classes2.js)
 installEconomy(Game); // the post-boss shop, the rooftop clock, starting deeper, newer wafer upgrades (economy.js)
 installPorridge(Game); // the PIXEL PORRIDGE EXCLUSIVE SHOP and its flair (porridge.js)
+installSaberToggle(Game); // L: the saber. Before the wish batches, which wrap it to cycle the sidearms (saber.js)
 installWishBatch1Client(Game, UI); // the first batch of wishes built by hand (wishbatch1.js)
 installWishBatch2Client(Game, UI); // the second batch (wishbatch2.js): after batch 1, it wraps the sidearms
 installWishBatch3Client(Game, UI); // the third batch (wishbatch3.js): THE SOAKER, GLARE, lasers
@@ -2936,6 +2938,7 @@ installWishBatch6Client(Game, UI); // the sixth batch (wishbatch6.js): after the
 installWishBatch7Client(Game); // the seventh batch: a tiny bit faster (wishbatch7.js)
 installWishBatch8Client(Game); // the eighth batch: weapon drops that look like themselves, the stickman, knives, finishes, inspects (wishbatch8.js)
 installWishBatch10Client(Game); // the tenth batch: mouse keybinds, the fart button, the nuggert, deputy grubs (wishbatch10.js)
+installWishBatch11Client(Game, UI); // the eleventh batch: skill backflips, the floor guide, two boon tickets, the number keys put sidearms away (wishbatch11.js)
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)

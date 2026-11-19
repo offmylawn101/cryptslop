@@ -25,6 +25,22 @@ export function makeSaber(color = '#40c0ff', scale = 1) {
   return g;
 }
 
+// L: draw or sheathe the saber. Installed on its own, BEFORE the wish batches: they wrap it so L also cycles the
+// sidearms (wishbatch1.js). Installing it with the rest of the saber, last, replaced their version: L only drew the saber
+export function installSaberToggle(Game) {
+  Object.defineProperties(Game.prototype, Object.getOwnPropertyDescriptors({
+    toggleSaber() {
+      if (this.mode !== 'play' || this.dead) return;
+      if (!this.hasSaber) { this.ui.toast('NO LIGHT SABER (BOSSES DROP THEM, THE SHOP SELLS THEM)'); return; }
+      if (this.cls === 'fister') { this.ui.toast('JOHN FISTER DOES NOT NEED A SWORD'); return; }
+      this.saberOut = !this.saberOut;
+      this.sound.play(this.saberOut ? 'slash' : 'ui');
+      this.ui.toast(this.saberOut ? 'SABER DRAWN' : 'SABER AWAY');
+    },
+
+  }));
+}
+
 export function installSaber(Game) {
   const P = Game.prototype;
   const orig = { resetFeatureRun: P.resetFeatureRun, updateCamera: P.updateCamera };
@@ -43,15 +59,6 @@ export function installSaber(Game) {
       this.saberOut = this.cls !== 'fister';
       this.ui.banner('LIGHT SABER! PRESS L TO DRAW OR SHEATHE IT', 3);
       this.sound.play('rank');
-    },
-
-    toggleSaber() {
-      if (this.mode !== 'play' || this.dead) return;
-      if (!this.hasSaber) { this.ui.toast('NO LIGHT SABER (BOSSES DROP THEM, THE SHOP SELLS THEM)'); return; }
-      if (this.cls === 'fister') { this.ui.toast('JOHN FISTER DOES NOT NEED A SWORD'); return; }
-      this.saberOut = !this.saberOut;
-      this.sound.play(this.saberOut ? 'slash' : 'ui');
-      this.ui.toast(this.saberOut ? 'SABER DRAWN' : 'SABER AWAY');
     },
 
     // called from updateWeapon while the saber is out (instead of the class weapon)
