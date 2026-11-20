@@ -12,6 +12,8 @@ export const NEW_CLASSES = {
   glare: { name: 'GLARE', color: '#ff4060', kit: ['beam'], desc: 'HOLD TO CHARGE, LET GO FOR A HUGE BEAM THAT PIERCES EVERYTHING. THE LONGER THE CHARGE, THE THICKER THE BEAM.' },
   // a wished-for class (wishbatch6.js, Chokymilkyway): a plumber who moves like a 3D platformer hero. Free from the start
   pipefitter: { name: 'PIPEFITTER', color: '#20b0a0', kit: ['wrench'], desc: 'A PLUMBER. JUMP AGAIN AS YOU LAND FOR A DOUBLE AND A TRIPLE JUMP. SLIDE AND JUMP FOR A LONG JUMP. CROUCH IN THE AIR TO GROUND POUND. KICK OFF WALLS FOREVER. STOMP HEADS. CLICK: A BIG WRENCH.' },
+  // a wished-for class (wishbatch12.js, aviliari0): raises the foes it kills. Free from the start
+  necromancer: { name: 'NECROMANCER', color: '#60ff90', kit: ['staff'], desc: 'CLICK: A HOMING SOUL BOLT. FOES YOU KILL RISE AS SKELETONS THAT FIGHT FOR YOU. R: BONE NOVA, EVERY SKELETON BURSTS.' },
   parkour: { name: 'PARKOUR', color: '#ff3030', kit: ['freerun'], desc: 'A RED BAND. +2 HARD DASHES, +3 AIR JUMPS, WALL RUNS, CROUCH IN AIR TO SLAM. MOVING HITS.' },
 };
 
@@ -80,6 +82,11 @@ export const NEW_CLASS_UPGRADES = {
   gl_wide: { cls: 'glare', name: 'WIDE EYED', desc: '+50% BEAM WIDTH', color: '#ff8080', mods: { glWidePct: 50 } },
   gl_quick: { cls: 'glare', name: 'QUICK GLANCE', desc: '-30% CHARGE TIME', color: '#ffa040', mods: { glChargePct: 30 } },
   gl_stare: { cls: 'glare', name: 'LONG STARE', desc: 'BEAMS LAST 60% LONGER', color: '#c04060', mods: { glLongPct: 60 } },
+  // NECROMANCER (wishbatch12.js)
+  nc_horde: { cls: 'necromancer', name: 'THE HORDE', desc: '+2 SKELETONS AT ONCE', color: '#60ff90', mods: { ncMax: 2 } },
+  nc_marrow: { cls: 'necromancer', name: 'HARD MARROW', desc: '+50% SKELETON DAMAGE', color: '#e0e0c0', mods: { ncBonePct: 50 } },
+  nc_soul: { cls: 'necromancer', name: 'HUNGRY SOULS', desc: '+40% SOUL BOLT DAMAGE', color: '#80ffb0', mods: { ncBoltPct: 40 } },
+  nc_rest: { cls: 'necromancer', name: 'NO REST', desc: 'SKELETONS LAST 50% LONGER, NOVAS 50% BIGGER', color: '#a0a0ff', mods: { ncLastPct: 50 } },
 };
 
 // ULTRA upgrades: one per class, always one of the cards at the end of a boss rush (alongside two GIGAs)
@@ -98,13 +105,14 @@ export const ULTRA_UPGRADES = {
   u_soaker: { cls: 'soaker', ultra: true, giga: true, name: 'ULTRA: DEEP SEA', desc: 'DOUBLE THE WATER, AND EVERY SQUEEZE HEALS YOU 25', color: '#40a0ff', mods: { skUltra: 1 } },
   u_glare: { cls: 'glare', ultra: true, giga: true, name: 'ULTRA: THE THIRD EYE', desc: 'EVERY BEAM SPLITS INTO THREE', color: '#ff2050', mods: { glUltra: 1 } },
   u_pipefitter: { cls: 'pipefitter', ultra: true, giga: true, name: 'ULTRA: FULL PRESSURE', desc: 'EVERY JUMP ON A TRIPLE CHAIN AND EVERY STOMP SENDS A SHOCKWAVE. GROUND POUNDS 2X', color: '#20d0c0', mods: { pfUltra: 1 } },
+  u_necromancer: { cls: 'necromancer', ultra: true, giga: true, name: 'ULTRA: THE GRAVE KING', desc: 'EVERY KILL RAISES TWO, AND EVERY BONE NOVA HEALS YOU 5 PER SKELETON', color: '#60ff90', mods: { ncUltra: 1 } },
   u_parkour: { cls: 'parkour', ultra: true, giga: true, name: 'ULTRA: TERMINAL VELOCITY', desc: 'MOVING HITS 2X HARDER (+1X PER COPY), KILLS GIVE YOUR DASHES BACK', color: '#ff3030', mods: { pkUltra: 1 } },
 };
 export const ultraFor = (cls) => `u_${cls}`;
 export const NEW_CLASS_MOD_KEYS = ['sgDmgPct', 'sgShards', 'sgCdPct', 'sgBounce', 'sgSplit', 'sgUltra', 'kkDmgPct', 'kkLunge', 'kkKillReset', 'kkRageS', 'kkSoft', 'kkWhirlPct', 'kkUltra',
   'icMax', 'icDmgPct', 'icRegenPct', 'icWide', 'icTurn', 'icRefund', 'icUltra', 'blCount', 'blDmgPct', 'blPierce', 'blCdPct', 'blEcho', 'blUltra',
   'pkDmgPct', 'pkDashes', 'pkStomp', 'pkSlamPct', 'pkFlow', 'pkUltra', 'fisterUltra',
-  'skTankPct', 'skDmgPct', 'skSoakPct', 'skSqueezePct', 'skUltra', 'glDmgPct', 'glWidePct', 'glChargePct', 'glLongPct', 'glUltra', 'pfDmgPct', 'pfPoundPct', 'pfSpringPct', 'pfLongPct', 'pfUltra'];
+  'skTankPct', 'skDmgPct', 'skSoakPct', 'skSqueezePct', 'skUltra', 'glDmgPct', 'glWidePct', 'glChargePct', 'glLongPct', 'glUltra', 'pfDmgPct', 'pfPoundPct', 'pfSpringPct', 'pfLongPct', 'pfUltra', 'ncMax', 'ncBonePct', 'ncBoltPct', 'ncLastPct', 'ncUltra'];
 
 // the EVIL HORSE now also turns up on its own: 33% a floor, certain after 3 floors without one
 export const WILD_HORSE = { chance: 0.33, pity: 3, delay: 25 };

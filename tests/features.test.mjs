@@ -44,6 +44,7 @@ for (let s = 1; s <= 400; s++) {
     const k = Math.floor(p.z / T) * W + Math.floor(p.x / T);
     if (p.w4) ok(m.type[k] === FLOOR && m.roomOf[k] > 0 && m.fh[k] === 0 && Math.hypot(p.x - m.exit.x, p.z - m.exit.z) > 5, `floor shop / old bee / hungry bee in its own room, clear of the exit, seed ${s}`); // wishbatch4.js
     else if (p.w5) ok(m.type[k] === FLOOR && m.roomOf[k] > 0, `special room in its own room, seed ${s}`); // wishbatch5.js
+    else if (p.w12) ok(m.type[k] === FLOOR && m.roomOf[k] > 0 && Math.hypot(p.x - m.exit.x, p.z - m.exit.z) > 5, `shrine in its own room, clear of the exit, seed ${s}`); // wishbatch12.js
     else ok(m.type[k] === FLOOR && m.roomOf[k] === 0, `prop in lounge seed ${s}`);
   }
   ok(propUnder(m, m.spawn.x, m.spawn.z, MV.halfWidth + 1.3) < 0, `spawn (and co-op spread) not inside a prop seed ${s}`);
@@ -895,7 +896,7 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
 // ---- classes and ground slams ----
 {
   const { CLASSES, CLASS_IDS, BOMB, bombDamage, rocketPush, SLAMMERS } = await import('../src/data.js');
-  ok(CLASS_IDS.join() === 'hornet,batter,grenader,spinner,cleaver,fister,pestilent,sieger,koolciller,interceptor,blasphemous,soaker,glare,pipefitter,parkour' && CLASS_IDS.every((c) => CLASSES[c].name && CLASSES[c].desc && CLASSES[c].kit.length), 'fifteen classes with names, descriptions and kits');
+  ok(CLASS_IDS.join() === 'hornet,batter,grenader,spinner,cleaver,fister,pestilent,sieger,koolciller,interceptor,blasphemous,soaker,glare,pipefitter,necromancer,parkour' && CLASS_IDS.every((c) => CLASSES[c].name && CLASSES[c].desc && CLASSES[c].kit.length), 'sixteen classes with names, descriptions and kits');
   {
     const { CLEAVER_UPGRADES, CLEAVER_KEYS, upgradeFits: fits, UPGRADE_IDS: ids, UPGRADES: ups, ENEMIES: EN3 } = await import('../src/data.js');
     ok(Object.keys(CLEAVER_UPGRADES).length === 10 && Object.keys(CLEAVER_UPGRADES).every((u) => ids.includes(u)), 'ten cleaver upgrades are in the boon pool');

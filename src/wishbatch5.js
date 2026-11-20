@@ -637,7 +637,7 @@ export function keymapFor(binds) { // binds: action's default key -> the key you
 export const keyName = (code) => /^Mouse\d$/.test(code) ? ['MOUSE L', 'MOUSE MID', 'MOUSE R', 'MOUSE 4', 'MOUSE 5'][Number(code.slice(5))] : String(code || '').replace(/^Key/, '').replace(/^Digit/, '').replace(/Left$/, ' L').replace(/Right$/, ' R').toUpperCase();
 
 // ---------- status icons ----------
-const GLYPH = {
+export const GLYPH = {
   bleed: [0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0], weak: [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1], rage: [1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0], fort: [1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0],
   frenzy: [0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0], w: [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1], food: [1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0], slow: [1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1],
   doom: [0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1], moon: [0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1], bike: [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1], el: [0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
@@ -1036,6 +1036,7 @@ export function installWishBatch5Client(Game, UI) {
       if (g.doomFloor) mine.push(['doom', 1]);
       if (g.moonOn) mine.push(['moon', 1]);
       if (g.biking) mine.push(['bike', 1]);
+      if (g.moreBuffs) g.moreBuffs(mine); // the shrines' buffs and curses (wishbatch12.js)
       mine.forEach(([id, n], k) => drawIcon(ctx, id, 6 + k * 11, Hd - 104, STATUS[id].c, n));
       if (mine.length && g.time % 6 < 2.5) drawSmall(ctx, mine.map(([id, n]) => `${STATUS[id].name}${STATUS[id].stack && n > 1 ? ` x${n}` : ''}`).join('  '), 6, Hd - 112, '#c8c4e0');
       if (g.doomNext) drawSmall(ctx, 'DOOMSDAY IS SET FOR THE NEXT FLOOR', Wd / 2, Hd - 60, '#ff4030', 'center');
