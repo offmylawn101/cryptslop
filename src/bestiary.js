@@ -111,7 +111,8 @@ export function installBestiary(Sim) {
     placePlague() {
       if (this.floor < ENEMIES.plaguebringer.deep) return;
       const [a, b] = DEEP.plague.swarms, n = this.floor >= 9 ? b : a;
-      const spots = this.deepSpots((k) => this.isHall(k));
+      const m = this.map, inReal = (k) => (m.realRooms || []).some((rr) => { const r = m.rooms[rr.room], i = k % W, j = Math.floor(k / W); return r && i >= r.x && i < r.x + r.w && j >= r.y && j < r.y + r.h; });
+      const spots = this.deepSpots((k) => this.isHall(k) && !inReal(k)); // never inside a REAL ROOM: it holds only randomlings
       for (let i = 0; i < n && spots.length; i++) {
         const k = spots.splice(Math.floor(Math.random() * spots.length), 1)[0];
         const e = o.addEnemy.call(this, 'plaguebringer', (k % W + 0.5) * T, this.map.fh[k], (Math.floor(k / W) + 0.5) * T, 1);

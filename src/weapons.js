@@ -21,8 +21,11 @@ export const GUNS = {
   repeater: { name: 'REPEATER', pellets: 3, dmg: 0.95, rate: 2.6, spread: 0.6, mag: 12 },
   needler: { name: 'NEEDLER', pellets: 2, dmg: 0.7, rate: 4.2, spread: 0.45, mag: 24 },
   blunder: { name: 'BLUNDERBUSS', pellets: 22, dmg: 0.6, rate: 0.6, spread: 2.1, mag: 3 },
+  // a wish (NEOLIONATCHICAGO): a shotgun that fires like a machine gun and never runs out. Rolled on its own (see rollWeapon), never from GUN_IDS
+  forever: { name: 'FOREVER SHOTGUN', pellets: 4, dmg: 0.3, rate: 6.5, spread: 1.4, mag: 99, inf: true },
 };
-export const GUN_IDS = Object.keys(GUNS);
+export const GUN_IDS = Object.keys(GUNS).filter((k) => !GUNS[k].inf);
+export const FOREVER_CHANCE = 0.1; // of RARE and better guns
 // the other classes' signature weapons: one noun list each
 const KINDS = {
   batter: ['BAT', 'CLUB', 'PADDLE', 'MALLET', 'STICK'],
@@ -58,6 +61,7 @@ export function rollWeapon(seed, floor, cls, minRarity = 0) {
   if (cls === 'hornet') {
     w.arch = GUN_IDS[Math.floor(R() * GUN_IDS.length)];
     w.dmg = q * jitter(); w.speed = (0.9 + 0.1 * q) * jitter(); w.size = 0.8 + R() * 0.4; w.extra = Math.floor(R() * (1 + rarity));
+    if (rarity >= 1 && rng((seed ^ 0x5f0e7e12) >>> 0)() < FOREVER_CHANCE) { w.arch = 'forever'; w.extra = 0; } // its own dice, so every other roll stays the same
   } else {
     w.dmg = q * jitter(); w.speed = (0.9 + 0.1 * q) * jitter(); w.size = (0.95 + 0.05 * q) * jitter(); w.extra = rarity >= 2 ? Math.floor(R() * rarity) : 0;
   }
@@ -101,7 +105,7 @@ function describeStats(w) {
   const pct = (v) => `${v >= 1 ? '+' : ''}${Math.round((v - 1) * 100)}%`;
   if (w.arch) {
     const a = GUNS[w.arch];
-    return `${a.pellets + (w.extra || 0)} PELLETS  DMG ${pct(a.dmg * w.dmg)}  RATE ${pct(a.rate * w.speed)}  MAG ${a.mag + (w.extra || 0)}`;
+    return `${a.pellets + (w.extra || 0)} PELLETS  DMG ${pct(a.dmg * w.dmg)}  RATE ${pct(a.rate * w.speed)}  ${a.inf ? 'FULL AUTO, INFINITE SHELLS' : `MAG ${a.mag + (w.extra || 0)}`}`;
   }
   const sz = { batter: 'REACH', grenader: 'BLAST', spinner: 'BOUNCE', cleaver: 'RANGE', pestilent: 'CLOUD' }[w.cls] || 'SIZE';
   return `DMG ${pct(w.dmg)}  SPEED ${pct(w.speed)}  ${sz} ${pct(w.size)}${w.extra ? `  +${w.extra}` : ''}`;

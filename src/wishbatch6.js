@@ -78,7 +78,7 @@ export function installWishBatch6(Sim) {
       if (on(this, 'sabre')) n = grind ? W6.grind.sabres + Math.floor(this.floor / 10) : this.floor >= W6.sabre.from && Math.random() < W6.sabre.chance ? 1 : 0;
       const hpScale = 1 + 0.2 * (this.floor - 1);
       for (let k = 0; k < n; k++) {
-        const pool = [...this.enemies.values()].filter((e) => !e.def.boss && !e.def.npc && !e.def.hunter && !e.def.unkillable && e.type !== 'fingler' && e.type !== 'chicken' && e.type !== 'sabrematon' && !e.tier);
+        const pool = [...this.enemies.values()].filter((e) => !e.def.boss && !e.def.npc && !e.def.hunter && !e.def.unkillable && !e.def.randomling && e.type !== 'fingler' && e.type !== 'chicken' && e.type !== 'sabrematon' && !e.tier);
         if (!pool.length) break;
         const e = pool[Math.floor(Math.random() * pool.length)];
         this.enemies.delete(e.id);

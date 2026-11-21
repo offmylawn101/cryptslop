@@ -48,6 +48,8 @@ const GUN_MODELS = {
   repeater(g, m, acc) { box(g, 0.18, 0.18, 0.55, DARK, [0, 0, 0], m); for (const [x, y] of [[-0.05, 0.05], [0.05, 0.05], [0, -0.04]]) cyl(g, 0.03, 0.03, 0.45, METAL, [x, y, -0.48], m); box(g, 0.08, 0.34, 0.12, acc, [0, -0.25, -0.05], m, acc.map((v) => v * 0.6), [0.25, 0, 0]); box(g, 0.08, 0.14, 0.2, DARK, [0, -0.12, 0.3], m); },
   needler(g, m, acc) { const P = [1, 0.35, 0.75]; box(g, 0.1, 0.12, 0.6, [0.85, 0.85, 0.9], [0, 0, -0.05], m); for (let k = 0; k < 6; k++) part(g, new THREE.ConeGeometry(0.03, 0.22, 4), P, { pos: [(k % 2 ? 0.03 : -0.03), 0.14, -0.28 + k * 0.08], rot: [-0.4, 0, (k % 2 ? -0.3 : 0.3)], emissive: P.map((v) => v * 0.8), mats: m }); box(g, 0.08, 0.16, 0.1, DARK, [0, -0.12, 0.15], m); },
   blunder(g, m, acc) { cyl(g, 0.05, 0.05, 0.6, [0.55, 0.4, 0.2], [0, 0.03, -0.3], m); part(g, new THREE.CylinderGeometry(0.17, 0.05, 0.25, 8), [0.75, 0.55, 0.25], { pos: [0, 0.03, -0.68], rot: [-Math.PI / 2, 0, 0], emissive: [0.3, 0.2, 0.08], mats: m }); box(g, 0.12, 0.2, 0.5, WOOD, [0, -0.04, 0.25], m, null, [-0.2, 0, 0]); },
+  // THE FOREVER SHOTGUN (wishbatch13.js): a pump gun with a drum and an ammo belt that never ends
+  forever(g, m, acc) { cyl(g, 0.045, 0.045, 0.75, METAL, [-0.04, 0.05, -0.35], m); cyl(g, 0.045, 0.045, 0.75, METAL, [0.04, 0.05, -0.35], m); box(g, 0.15, 0.15, 0.32, DARK, [0, 0, 0.08], m); cyl(g, 0.15, 0.15, 0.12, acc, [0, -0.14, -0.05], m, acc.map((v) => v * 0.5), [0, 0, Math.PI / 2], 10); for (let k = 0; k < 5; k++) box(g, 0.05, 0.03, 0.09, [0.95, 0.7, 0.2], [0.12 + k * 0.03, -0.2 - k * 0.06, -0.02], m, [0.4, 0.25, 0.05]); box(g, 0.1, 0.16, 0.36, WOOD, [0, -0.04, 0.4], m, null, [-0.2, 0, 0]); },
 };
 // every other class's weapon
 const CLASS_MODELS = {

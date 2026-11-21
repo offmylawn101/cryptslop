@@ -135,6 +135,38 @@ export class UI {
     drawText(ctx, text, x, y, color, scale, align);
   }
 
+  // the boon offer: three cards along the bottom. Solid backs and bright text so the HUD under it never
+  // muddies the words (a wish from ObeasePickle; wishbatch13.js draws it last, on top of everything)
+  drawBoonOffer() {
+    const g = this.g, ctx = this.ctx, W = this.W, H = this.H, cx = Math.floor(W / 2), w = g.world;
+    if (!g.offers.length || g.dead || g.casino.open || !w) return;
+    const offer = g.offers[0];
+    const cw = Math.min(110, Math.floor((W - 160) / 3));
+    const descs = offer.map((id) => wrap(UPGRADES[id].desc, Math.floor((cw - 8) / 4)).slice(0, 3));
+    const chh = 38 + 7 * Math.max(2, ...descs.map((d) => d.length)); // room under the words for the CLASS ONLY line
+    const total = cw * 3 + 8;
+    const x0 = Math.round(cx - total / 2), y0 = H - chh - 30;
+    const pad = g.pad && g.pad.active;
+    const head = offer.giga ? `GIGA UPGRADE - ${pad ? 'LB+RB THEN X Y B' : 'SHIFT + 1 2 3'}` : g.offers.length > 1 ? `CHOOSE A BOON (${g.offers.length} WAITING)` : `CHOOSE A BOON - ${pad ? 'HOLD LB+RB, THEN X Y B' : 'SHIFT + 1 2 3'}`;
+    ctx.fillStyle = 'rgba(0,0,0,0.78)'; ctx.fillRect(x0 - 4, y0 - 14, total + 8, chh + 26); // one dark plate under the whole offer
+    drawText(ctx, head, cx, y0 - 10, offer.giga ? C.pink : C.hot, 1, 'center');
+    offer.forEach((id, i) => {
+      const u = UPGRADES[id];
+      const x = x0 + i * (cw + 4);
+      this.panel(x, y0, cw, chh);
+      ctx.fillStyle = 'rgba(10,6,22,0.9)'; ctx.fillRect(x + 1, y0 + 3, cw - 2, chh - 4);
+      if (offer.giga) { ctx.fillStyle = `rgba(255,79,216,${0.15 + Math.sin(g.time * 5 + i) * 0.08})`; ctx.fillRect(x + 1, y0 + 1, cw - 2, chh - 2); }
+      drawText(ctx, `${i + 1}`, x + 4, y0 + 4, C.hot);
+      wrap(u.name, Math.floor((cw - 16) / 6)).slice(0, 2).forEach((l, k) => drawText(ctx, l, x + 13, y0 + 4 + k * 9, u.color));
+      descs[i].forEach((l, k) => drawSmall(ctx, l, x + 4, y0 + 24 + k * 7, C.text));
+      if (u.cls) drawSmall(ctx, `${CLASSES[u.cls].name} ONLY`, x + cw - 3, y0 + chh - 8, CLASSES[u.cls].color, 'right');
+      else if (!offer.giga && (i + Math.floor(g.time / 9)) % 3 === 0) drawSmall(ctx, `${2 + (id.length * 7) % 9} HOPPERS ARE LOOKING AT THIS`, x + 3, y0 + chh - 8, C.pink); // social proof (a joke)
+    });
+    const cost = 15 + 5 * w.floor;
+    const ends = 59 - Math.floor(g.time) % 60;
+    if (!offer.giga) drawSmall(ctx, `SHIFT+4 DOUBLE OR NOTHING   SHIFT+5 REROLL: ${cost} HONEY (WAS ${cost * 4}! 75% OFF, ENDS IN 0:${String(ends).padStart(2, '0')})`, cx, y0 + chh + 3, C.pink, 'center');
+  }
+
   draw(dt) {
     const ctx = this.ctx, W = this.W, H = this.H;
     ctx.clearRect(0, 0, W, H);
@@ -824,29 +856,7 @@ export class UI {
       if (prompt) drawText(ctx, prompt, cx, cy + 34, pc, 1, 'center');
     }
 
-    // upgrade offer
-    if (g.offers.length && !g.dead && !g.casino.open) {
-      const offer = g.offers[0];
-      const cw = Math.min(110, Math.floor((W - 160) / 3)), chh = 40;
-      const total = cw * 3 + 8;
-      const x0 = Math.round(cx - total / 2), y0 = H - chh - 30;
-      const pad = g.pad && g.pad.active;
-      drawText(ctx, offer.giga ? `GIGA UPGRADE - ${pad ? 'LB+RB THEN X Y B' : 'SHIFT + 1 2 3'}` : g.offers.length > 1 ? `CHOOSE A BOON (${g.offers.length} WAITING)` : `CHOOSE A BOON - ${pad ? 'HOLD LB+RB, THEN X Y B' : 'SHIFT + 1 2 3'}`, cx, y0 - 10, offer.giga ? C.pink : C.hot, 1, 'center');
-      offer.forEach((id, i) => {
-        const u = UPGRADES[id];
-        const x = x0 + i * (cw + 4);
-        this.panel(x, y0, cw, chh);
-        if (offer.giga) { ctx.fillStyle = `rgba(255,79,216,${0.15 + Math.sin(g.time * 5 + i) * 0.08})`; ctx.fillRect(x + 1, y0 + 1, cw - 2, chh - 2); }
-        drawText(ctx, `${i + 1}`, x + 4, y0 + 4, C.hot);
-        wrap(u.name, Math.floor((cw - 16) / 6)).slice(0, 2).forEach((l, k) => drawText(ctx, l, x + 13, y0 + 4 + k * 9, u.color));
-        wrap(u.desc, Math.floor((cw - 8) / 4)).slice(0, 2).forEach((l, k) => drawSmall(ctx, l, x + 4, y0 + 24 + k * 7, C.dim));
-        if (u.cls) drawSmall(ctx, `${CLASSES[u.cls].name} ONLY`, x + cw - 3, y0 + chh - 8, CLASSES[u.cls].color, 'right');
-        else if (!offer.giga && (i + Math.floor(g.time / 9)) % 3 === 0) drawSmall(ctx, `${2 + (id.length * 7) % 9} HOPPERS ARE LOOKING AT THIS`, x + 3, y0 + chh - 8, C.pink); // social proof (a joke)
-      });
-      const cost = 15 + 5 * w.floor;
-      const ends = 59 - Math.floor(g.time) % 60;
-      if (!offer.giga) drawSmall(ctx, `SHIFT+4 DOUBLE OR NOTHING   SHIFT+5 REROLL: ${cost} HONEY (WAS ${cost * 4}! 75% OFF, ENDS IN 0:${String(ends).padStart(2, '0')})`, cx, y0 + chh + 3, C.pink, 'center');
-    }
+    if (!this.lateOffers) this.drawBoonOffer(); // a wish (wishbatch13.js) draws it last, over the rest of the HUD
 
     // chat: long messages wrap onto more lines, never cut off
     const chatW = Math.max(90, W - 80 - 78), perLine = Math.max(8, Math.floor(chatW / 6));
