@@ -728,7 +728,8 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
     .concat([...readFileSync(new URL('../src/wishbatch5.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 5's randomlings, the hype bee and NOCTRESS
     .concat([...readFileSync(new URL('../src/wishbatch6.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 6's sabrematon
     .concat([...readFileSync(new URL('../src/wishbatch8.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 8's stickman
-    .concat([...readFileSync(new URL('../src/wishbatch10.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])); // batch 10's deputy
+    .concat([...readFileSync(new URL('../src/wishbatch10.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 10's deputy
+    .concat([...readFileSync(new URL('../src/wishbatch14.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])); // batch 14's relentless
   ok(ENEMY_TYPES.length >= 37 && ENEMY_NAMES.length === ENEMY_TYPES.length && HONEY_FOR_KILL.length === ENEMY_TYPES.length && ENEMY_BUILDERS.length === ENEMY_TYPES.length, `every enemy type has a name, honey value and model (${ENEMY_TYPES.length}/${ENEMY_NAMES.length}/${HONEY_FOR_KILL.length}/${ENEMY_BUILDERS.length})`);
   for (const t of ENEMY_TYPES) ok(EN[t] && EN[t].hit && (EN[t].hit.length || EN[t].unkillable) && (SC[t] > 0 || EN[t].unkillable), `${t} has stats, hit spheres and a score (the unkillable swarm has neither)`);
   ok(champName(7) === champName(7) && champName(7) !== champName(8), 'champion names are deterministic and varied');

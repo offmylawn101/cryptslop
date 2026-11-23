@@ -381,6 +381,7 @@ export class SoundSystem {
       const t = this.nextNote;
       const s = this.step % 16;
       const bar = Math.floor(this.step / 16);
+      if (this.groove && !this.trackName && this.grooveStep) { this.nextNote += this.grooveStep(t, this.step); this.step++; continue; } // HONEY GROOVE plays in the lounge (wishbatch14.js)
       const chordRoot = this.root + prog[bar % 4];
       // --- throat singing: move the whistle to the next harmonic every half bar ---
       if (s % 8 === 0 && this.ovt) {
