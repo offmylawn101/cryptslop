@@ -15,6 +15,7 @@ import { installWishBatch10 } from './wishbatch10.js';
 import { installWishBatch12 } from './wishbatch12.js';
 import { installWishBatch13 } from './wishbatch13.js';
 import { installWishBatch14 } from './wishbatch14.js';
+import { installWishBatch15 } from './wishbatch15.js';
 import { generateFloor, bfs, lineOfSight, openVault, propUnder, inLounge, isPit, T, W, H, WALL, PAD } from './mapgen.js';
 import {
   ENEMIES, ENEMY_TYPES, SCORE, countUp, maxHpFor, modSum, TIERS, AFFIX_IDS, SLAMMERS, FINGLER_CHANCE, COLLAB_FINGLER_CHANCE, isCollabWeek, REVIVE,
@@ -1652,3 +1653,4 @@ installWishBatch12(Sim); // the twelfth batch: the hunt bell's quarry, the curse
 
 installWishBatch13(Sim); // the thirteenth batch: the REALLY HARD floor and its chest (wishbatch13.js)
 installWishBatch14(Sim); // the fourteenth batch: THE RELENTLESS, a hunter that cannot die (wishbatch14.js)
+installWishBatch15(Sim); // the fifteenth batch: THE WITHERED KING (wishbatch15.js)

@@ -729,7 +729,8 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
     .concat([...readFileSync(new URL('../src/wishbatch6.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 6's sabrematon
     .concat([...readFileSync(new URL('../src/wishbatch8.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 8's stickman
     .concat([...readFileSync(new URL('../src/wishbatch10.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 10's deputy
-    .concat([...readFileSync(new URL('../src/wishbatch14.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])); // batch 14's relentless
+    .concat([...readFileSync(new URL('../src/wishbatch14.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])) // batch 14's relentless
+    .concat([...readFileSync(new URL('../src/wishbatch15.js', import.meta.url), 'utf8').matchAll(/\['(\w+)', make\w+\]/g)].map((m) => m[1])); // batch 15's withered king
   ok(ENEMY_TYPES.length >= 37 && ENEMY_NAMES.length === ENEMY_TYPES.length && HONEY_FOR_KILL.length === ENEMY_TYPES.length && ENEMY_BUILDERS.length === ENEMY_TYPES.length, `every enemy type has a name, honey value and model (${ENEMY_TYPES.length}/${ENEMY_NAMES.length}/${HONEY_FOR_KILL.length}/${ENEMY_BUILDERS.length})`);
   for (const t of ENEMY_TYPES) ok(EN[t] && EN[t].hit && (EN[t].hit.length || EN[t].unkillable) && (SC[t] > 0 || EN[t].unkillable), `${t} has stats, hit spheres and a score (the unkillable swarm has neither)`);
   ok(champName(7) === champName(7) && champName(7) !== champName(8), 'champion names are deterministic and varied');
@@ -897,7 +898,7 @@ console.log(`  horses ${horses}/400, vaults ${vaultCount} (nests ${nests}, seals
 // ---- classes and ground slams ----
 {
   const { CLASSES, CLASS_IDS, BOMB, bombDamage, rocketPush, SLAMMERS } = await import('../src/data.js');
-  ok(CLASS_IDS.join() === 'hornet,batter,grenader,spinner,cleaver,fister,pestilent,sieger,koolciller,interceptor,blasphemous,soaker,glare,pipefitter,necromancer,parkour' && CLASS_IDS.every((c) => CLASSES[c].name && CLASSES[c].desc && CLASSES[c].kit.length), 'sixteen classes with names, descriptions and kits');
+  ok(CLASS_IDS.join() === 'hornet,batter,grenader,spinner,cleaver,fister,pestilent,sieger,koolciller,interceptor,blasphemous,soaker,glare,pipefitter,necromancer,baller,parkour' && CLASS_IDS.every((c) => CLASSES[c].name && CLASSES[c].desc && CLASSES[c].kit.length), 'seventeen classes with names, descriptions and kits');
   {
     const { CLEAVER_UPGRADES, CLEAVER_KEYS, upgradeFits: fits, UPGRADE_IDS: ids, UPGRADES: ups, ENEMIES: EN3 } = await import('../src/data.js');
     ok(Object.keys(CLEAVER_UPGRADES).length === 10 && Object.keys(CLEAVER_UPGRADES).every((u) => ids.includes(u)), 'ten cleaver upgrades are in the boon pool');

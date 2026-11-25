@@ -139,7 +139,7 @@ export class TouchControls {
         const el = this.btn[`kit${i}`];
         if (kit[i]) { el.textContent = kit[i][1]; el.dataset.act = kit[i][0]; el.classList.remove('hide'); } else el.classList.add('hide');
       }
-      this.btn.fire.textContent = { hornet: 'FIRE', batter: 'SWING', grenader: 'BOMB', cleaver: 'SLASH', spinner: 'SPIN', pestilent: 'COUGH', fister: 'PUNCH', sieger: 'LOB', koolciller: 'POKE', interceptor: 'LASER', blasphemous: 'RING', parkour: 'RUN', necromancer: 'BOLT', soaker: 'SPRAY', glare: 'GLARE', pipefitter: 'WRENCH' }[g.cls] || 'FIRE' || 'FIRE';
+      this.btn.fire.textContent = { hornet: 'FIRE', batter: 'SWING', grenader: 'BOMB', cleaver: 'SLASH', spinner: 'SPIN', pestilent: 'COUGH', fister: 'PUNCH', sieger: 'LOB', koolciller: 'POKE', interceptor: 'LASER', blasphemous: 'RING', parkour: 'RUN', necromancer: 'BOLT', soaker: 'SPRAY', glare: 'GLARE', pipefitter: 'WRENCH', baller: 'SHOOT' }[g.cls] || 'FIRE' || 'FIRE';
       this.btn.fire.style.borderColor = CLASSES[g.cls].color;
     }
     // the POW button only when you have a power; the button size setting

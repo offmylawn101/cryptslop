@@ -29,6 +29,7 @@ import { installWishBatch11Client } from './wishbatch11.js';
 import { installWishBatch12Client } from './wishbatch12.js';
 import { installWishBatch13Client } from './wishbatch13.js';
 import { installWishBatch14Client } from './wishbatch14.js';
+import { installWishBatch15Client } from './wishbatch15.js';
 import { installPerks } from './perks.js';
 import { installQuests } from './quests.js';
 import { installParryFx } from './parryfx.js';
@@ -2944,6 +2945,7 @@ installWishBatch10Client(Game); // the tenth batch: mouse keybinds, the fart but
 installWishBatch11Client(Game, UI); // the eleventh batch: skill backflips, the floor guide, two boon tickets, the number keys put sidearms away (wishbatch11.js)
 installWishBatch12Client(Game, UI); // the twelfth batch: THE NECROMANCER, six new shrines, their buffs and curses (wishbatch12.js)
 installWishBatch13Client(Game, UI); // the thirteenth batch: THE BANANA, THE DUNKMASTER, the REALLY HARD floor, the FOREVER SHOTGUN, readable boon cards (wishbatch13.js)
+installWishBatch15Client(Game, UI); // the fifteenth batch: the LICKING BUTTON, MILK THE CAT, THE BALLER, THE COURT, THE POLYESTER MAN, THE WITHERED KING (wishbatch15.js)
 installWishBatch14Client(Game); // the fourteenth batch: THE RELENTLESS, BOB, BUZZBY'S CHAINSAW, HONEY GROOVE (wishbatch14.js)
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)

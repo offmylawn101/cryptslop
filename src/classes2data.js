@@ -14,6 +14,8 @@ export const NEW_CLASSES = {
   pipefitter: { name: 'PIPEFITTER', color: '#20b0a0', kit: ['wrench'], desc: 'A PLUMBER. JUMP AGAIN AS YOU LAND FOR A DOUBLE AND A TRIPLE JUMP. SLIDE AND JUMP FOR A LONG JUMP. CROUCH IN THE AIR TO GROUND POUND. KICK OFF WALLS FOREVER. STOMP HEADS. CLICK: A BIG WRENCH.' },
   // a wished-for class (wishbatch12.js, aviliari0): raises the foes it kills. Free from the start
   necromancer: { name: 'NECROMANCER', color: '#60ff90', kit: ['staff'], desc: 'CLICK: A HOMING SOUL BOLT. FOES YOU KILL RISE AS SKELETONS THAT FIGHT FOR YOU. R: BONE NOVA, EVERY SKELETON BURSTS.' },
+  // a wished-for class (wishbatch15.js, PizzadudebutWavy): a retired basketball legend. Free from the start
+  baller: { name: 'BALLER', color: '#ff8a20', kit: ['hoops'], desc: 'A RETIRED BASKETBALL LEGEND, NUMBER 00. CLICK: BASKETBALLS, ALMOST NO COOLDOWN. THEY ARC AND BOUNCE. FIND THE COURT AND SINK ONE.' },
   parkour: { name: 'PARKOUR', color: '#ff3030', kit: ['freerun'], desc: 'A RED BAND. +2 HARD DASHES, +3 AIR JUMPS, WALL RUNS, CROUCH IN AIR TO SLAM. MOVING HITS.' },
 };
 
@@ -68,6 +70,9 @@ export const NEW_CLASS_UPGRADES = {
   pk_crater: { cls: 'parkour', name: 'CRATER', desc: 'SLAMS HIT 60% WIDER', color: '#ff6040', mods: { pkSlamPct: 60 } },
   pk_flow: { cls: 'parkour', name: 'FLOW STATE', desc: 'WALL RUNNING RECHARGES YOUR DASHES', color: '#ff40a0', mods: { pkFlow: 1 } },
   // THE PIPEFITTER
+  bl_hot: { cls: 'baller', name: 'ON FIRE', desc: '+40% BASKETBALL DAMAGE', color: '#ff8a20', mods: { blDmgPct: 40 } },
+  bl_handles: { cls: 'baller', name: 'HANDLES', desc: 'BASKETBALLS COME 30% FASTER', color: '#ffd040', mods: { blRofPct: 30 } },
+  bl_bounce: { cls: 'baller', name: 'FRESH RUBBER', desc: '+2 BOUNCES, AND EVERY BOUNCE CAN HIT AGAIN', color: '#ff6040', mods: { blBounce: 2 } },
   pf_wrench: { cls: 'pipefitter', name: 'TORQUE', desc: '+50% WRENCH DAMAGE', color: '#20b0a0', mods: { pfDmgPct: 50 } },
   pf_pound: { cls: 'pipefitter', name: 'HEAVY BOOTS', desc: 'GROUND POUNDS HIT 60% WIDER AND HARDER', color: '#ff8040', mods: { pfPoundPct: 60 } },
   pf_spring: { cls: 'pipefitter', name: 'SPRING IN YOUR STEP', desc: 'THE TRIPLE JUMP GOES 30% HIGHER, STOMPS BOUNCE HIGHER', color: '#ffe040', mods: { pfSpringPct: 30 } },
@@ -105,6 +110,7 @@ export const ULTRA_UPGRADES = {
   u_soaker: { cls: 'soaker', ultra: true, giga: true, name: 'ULTRA: DEEP SEA', desc: 'DOUBLE THE WATER, AND EVERY SQUEEZE HEALS YOU 25', color: '#40a0ff', mods: { skUltra: 1 } },
   u_glare: { cls: 'glare', ultra: true, giga: true, name: 'ULTRA: THE THIRD EYE', desc: 'EVERY BEAM SPLITS INTO THREE', color: '#ff2050', mods: { glUltra: 1 } },
   u_pipefitter: { cls: 'pipefitter', ultra: true, giga: true, name: 'ULTRA: FULL PRESSURE', desc: 'EVERY JUMP ON A TRIPLE CHAIN AND EVERY STOMP SENDS A SHOCKWAVE. GROUND POUNDS 2X', color: '#20d0c0', mods: { pfUltra: 1 } },
+  u_baller: { cls: 'baller', ultra: true, giga: true, name: 'ULTRA: HALL OF FAME', desc: 'BASKETBALLS GO THROUGH FOES. EVERY SWISH HEALS YOU 15', color: '#ff8a20', mods: { blUltra: 1 } },
   u_necromancer: { cls: 'necromancer', ultra: true, giga: true, name: 'ULTRA: THE GRAVE KING', desc: 'EVERY KILL RAISES TWO, AND EVERY BONE NOVA HEALS YOU 5 PER SKELETON', color: '#60ff90', mods: { ncUltra: 1 } },
   u_parkour: { cls: 'parkour', ultra: true, giga: true, name: 'ULTRA: TERMINAL VELOCITY', desc: 'MOVING HITS 2X HARDER (+1X PER COPY), KILLS GIVE YOUR DASHES BACK', color: '#ff3030', mods: { pkUltra: 1 } },
 };
