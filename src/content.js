@@ -18,14 +18,16 @@ export const NEW_ENEMY_TYPES = ['stomper', 'marauder', 'cruiser', 'nyaslop', 'se
   // wishes, batch 14 (wishbatch14.js): an armored hunter that cannot die
   'relentless',
   // wishes, batch 15 (wishbatch15.js): a dried-up old king
-  'withered'];
+  'withered',
+  // wishes, batch 16 (wishbatch16.js): a flying head with a lit fuse
+  'blasthead'];
 export const NEW_ENEMY_NAMES = ['STOMPER', 'MARAUDER', 'CRUISER', 'NYASLOP, THE GREMLIN CAT', 'THE SEAMSTRESS', 'THE APIARIST', 'COMBSTACK', 'LAMPMOTHER', 'THE TARANTULA TYRANT', 'SWARMHEART', 'THE EVIL HORSE', 'A PERSON',
   'MOTHMAN', 'PLAGUEBRINGERS', 'CONSTRUCTION', 'ANTLION', 'HONEYPOT ANT', 'FROSTBOOM', 'RANDOMLING PERSONIFIER', 'THE WANDERER', 'NECRO-TICK', 'HIVEMIND',
   'DERPY THE FRUIT FLY', 'QUEEN BEEHEMOTH', 'TEDDY RUCKUS, THE PARTY BEAR', 'UNIT ZERO', 'SIR ECLIPSE, THE MOONLESS KNIGHT', 'SWORD CHICKEN', 'OGLER, THE BEAM WARDEN',
   'THE SHAPESHIFTER', 'THE THUMPER', 'THE FLICKER', 'THE HYPE BEE', 'NOCTRESS, THE MOTH OF LAST LIGHT',
   'THE SABREMATON',
   'THE STICKMAN',
-  "LIL' DEPUTY GRUB", 'THE RELENTLESS', 'THE WITHERED KING'];
+  "LIL' DEPUTY GRUB", 'THE RELENTLESS', 'THE WITHERED KING', 'THE BLASTHEAD'];
 export const NEW_ENEMIES = {
   // RANDOMLINGS: they only live in the real rooms (an office, a kitchen...) that replace hive rooms after floor 6
   stomper: { // heavy: every step shakes the ground, its attack is a shockwave you have to jump
@@ -100,13 +102,15 @@ export const NEW_ENEMIES = {
   sabrematon: { hp: 520, speed: 4.6, radius: 0.6, melee: { range: 2.4, dmg: 20, windup: 0.4, cooldown: 0.8 }, hit: [[1.3, 0.7, 1], [2.3, 0.35, 2]], height: 2.6 },
   // wishes, batch 14 (wishbatch14.js): it hunts you through the hive and cannot die. Shots and parries only stagger it
   withered: { hp: 560, speed: 2.6, radius: 0.75, melee: { range: 2.4, dmg: 26, windup: 0.75, cooldown: 1.7 }, ranged: { dmg: 9, speed: 10, cooldown: 2.6, range: 22 }, hit: [[1.3, 0.7, 1], [2.45, 0.4, 2]], height: 3.0 },
+  // wishes, batch 16 (wishbatch16.js): a big floating head with a fuse. It flies at you and goes off
+  blasthead: { hp: 55, speed: 5.4, radius: 0.55, melee: { range: 0.6, dmg: 1, windup: 0.3, cooldown: 2 }, hover: 1.3, hit: [[1.75, 0.6, 2]], height: 2.4 },
   relentless: { hp: 1, speed: 4.6, radius: 0.6, melee: { range: 2.2, dmg: 34, windup: 0.5, cooldown: 1.3 }, unkillable: true, hit: [[1.1, 0.65, 1], [2.05, 0.35, 1]], height: 2.5 },
   noctress: { hp: 1600, speed: 4.0, radius: 1.4, hover: 0.4, boss: true, pattern: ['spread', 'summon:moth:3', 'rain', 'ring', 'spiral'], hit: [[3.0, 1.4, 1], [3.2, 0.55, 2]], height: 4.2 },
 };
 export const NEW_SCORE = { stomper: 120, marauder: 80, cruiser: 140, nyaslop: 600, seamstress: 600, apiarist: 550, combstack: 650, lampmother: 550, tyrant: 650, swarmheart: 700, evilhorse: 300, civilian: 5,
   mothman: 90, plaguebringer: 0, construction: 220, antlion: 70, honeypot: 80, frostboom: 400, personifier: 260, wanderer: 600, necrotick: 15, hivemind: 160, derpy: 9, beehemoth: 700, partybear: 650, unitzero: 750, eclipse: 900, chicken: 20, ogler: 1200,
-  shifter: 140, thumper: 160, flicker: 110, hypebee: 45, noctress: 1300, sabrematon: 300, stickman: 60, deputy: 35, relentless: 0, withered: 220 };
-export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30, 2, 160, 180, 170, 220, 8, 300, 22, 24, 18, 8, 320, 40, 10, 6, 0, 70];
+  shifter: 140, thumper: 160, flicker: 110, hypebee: 45, noctress: 1300, sabrematon: 300, stickman: 60, deputy: 35, relentless: 0, withered: 220, blasthead: 70 };
+export const NEW_HONEY = [16, 12, 18, 150, 150, 150, 160, 150, 160, 170, 60, 3, 14, 0, 30, 12, 40, 60, 40, 120, 3, 30, 2, 160, 180, 170, 220, 8, 300, 22, 24, 18, 8, 320, 40, 10, 6, 0, 70, 9];
 export const RANDOMLINGS = ['stomper', 'marauder', 'cruiser'];
 
 // ---------- bosses ----------
@@ -234,6 +238,7 @@ export const LORE = {
   flicker: 'A RANDOMLING THAT LOOKS LIKE A BAD SIGNAL. IT DOES NOT WALK TO YOU. IT IS JUST BEHIND YOU NOW. TURN AROUND.',
   stickman: 'A STICK FIGURE THAT ESCAPED FROM THE MARGIN OF A MATH NOTEBOOK. IT FOUND A PISTOL. IT IS ONE LINE THICK, SO IT IS VERY HARD TO HIT, AND ONE GOOD HIT IS ALL IT TAKES. IT KEEPS ITS DISTANCE AND IT DOES NOT MISS MUCH.',
   deputy: 'A GRUB THAT FELL OUT OF ITS CELL TOO EARLY AND WAS RAISED BY A WESTERN ON A TV IN THE BREAK ROOM. IT FOUND A HAT, A BANDANA AND A PISTOL THAT ONLY SHOOTS RAINBOWS. THEY RIDE IN POSSES. THEY ARE KNEE HIGH, SO AIM DOWN.',
+  blasthead: 'A HEAD. JUST A HEAD. NOBODY HAS FOUND THE REST OF IT AND IT DOES NOT SEEM TO MISS IT. IT FLOATS, IT GRINS, AND THE FUSE ON TOP IS ALWAYS LIT. IT FLIES STRAIGHT AT YOU AND GOES OFF. SHOOT IT FIRST AND IT GOES OFF WHERE IT IS, WHICH IS VERY BAD NEWS FOR WHOEVER IS STANDING NEXT TO IT.',
   withered: 'ONCE HE RULED A HIVE OF TEN THOUSAND. NOW HE RULES A HUSK. HE HAS BEEN DRYING OUT IN THE DEEP COMB FOR LONGER THAN ANYONE CAN COUNT, AND HE STILL WANDERS UP NOW AND THEN TO SEE WHO IS IN CHARGE. HE SPITS THE DUST OF HIS OLD KINGDOM. HE IS SLOW. HE IS VERY HARD TO KILL. HIS CROWN STILL FITS. MOSTLY.',
   relentless: 'NOBODY KNOWS WHAT IS INSIDE THE ARMOR. NOBODY HAS EVER GOT IT OPEN. IT DOES NOT SLEEP, IT DOES NOT EAT, IT DOES NOT STOP. BULLETS KNOCK IT BACK A STEP. A PARRY KNOCKS IT BACK A FEW MORE. IT CANNOT ENTER THE HONEY LOUNGE, AND IT LEAVES WHEN YOU DO.',
   sabrematon: 'A LANKY BRASS MACHINE BUILT TO DUEL, WITH A SWORD WHERE ITS MANNERS SHOULD BE. IT LUNGES ACROSS THE ROOM, THROWS ITS BLADE WHEN YOU KEEP YOUR DISTANCE, AND AT HALF HEALTH ITS VISOR TURNS RED AND IT STOPS BEING POLITE. PARRY THE THROWN SWORD. IT HATES THAT.',

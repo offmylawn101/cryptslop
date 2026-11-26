@@ -23,9 +23,12 @@ export const GUNS = {
   blunder: { name: 'BLUNDERBUSS', pellets: 22, dmg: 0.6, rate: 0.6, spread: 2.1, mag: 3 },
   // a wish (NEOLIONATCHICAGO): a shotgun that fires like a machine gun and never runs out. Rolled on its own (see rollWeapon), never from GUN_IDS
   forever: { name: 'FOREVER SHOTGUN', pellets: 4, dmg: 0.3, rate: 6.5, spread: 1.4, mag: 99, inf: true },
+  // a wish (aniri18runner, Emi676Nairobi): a super cool gun. Tight, fast, hits hard. Rolled on its own dice too (wishbatch16.js)
+  cool: { name: 'SUPER COOL GUN', pellets: 5, dmg: 1.45, rate: 1.7, spread: 0.45, mag: 10, own: true },
 };
-export const GUN_IDS = Object.keys(GUNS).filter((k) => !GUNS[k].inf);
+export const GUN_IDS = Object.keys(GUNS).filter((k) => !GUNS[k].inf && !GUNS[k].own);
 export const FOREVER_CHANCE = 0.1; // of RARE and better guns
+export const COOL_CHANCE = 0.08; // of RARE and better guns that are not FOREVER
 // the other classes' signature weapons: one noun list each
 const KINDS = {
   batter: ['BAT', 'CLUB', 'PADDLE', 'MALLET', 'STICK'],
@@ -62,6 +65,7 @@ export function rollWeapon(seed, floor, cls, minRarity = 0) {
     w.arch = GUN_IDS[Math.floor(R() * GUN_IDS.length)];
     w.dmg = q * jitter(); w.speed = (0.9 + 0.1 * q) * jitter(); w.size = 0.8 + R() * 0.4; w.extra = Math.floor(R() * (1 + rarity));
     if (rarity >= 1 && rng((seed ^ 0x5f0e7e12) >>> 0)() < FOREVER_CHANCE) { w.arch = 'forever'; w.extra = 0; } // its own dice, so every other roll stays the same
+    else if (rarity >= 1 && rng((seed ^ 0x0c001c00) >>> 0)() < COOL_CHANCE) w.arch = 'cool'; // THE SUPER COOL GUN: its own dice as well
   } else {
     w.dmg = q * jitter(); w.speed = (0.9 + 0.1 * q) * jitter(); w.size = (0.95 + 0.05 * q) * jitter(); w.extra = rarity >= 2 ? Math.floor(R() * rarity) : 0;
   }
