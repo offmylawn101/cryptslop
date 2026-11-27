@@ -29,6 +29,7 @@ export const GUNS = {
 export const GUN_IDS = Object.keys(GUNS).filter((k) => !GUNS[k].inf && !GUNS[k].own);
 export const FOREVER_CHANCE = 0.1; // of RARE and better guns
 export const COOL_CHANCE = 0.08; // of RARE and better guns that are not FOREVER
+export const ONE_HIT_CHANCE = 0.08; // of EPIC and better weapons, any class: THE ONE-HITTER (a wish, simplymikakain. wishbatch17.js)
 // the other classes' signature weapons: one noun list each
 const KINDS = {
   batter: ['BAT', 'CLUB', 'PADDLE', 'MALLET', 'STICK'],
@@ -78,6 +79,8 @@ export function rollWeapon(seed, floor, cls, minRarity = 0) {
   const sig = w.perks.find((p) => PERKS[p].tier === 3);
   if (sig) w.name = `${PERKS[sig].name} ${noun}${rarity >= 4 ? ` ${SUF[Math.floor(R() * SUF.length)]}` : ''}`; // a signature weapon is named for it
   w.power = Math.round((w.power + 0.25 * w.perks.length + (sig ? 0.4 : 0)) * 100) / 100;
+  // THE ONE-HITTER: its own dice, rolled last, so every other roll stays the same
+  if (rarity >= 2 && rng((seed ^ 0x1417a0e5) >>> 0)() < ONE_HIT_CHANCE) { w.oneHit = true; w.name = `ONE-HITTER ${noun}`; w.power = Math.round((w.power + 1) * 100) / 100; }
   return w;
 }
 
@@ -103,7 +106,8 @@ export function applyGun(ws, w) {
 export function describeWeapon(w) {
   const perks = perkLine(w);
   const base = describeStats(w);
-  return perks ? `${base}  |  ${perks}` : base;
+  const line = perks ? `${base}  |  ${perks}` : base;
+  return w.oneHit ? `${line}  |  ONE HIT KILLS, THEN 4S TO RECOVER` : line;
 }
 function describeStats(w) {
   const pct = (v) => `${v >= 1 ? '+' : ''}${Math.round((v - 1) * 100)}%`;

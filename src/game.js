@@ -31,6 +31,7 @@ import { installWishBatch13Client } from './wishbatch13.js';
 import { installWishBatch14Client } from './wishbatch14.js';
 import { installWishBatch15Client } from './wishbatch15.js';
 import { installWishBatch16Client } from './wishbatch16.js';
+import { installWishBatch17Client } from './wishbatch17.js';
 import { installPerks } from './perks.js';
 import { installQuests } from './quests.js';
 import { installParryFx } from './parryfx.js';
@@ -2949,6 +2950,7 @@ installWishBatch13Client(Game, UI); // the thirteenth batch: THE BANANA, THE DUN
 installWishBatch15Client(Game, UI); // the fifteenth batch: the LICKING BUTTON, MILK THE CAT, THE BALLER, THE COURT, THE POLYESTER MAN, THE WITHERED KING (wishbatch15.js)
 installWishBatch14Client(Game); // the fourteenth batch: THE RELENTLESS, BOB, BUZZBY'S CHAINSAW, HONEY GROOVE (wishbatch14.js)
 installWishBatch16Client(Game, UI); // the sixteenth batch: PRIDE MODE, THE GOON CORNER, THE FAKE DOOR, THE PEE BUTTON, THE ROOKIE REGIME, THE SUMMIT, RAIL RUNNER, BACON, THE BLASTHEAD, REWIND, THE SUPER COOL GUN (wishbatch16.js)
+installWishBatch17Client(Game, UI); // the seventeenth batch: THE ONE-HITTER, AN ELEMENT OF YOUR CHOICE, THE STRONGEST KICK, THE ONE IN TEN THOUSAND (wishbatch17.js)
 installShapeFx(Game); // explosions are spheres, slams are rings on the ground: no particles (shapefx.js)
 installWishes(Game, UI); // the PETITION BEE: players wish for what chat builds next (wishes.js)
 installSaber(Game); // the LIGHT SABER (saber.js)
